@@ -1,0 +1,24 @@
+/**
+ * AAF Framework - Custom styles
+ * Brand colors from AAF Visual guidelines
+ */
+
+:root {
+  --aaf-structure-white: #FFFFFF;
+  --aaf-terminal-black: #000000;
+  --aaf-scaffold-grey: #F0F2F5;
+  --aaf-iron-grey: #586069;
+  --aaf-probabilistic-purple: #8A2BE2;
+  --aaf-deterministic-blue: #007BFF;
+}
+
+/* Primary color overrides - apply AAF palette */
+[data-theme='light'] {
+  --ifm-color-primary: var(--aaf-deterministic-blue);
+  --ifm-color-primary-dark: #0062cc;
+  --ifm-color-primary-darker: #005cbf;
+  --ifm-color-primary-darkest: #004c9e;
+  --ifm-color-primary-light: #1a8cff;
+  --ifm-color-primary-lighter: #2694ff;
+  --ifm-color-primary-lightest: #4da9ff;
+}
