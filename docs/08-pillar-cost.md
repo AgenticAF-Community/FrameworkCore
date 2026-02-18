@@ -3,7 +3,7 @@ title: "Pillar 3: Cost Optimization"
 sidebar_position: 8
 ---
 
-## 
+![The Model Router: Precision Economics for Agentic Loops](./assets/cost-optimisation-pillar.png)
 
 ## **Pillar 3: Cost Optimization**
 

@@ -4,15 +4,22 @@
 const config = {
   title: 'The Agentic Architecture Framework',
   tagline: 'A governance-first architecture for agentic AI systems',
-  favicon: '/img/aaf-logo.png',
+  favicon: '/img/aaf-favicon.png',
 
-  url: 'https://agenticaf-community.github.io',
-  baseUrl: '/FrameworkCore/',
+  // Production: agenticaf.io (Vercel); preview uses VERCEL_URL
+  url: process.env.VERCEL
+    ? (process.env.VERCEL_ENV === 'production' ? 'https://agenticaf.io' : `https://${process.env.VERCEL_URL}`)
+    : 'https://agenticaf.io',
+  baseUrl: '/',
 
   organizationName: 'AgenticAF-Community',
   projectName: 'FrameworkCore',
-  deploymentBranch: 'gh-pages',
   trailingSlash: false,
+
+  // Kit landing page for gated PDF download
+  customFields: {
+    pdfDownloadUrl: process.env.PDF_DOWNLOAD_URL || 'https://agentic-architecture-framework.kit.com/fc548b5d10',
+  },
 
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
@@ -53,6 +60,8 @@ const config = {
         logo: {
           alt: 'Agentic Architecture Framework',
           src: '/img/aaf-logo.png',
+          width: 200,
+          height: 44,
         },
         items: [
           {
@@ -86,6 +95,10 @@ const config = {
                 label: 'GitHub',
                 href: 'https://github.com/AgenticAF-Community/FrameworkCore',
               },
+              {
+                label: 'License',
+                href: 'https://github.com/AgenticAF-Community/FrameworkCore/blob/main/LICENSE',
+              },
             ],
           },
           {
@@ -102,7 +115,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} AgenticAF Community. Licensed under CC BY 4.0.`,
+        copyright: `Copyright © ${new Date().getFullYear()} AgenticAF Community. Licensed under CC BY-NC 4.0 (non-commercial).`,
       },
       metadata: [
         { name: 'description', content: 'Agentic Architecture Framework: vendor-agnostic guide to AI agent architecture' },

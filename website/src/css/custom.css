@@ -12,6 +12,13 @@
   --aaf-deterministic-blue: #007BFF;
 }
 
+/* Larger navbar logo for clarity */
+.navbar__logo img {
+  height: 44px !important;
+  width: auto !important;
+  max-height: 44px;
+}
+
 /* Primary color overrides - apply AAF palette */
 [data-theme='light'] {
   --ifm-color-primary: var(--aaf-deterministic-blue);

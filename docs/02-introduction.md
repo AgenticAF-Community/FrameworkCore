@@ -10,6 +10,8 @@ sidebar_position: 2
 
 Agentic systems are rapidly becoming the default shape of applied AI: software that can interpret context, plan, call tools, observe outcomes, and iterate toward completion. The moment a system crosses that line, from producing text to initiating actions—it stops being “an LLM feature” and becomes a production software system with an expanded risk profile: larger attack surface, higher operational complexity, and materially greater blast radius when things go wrong.
 
+![The Epistemic Gate: Turning AI Probability into Production Authority](./assets/section-1-epistemic-gate.png)
+
 This white paper introduces the Agentic Architecture Framework: a practical method for designing agentic systems that are safe, reliable, efficient, and governable in real environments. It is intentionally influenced by “well-architected” discipline from cloud engineering—not because agents are “cloud workloads,” but because the failure pattern is identical: when teams neglect foundational architectural pillars, systems become brittle, expensive, and hard to operate at scale. AWS describes this explicitly: neglecting core pillars makes it challenging to build systems that deliver on expectations and requirements. 
 
 ### **1.1 Why This Is Now a Systems Problem (Not a Model Problem)**

@@ -26,9 +26,9 @@ We welcome feedback and contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) fo
 
 ## License
 
-This work is licensed under [CC BY 4.0](LICENSE). You may share and adapt the framework with attribution.
+This work is licensed under [CC BY-NC 4.0](LICENSE) (non-commercial). You may share and adapt the framework with attribution; commercial use of the framework document itself is not permitted.
 
 ## Links
 
-- **Website:** https://agenticaf-community.github.io/FrameworkCore/
+- **Website:** https://agenticaf.io
 - **Repository:** [github.com/AgenticAF-Community/FrameworkCore](https://github.com/AgenticAF-Community/FrameworkCore)

@@ -81,7 +81,7 @@ Multi-agent implies multiple loci of decision-making coordinating via messages o
 
 Most “agent failures” in practice are autonomy failures. Teams unknowingly grant too much autonomy without corresponding validation and governance.
 
-(Insert graphic) 
+![The AAF Autonomy Spectrum: Scaling Agency with Governance](./assets/aaf-autonomy-spectrum-v1.png) 
 
 A practical taxonomy that maps directly to architecture controls:
 
@@ -120,6 +120,8 @@ This autonomy spectrum is foundational to the framework. Many controls (security
 ### **2.5 The Architecture of Epistemic Gates (Why Probabilistic Output Becomes “Authority”)**
 
 To build agents safely, we need to explicitly model a core risk: probabilistic outputs are frequently interpreted by humans as deterministic answers. Unless the system is designed to prevent it, probability quietly becomes authority.
+
+![The Epistemic Gate: Turning AI Probabilities into Production Authority](./assets/aaf-epistemic-gates-v1.png)
 
 This is the purpose of epistemic gates:
 

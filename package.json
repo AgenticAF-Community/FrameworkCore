@@ -1,0 +1,11 @@
+{
+  "name": "aaf-framework",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:pdf": "node scripts/build-pdf.js"
+  },
+  "devDependencies": {
+    "md-to-pdf": "^5.2.5"
+  }
+}

@@ -11,6 +11,8 @@ sidebar_position: 1
 
 Agentic AI is crossing the threshold from experimentation to operational infrastructure. The moment an AI system can take initiative, call tools, and operate over time, it stops being “a model that produces text” and becomes a probabilistic control system embedded inside real environments—email, calendars, codebases, CRMs, payment systems, production deployments.
 
+![The Blueprint: Agentic Architecture Framework (v1)](./assets/primer-aaf-overview.png)
+
 That shift changes the dominant failure mode.
 
 Most high-impact failures in AI systems do not happen because the model is probabilistic. They happen because probabilistic outputs are treated as deterministic truth—and are allowed to cross the line into actions, permissions, and decisions without sufficient validation. That is a systems design failure.

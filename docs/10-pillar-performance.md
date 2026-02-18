@@ -40,6 +40,8 @@ This is a critical performance lesson:
 
 ### **9.2 Topology Selection: When Single-Agent Is Faster (and When Multi-Agent Helps)**
 
+![Topology Trade-offs: Orchestration vs. Chaos](./assets/aaf-topology-tradeoffs-v1.png)
+
 #### **9.2.1 Single-agent systems as the default baseline**
 
 For many production workloads, a single well-instrumented agent with good tool access is the best performance foundation because it minimizes:

@@ -1,0 +1,7 @@
+{
+  "name": "aaf-framework",
+  "buildCommand": "cd website && npm ci && npm run build",
+  "outputDirectory": "website/build",
+  "framework": null,
+  "installCommand": "cd website && npm ci"
+}

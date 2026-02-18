@@ -36,6 +36,8 @@ This creates a layered control model: AGENTS.md guides how the agent works in a 
 
 ### **A.1 Architecture pattern: Policy Supervisor + Workers**
 
+![Anatomy of Governed Multi-Agent Orchestration](./assets/anatomy-multiagent-v1.png)
+
 Supervisor (Master) agent responsibilities
 
 * Reads the Agent Control Contract (ACC) and treats it as binding.

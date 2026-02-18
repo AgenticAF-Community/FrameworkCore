@@ -4,12 +4,19 @@ website/node_modules/
 
 # Build
 website/build/
+website/static/pdf/
 .docusaurus/
 
 # Env
 .env
 .env.local
 .env.*.local
+
+# Vercel link (project id)
+.vercel
+
+# Deploy script contains hardcoded token
+scripts/deploy-vercel.sh
 
 # IDE
 .idea/

@@ -3,7 +3,7 @@ title: "Pillar 1: Security Architecture"
 sidebar_position: 6
 ---
 
-## 
+![AAF Security: The Tool Gateway Pattern](./assets/security-pillar-graphic.png)
 
 # **Pillar 1: Security Architecture**
 
