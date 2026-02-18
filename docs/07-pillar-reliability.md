@@ -3,7 +3,7 @@ title: "Pillar 2: Reliability"
 sidebar_position: 7
 ---
 
-## 
+![Reliability: The Verification Checkpoint](./assets/reliability-pillar.png)
 
 # **Pillar 2: Reliability**
 

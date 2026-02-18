@@ -3,7 +3,7 @@ title: "Cross-Cutting Foundation: Context Optimization"
 sidebar_position: 12
 ---
 
-## 
+![The Curated Backpack: Context Optimization for AI Agents](./assets/context-optimisation.png)
 
 # **Cross-Cutting Foundation: Context Optimization**
 

@@ -3,7 +3,7 @@ title: "Pillar 4: Operational Excellence"
 sidebar_position: 9
 ---
 
-## 
+![The Observable Trace: Operational Excellence in Agentic Systems](./assets/operational-excellence.png)
 
 ## **Pillar 4: Operational Excellence**
 

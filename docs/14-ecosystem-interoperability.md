@@ -3,7 +3,7 @@ title: "Ecosystem and Interoperability"
 sidebar_position: 14
 ---
 
-## 
+![Ecosystem and Interoperability](./assets/ecosystem.png)
 
 # **Ecosystem and Interoperability**
 

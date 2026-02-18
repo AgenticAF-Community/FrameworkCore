@@ -3,6 +3,8 @@ title: "Pillar 6: Sustainability"
 sidebar_position: 11
 ---
 
+![The Compute Filter: Engineering Sustainable AI Agents](./assets/sustainability-pillar.png)
+
 # **Pillar 6: Sustainability**
 
 (Design agentic systems that scale responsibly: measure footprint, reduce waste, and govern compute like a shared resource)
