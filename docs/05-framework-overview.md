@@ -169,6 +169,8 @@ Most organizations should start with low autonomy (assistive, human-approved) an
 
 This aligns with the principle that epistemic and autonomy gates must scale with risk: low-stakes workloads can tolerate lighter gates, but high-stakes workloads require strong and unavoidable ones.
 
+For **usage patterns**, **MCP server and skills**, and the **AAF Posture Review and Reporting** CLI (codebase alignment report), see *How to Apply the Framework in Practice* (Section 15).
+
 ### **4.5 A Note on Ecosystem Alignment (Protocols vs Architecture)**
 
 The framework is designed to remain compatible with emerging protocols and standards for agent interoperability, but it intentionally sits “above” them. Protocols (e.g., agent-to-agent messaging, tool discovery mechanisms) enable coordination; architecture governs how that coordination is secured, observed, budgeted, and verified.
