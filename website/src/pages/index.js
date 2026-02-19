@@ -2,6 +2,7 @@ import React from 'react';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
+import HomepageStats from '../components/HomepageStats';
 
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
@@ -42,6 +43,8 @@ export default function Home() {
             Download Full PDF
           </a>
         </div>
+
+        <HomepageStats />
 
         <div style={{ fontSize: '0.9rem', color: 'var(--ifm-font-color-secondary)', maxWidth: '600px', margin: '0 auto 3rem', lineHeight: 1.6 }}>
           <strong>License (CC BY-NC 4.0):</strong> You may share and use this framework for non-commercial purposes. 

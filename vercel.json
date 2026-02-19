@@ -3,5 +3,11 @@
   "buildCommand": "cd website && npm ci && npm run build",
   "outputDirectory": "website/build",
   "framework": null,
-  "installCommand": "cd website && npm ci"
+  "installCommand": "npm ci",
+  "crons": [
+    {
+      "path": "/api/refresh-stats",
+      "schedule": "0 12 * * *"
+    }
+  ]
 }

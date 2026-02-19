@@ -50,7 +50,62 @@
     .summary .found .n { color: #0d6832; }
     .summary .not-found .n { color: #721c24; }
     .summary .unclear .n { color: #856404; }
-    .container { max-width: 960px; margin: 0 auto; padding: 0 1.25rem 1.25rem; }
+    .scorecard {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      padding: 1rem 1.25rem;
+      background: var(--aaf-white);
+      border-bottom: 1px solid #e0e0e0;
+      flex-wrap: wrap;
+    }
+    .score-overall {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .score-circle {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 50%;
+      background: var(--aaf-primary);
+      color: var(--aaf-white);
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .score-circle.grade-a { background: #0d6832; }
+    .score-circle.grade-b { background: #1e7e34; }
+    .score-circle.grade-c { background: #856404; }
+    .score-circle.grade-d { background: #b94a00; }
+    .score-circle.grade-f { background: #721c24; }
+    .score-label { font-size: 0.85rem; color: var(--aaf-iron); }
+    .score-grade { font-size: 1.1rem; font-weight: 600; color: var(--aaf-black); }
+    .score-pillars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .pillar-score-dot {
+      display: inline-block;
+      width: 1.75rem;
+      padding: 0.2rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-align: center;
+      background: #e8e8e8;
+      color: var(--aaf-iron);
+    }
+    .pillar-score-dot.hi { background: #d4edda; color: #155724; }
+    .pillar-score-dot.mid { background: #fff3cd; color: #856404; }
+    .pillar-score-dot.lo { background: #f8d7da; color: #721c24; }
+    .container { max-width: 100%; width: 100%; margin: 0; padding: 0 1.25rem 1.25rem; }
+    .pillars-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
     .disclaimer {
       padding: 0.4rem 0.6rem;
       margin: 0.75rem 0;
@@ -63,7 +118,7 @@
     .pillar {
       background: var(--aaf-white);
       border-radius: 6px;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0;
       border: 1px solid #e5e5e5;
       overflow: hidden;
     }
@@ -123,6 +178,18 @@
       text-align: center;
     }
     .footer a { color: var(--aaf-primary); }
+    @media (max-width: 900px) {
+      .pillars-grid { grid-template-columns: 1fr; }
+      .scorecard { flex-direction: column; align-items: flex-start; }
+    }
+    @media print {
+      body { background: white; }
+      .header, .score-circle { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .pillar { box-shadow: none; break-inside: avoid; }
+      .pillar.collapsed .pillar-body { display: block; }
+      .pillar-head { cursor: default; }
+      .container { padding: 0 0.5rem; }
+    }
   </style>
 </head>
 <body>
@@ -136,11 +203,31 @@
     <span class="unclear"><span class="n">8</span> unclear</span>
     <span>→ <strong>Focus on not found / unclear to action</strong></span>
   </div>
+  <div class="scorecard">
+    <div class="score-overall">
+      <div class="score-circle grade-c">68</div>
+      <div>
+        <div class="score-grade">Grade C — Needs work</div>
+        <div class="score-label">Overall posture · 68 checks (found + ½ unclear)</div>
+      </div>
+    </div>
+    <div class="score-pillars">
+      <span class="pillar-score-dot hi" title="Security Architecture: 75%">75</span>
+      <span class="pillar-score-dot mid" title="Reliability: 62%">62</span>
+      <span class="pillar-score-dot lo" title="Cost Optimization: 25%">25</span>
+      <span class="pillar-score-dot hi" title="Operational Excellence: 100%">100</span>
+      <span class="pillar-score-dot hi" title="Performance Efficiency: 83%">83</span>
+      <span class="pillar-score-dot mid" title="Sustainability: 50%">50</span>
+      <span class="pillar-score-dot mid" title="Context Optimization (cross-cutting): 62%">62</span>
+      <span class="pillar-score-dot lo" title="Autonomy & Outcome Governance (cross-cutting): 25%">25</span>
+    </div>
+  </div>
   <div class="container">
     <div class="disclaimer">Heuristic scan only. Manual review required for production readiness. Use “not found” rows as an action list.</div>
 
+    <div class="pillars-grid">
     <section class="pillar" id="p-security">
-      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Security Architecture</span><span class="count">3/4 found</span><span class="tog"></span></div>
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Security Architecture</span><span class="count">3/4 · 75%</span><span class="tog"></span></div>
       <div class="pillar-body">
         <table>
           <thead><tr><th>Status</th><th>Check</th></tr></thead>
@@ -167,7 +254,7 @@
     </section>
 
     <section class="pillar pillar--cross" id="p-reliability">
-      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Reliability</span><span class="count">2/4 found</span><span class="tog"></span></div>
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Reliability</span><span class="count">2/4 · 62%</span><span class="tog"></span></div>
       <div class="pillar-body">
         <table>
           <thead><tr><th>Status</th><th>Check</th></tr></thead>
@@ -194,7 +281,7 @@
     </section>
 
     <section class="pillar" id="p-cost">
-      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Cost Optimization</span><span class="count">1/4 found</span><span class="tog"></span></div>
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Cost Optimization</span><span class="count">1/4 · 25%</span><span class="tog"></span></div>
       <div class="pillar-body">
         <table>
           <thead><tr><th>Status</th><th>Check</th></tr></thead>
@@ -221,7 +308,7 @@
     </section>
 
     <section class="pillar" id="p-ops">
-      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Operational Excellence</span><span class="count">4/4 found</span><span class="tog"></span></div>
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Operational Excellence</span><span class="count">4/4 · 100%</span><span class="tog"></span></div>
       <div class="pillar-body">
         <table>
           <thead><tr><th>Status</th><th>Check</th></tr></thead>
@@ -236,7 +323,7 @@
     </section>
 
     <section class="pillar" id="p-performance">
-      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Performance Efficiency</span><span class="count">2/3 found</span><span class="tog"></span></div>
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Performance Efficiency</span><span class="count">2/3 · 83%</span><span class="tog"></span></div>
       <div class="pillar-body">
         <table>
           <thead><tr><th>Status</th><th>Check</th></tr></thead>
@@ -250,7 +337,7 @@
     </section>
 
     <section class="pillar" id="p-sustainability">
-      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Sustainability</span><span class="count">1/2 found</span><span class="tog"></span></div>
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Sustainability</span><span class="count">1/2 · 50%</span><span class="tog"></span></div>
       <div class="pillar-body">
         <table>
           <thead><tr><th>Status</th><th>Check</th></tr></thead>
@@ -263,7 +350,7 @@
     </section>
 
     <section class="pillar pillar--cross" id="p-context">
-      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Context Optimization (cross-cutting)</span><span class="count">2/4 found</span><span class="tog"></span></div>
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Context Optimization (cross-cutting)</span><span class="count">2/4 · 62%</span><span class="tog"></span></div>
       <div class="pillar-body">
         <table>
           <thead><tr><th>Status</th><th>Check</th></tr></thead>
@@ -278,7 +365,7 @@
     </section>
 
     <section class="pillar pillar--cross" id="p-autonomy">
-      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Autonomy & Outcome Governance (cross-cutting)</span><span class="count">1/4 found</span><span class="tog"></span></div>
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Autonomy & Outcome Governance (cross-cutting)</span><span class="count">1/4 · 25%</span><span class="tog"></span></div>
       <div class="pillar-body">
         <table>
           <thead><tr><th>Status</th><th>Check</th></tr></thead>
@@ -291,6 +378,7 @@
         </table>
       </div>
     </section>
+    </div>
 
     <footer class="footer">AAF Posture CLI · <a href="https://agenticaf.io" target="_blank" rel="noopener">agenticaf.io</a></footer>
   </div>

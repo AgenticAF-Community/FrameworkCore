@@ -5,7 +5,8 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.25.2",
     "mcp-handler": "^1.0.7",
-    "zod": "^3.23.0"
+    "zod": "^3.23.0",
+    "@vercel/blob": "^0.26.0"
   },
   "scripts": {
     "build:pdf": "node scripts/build-pdf.js",
