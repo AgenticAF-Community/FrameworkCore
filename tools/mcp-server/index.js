@@ -67,7 +67,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: "aaf_get_skill",
       description:
-        "Return the full content of an AAF skill by id. Use when the user needs architecture-review, security, epistemic-gates, or cost-context guidance.",
+        "Return the full content of an AAF skill by id. Use when the user needs architecture-review, security, epistemic-gates, cost-context, cross-cutting, ACC implementation, or orchestration/OCC guidance.",
       inputSchema: {
         type: "object",
         properties: {
@@ -75,7 +75,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
             type: "string",
             enum: VALID_SKILL_IDS,
             description:
-              "Skill id: aaf-architecture-review, aaf-security, aaf-epistemic-gates, aaf-cost-context",
+              "Skill id: aaf-architecture-review, aaf-security, aaf-epistemic-gates, aaf-cost-context, aaf-cross-cutting, aaf-acc-implementation, aaf-orchestration-occ",
           },
         },
         required: ["skillId"],

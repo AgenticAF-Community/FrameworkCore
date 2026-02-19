@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AAF Posture Report — Demo</title>
+  <style>
+    :root {
+      --aaf-primary: #007BFF;
+      --aaf-primary-dark: #0062cc;
+      --aaf-white: #FFFFFF;
+      --aaf-black: #1a1a1a;
+      --aaf-scaffold: #F0F2F5;
+      --aaf-iron: #586069;
+      --aaf-purple: #8A2BE2;
+      --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--aaf-black);
+      background: var(--aaf-scaffold);
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background: linear-gradient(135deg, var(--aaf-primary) 0%, var(--aaf-primary-dark) 100%);
+      color: var(--aaf-white);
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .header h1 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+    .header-meta { font-size: 0.8rem; opacity: 0.9; }
+    .summary {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0.5rem 1.25rem;
+      background: var(--aaf-white);
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 0.8rem;
+    }
+    .summary span { color: var(--aaf-iron); }
+    .summary .n { font-weight: 600; color: var(--aaf-black); }
+    .summary .found .n { color: #0d6832; }
+    .summary .not-found .n { color: #721c24; }
+    .summary .unclear .n { color: #856404; }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 1.25rem 1.25rem; }
+    .disclaimer {
+      padding: 0.4rem 0.6rem;
+      margin: 0.75rem 0;
+      font-size: 0.75rem;
+      color: var(--aaf-iron);
+      background: var(--aaf-white);
+      border-radius: 4px;
+      border: 1px solid #e8e8e8;
+    }
+    .pillar {
+      background: var(--aaf-white);
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+      border: 1px solid #e5e5e5;
+      overflow: hidden;
+    }
+    .pillar--cross { border-left: 3px solid var(--aaf-purple); }
+    .pillar-head {
+      padding: 0.4rem 0.75rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--aaf-primary-dark);
+      background: #fafafa;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pillar-head:hover { background: #f5f5f5; }
+    .pillar-head .count { font-weight: 400; color: var(--aaf-iron); font-size: 0.8rem; }
+    .pillar-body { padding: 0; }
+    .pillar.collapsed .pillar-body { display: none; }
+    .pillar.collapsed .pillar-head .tog::after { content: '▶'; }
+    .pillar-head .tog::after { content: '▼'; font-size: 0.7rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    th { text-align: left; padding: 0.35rem 0.75rem; font-weight: 600; color: var(--aaf-iron); background: #fafafa; border-bottom: 1px solid #eee; }
+    th { width: 5rem; }
+    td { padding: 0.35rem 0.75rem; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr.action td { background: #fffef5; }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .badge--found { background: #d4edda; color: #155724; }
+    .badge--not-found { background: #f8d7da; color: #721c24; }
+    .badge--unclear { background: #fff3cd; color: #856404; }
+    .evidence {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--aaf-iron);
+      margin-top: 0.2rem;
+    }
+    .action-hint {
+      font-size: 0.7rem;
+      color: var(--aaf-iron);
+      margin-top: 0.2rem;
+    }
+    .action-hint strong { color: var(--aaf-primary-dark); }
+    .footer {
+      margin-top: 1rem;
+      padding-top: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--aaf-iron);
+      text-align: center;
+    }
+    .footer a { color: var(--aaf-primary); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>AAF Posture Report</h1>
+    <span class="header-meta">/Users/me/my-agent · 847 files · 2025-02-19 14:32</span>
+  </header>
+  <div class="summary">
+    <span class="found"><span class="n">42</span> found</span>
+    <span class="not-found"><span class="n">18</span> not found</span>
+    <span class="unclear"><span class="n">8</span> unclear</span>
+    <span>→ <strong>Focus on not found / unclear to action</strong></span>
+  </div>
+  <div class="container">
+    <div class="disclaimer">Heuristic scan only. Manual review required for production readiness. Use “not found” rows as an action list.</div>
+
+    <section class="pillar" id="p-security">
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Security Architecture</span><span class="count">3/4 found</span><span class="tog"></span></div>
+      <div class="pillar-body">
+        <table>
+          <thead><tr><th>Status</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge--found">Found</span></td>
+              <td>Are all entry points authenticated and authorized?<div class="evidence">src/middleware/auth.ts</div></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge--found">Found</span></td>
+              <td>Are tool scopes least privilege?<div class="evidence">lib/gateway.ts</div></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge--not-found">Not found</span></td>
+              <td>Are write actions gated and verified?<div class="action-hint"><strong>Action:</strong> Add a single tool gateway; require approval for write/irreversible. See docs/06-pillar-security.md</div></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge--found">Found</span></td>
+              <td>Are untrusted inputs (including retrieved content) treated as hostile?<div class="evidence">src/sanitize.ts</div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="pillar pillar--cross" id="p-reliability">
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Reliability</span><span class="count">2/4 found</span><span class="tog"></span></div>
+      <div class="pillar-body">
+        <table>
+          <thead><tr><th>Status</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge--found">Found</span></td>
+              <td>Is success defined as a verifiable end state?<div class="evidence">tests/outcome_harness.js</div></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge--found">Found</span></td>
+              <td>Are tool failures expected and handled?<div class="evidence">lib/toolRunner.ts (try/catch, retry)</div></td>
+            </tr>
+            <tr class="action">
+              <td><span class="badge badge--not-found">Not found</span></td>
+              <td>Are actions idempotent or checkpointed?<div class="action-hint"><strong>Action:</strong> Add idempotency keys or checkpoint/resume for long runs. docs/07-pillar-reliability.md</div></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge--unclear">Unclear</span></td>
+              <td>Are retries safe?<div class="action-hint"><strong>Action:</strong> Confirm retry logic is non-destructive and bounded. Manual check.</div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="pillar" id="p-cost">
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Cost Optimization</span><span class="count">1/4 found</span><span class="tog"></span></div>
+      <div class="pillar-body">
+        <table>
+          <thead><tr><th>Status</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr class="action">
+              <td><span class="badge badge--not-found">Not found</span></td>
+              <td>Are budgets enforced at runtime?<div class="action-hint"><strong>Action:</strong> Add max_steps, max_tokens, or spend limits. docs/08-pillar-cost.md</div></td>
+            </tr>
+            <tr class="action">
+              <td><span class="badge badge--not-found">Not found</span></td>
+              <td>Is model routing explicit by phase and risk?<div class="action-hint"><strong>Action:</strong> Route planner vs executor; escalate high-risk to stronger model.</div></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge--found">Found</span></td>
+              <td>Is context budgeted (no uncontrolled prompt accumulation)?<div class="evidence">config/context_limits.json</div></td>
+            </tr>
+            <tr class="action">
+              <td><span class="badge badge--not-found">Not found</span></td>
+              <td>Are caching and early stopping designed in?<div class="action-hint"><strong>Action:</strong> Add prompt caching; stop on verification success. docs/08-pillar-cost.md</div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="pillar" id="p-ops">
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Operational Excellence</span><span class="count">4/4 found</span><span class="tog"></span></div>
+      <div class="pillar-body">
+        <table>
+          <thead><tr><th>Status</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge--found">Found</span></td><td>Is the full loop observable (observe → decide → act → verify)?<div class="evidence">observability/trace.ts</div></td></tr>
+            <tr><td><span class="badge badge--found">Found</span></td><td>Is there an evaluation harness and regression suite?<div class="evidence">tests/e2e/</div></td></tr>
+            <tr><td><span class="badge badge--found">Found</span></td><td>Is rollout staged with rollback?<div class="evidence">.github/workflows/deploy.yml (canary)</div></td></tr>
+            <tr><td><span class="badge badge--found">Found</span></td><td>Are skills/tools versioned and reviewed?<div class="evidence">tools/README.md, CHANGELOG</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="pillar" id="p-performance">
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Performance Efficiency</span><span class="count">2/3 found</span><span class="tog"></span></div>
+      <div class="pillar-body">
+        <table>
+          <thead><tr><th>Status</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge--found">Found</span></td><td>Is topology justified by task structure (single-agent by default)?<div class="evidence">docs/architecture.md</div></td></tr>
+            <tr><td><span class="badge badge--found">Found</span></td><td>Are tool round trips minimized?<div class="evidence">lib/batch.ts</div></td></tr>
+            <tr class="action"><td><span class="badge badge--unclear">Unclear</span></td><td>Is work partitioned into interactive vs batch?<div class="action-hint"><strong>Action:</strong> Confirm partitioning; manual check. docs/10-pillar-performance.md</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="pillar" id="p-sustainability">
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Sustainability</span><span class="count">1/2 found</span><span class="tog"></span></div>
+      <div class="pillar-body">
+        <table>
+          <thead><tr><th>Status</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge--found">Found</span></td><td>Is usage measured and visible?<div class="evidence">observability/metrics.ts</div></td></tr>
+            <tr class="action"><td><span class="badge badge--not-found">Not found</span></td><td>Are efficiency levers used as defaults (minimal context, concise outputs, bounded loops)?<div class="action-hint"><strong>Action:</strong> Set defaults for context caps and output length. docs/11-pillar-sustainability.md</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="pillar pillar--cross" id="p-context">
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Context Optimization (cross-cutting)</span><span class="count">2/4 found</span><span class="tog"></span></div>
+      <div class="pillar-body">
+        <table>
+          <thead><tr><th>Status</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge--found">Found</span></td><td>Is context separated from memory (task-scoped vs durable)?<div class="evidence">lib/context.ts (ephemeral vs store)</div></td></tr>
+            <tr><td><span class="badge badge--found">Found</span></td><td>Is context budgeted per task/step with explicit allocations?<div class="evidence">config/context_limits.json</div></td></tr>
+            <tr class="action"><td><span class="badge badge--not-found">Not found</span></td><td>Is provenance tracked (trusted policy vs untrusted data)?<div class="action-hint"><strong>Action:</strong> Tag sources; separate system policy from user/retrieved content. docs/12-context-optimization.md</div></td></tr>
+            <tr class="action"><td><span class="badge badge--unclear">Unclear</span></td><td>Is retrieval/context construction minimal and explainable?<div class="action-hint"><strong>Action:</strong> Review what gets injected into each step; cap size.</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="pillar pillar--cross" id="p-autonomy">
+      <div class="pillar-head" onclick="this.closest('.pillar').classList.toggle('collapsed')"><span>Autonomy & Outcome Governance (cross-cutting)</span><span class="count">1/4 found</span><span class="tog"></span></div>
+      <div class="pillar-body">
+        <table>
+          <thead><tr><th>Status</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr class="action"><td><span class="badge badge--not-found">Not found</span></td><td>Is autonomy level declared (assistive, delegated, bounded autonomous, supervisory)?<div class="action-hint"><strong>Action:</strong> Add ACC or config declaring autonomy per workflow. docs/13-autonomy-governance.md</div></td></tr>
+            <tr><td><span class="badge badge--found">Found</span></td><td>Is there a Definition of Done with acceptance checks and evidence per task class?<div class="evidence">tests/outcome_harness.js</div></td></tr>
+            <tr class="action"><td><span class="badge badge--not-found">Not found</span></td><td>Are budgets (steps/tools/tokens/time/spend) enforced and visible?<div class="action-hint"><strong>Action:</strong> Enforce and expose budgets in runtime config.</div></td></tr>
+            <tr class="action"><td><span class="badge badge--not-found">Not found</span></td><td>Are escalation triggers and degraded modes defined?<div class="action-hint"><strong>Action:</strong> Define when to stop/escalate; read-only fallback. docs/13-autonomy-governance.md</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="footer">AAF Posture CLI · <a href="https://agenticaf.io" target="_blank" rel="noopener">agenticaf.io</a></footer>
+  </div>
+  <script>
+    document.querySelectorAll('.pillar-head').forEach(h => {
+      h.addEventListener('click', () => h.closest('.pillar').classList.toggle('collapsed'));
+    });
+  </script>
+</body>
+</html>

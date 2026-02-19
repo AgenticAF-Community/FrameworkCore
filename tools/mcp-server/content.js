@@ -16,6 +16,9 @@ const VALID_SKILL_IDS = [
   "aaf-security",
   "aaf-epistemic-gates",
   "aaf-cost-context",
+  "aaf-cross-cutting",
+  "aaf-acc-implementation",
+  "aaf-orchestration-occ",
 ];
 
 function safeReadFile(filePath) {

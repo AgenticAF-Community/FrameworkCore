@@ -25,6 +25,9 @@ scripts/deploy-vercel.sh
 *.swo
 .DS_Store
 
+# Generated posture report (run: npm run sync:from-docs; node tools/aaf-posture/cli.js . --format html)
+aaf-posture-report.html
+
 # Logs
 *.log
 npm-debug.log*

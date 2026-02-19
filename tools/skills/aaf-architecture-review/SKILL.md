@@ -57,35 +57,58 @@ A design spec should answer, at minimum:
 
 Apply pillars as structured review lenses. Absence of budgets, verification, and observability is a strong indicator the system is not production-ready.
 
-**Security**
+**Security Architecture**
 
-- [ ] All entry points authenticated and authorized.
-- [ ] Tool scopes least privilege; write actions gated and verified.
-- [ ] Untrusted inputs (including retrieved content) treated as hostile.
+- [ ] Are all entry points authenticated and authorized?
+- [ ] Are tool scopes least privilege?
+- [ ] Are write actions gated and verified?
+- [ ] Are untrusted inputs (including retrieved content) treated as hostile?
 
 **Reliability**
 
-- [ ] Success defined as verifiable end state.
-- [ ] Tool failures expected and handled; actions idempotent or checkpointed; retries safe.
+- [ ] Is success defined as a verifiable end state?
+- [ ] Are tool failures expected and handled?
+- [ ] Are actions idempotent or checkpointed?
+- [ ] Are retries safe?
 
-**Cost**
+**Cost Optimization**
 
-- [ ] Budgets enforced at runtime.
-- [ ] Model routing explicit by phase and risk; context budgeted; caching and early stopping designed.
+- [ ] Are budgets enforced at runtime?
+- [ ] Is model routing explicit by phase and risk?
+- [ ] Is context budgeted (no uncontrolled prompt accumulation)?
+- [ ] Are caching and early stopping designed in?
 
-**Operational excellence**
+**Operational Excellence**
 
-- [ ] Full loop observable (observe → decide → act → verify).
-- [ ] Evaluation harness and regression suite; staged rollout with rollback; skills/tools versioned and reviewed.
+- [ ] Is the full loop observable (observe → decide → act → verify)?
+- [ ] Is there an evaluation harness and regression suite?
+- [ ] Is rollout staged with rollback?
+- [ ] Are skills/tools versioned and reviewed?
 
-**Performance**
+**Performance Efficiency**
 
-- [ ] Topology justified (single-agent by default; orchestration only where it helps).
-- [ ] Tool round trips minimized; work partitioned (interactive vs batch).
+- [ ] Is topology justified by task structure (single-agent by default; orchestration only where it helps)?
+- [ ] Are tool round trips minimized?
+- [ ] Is work partitioned into interactive vs batch?
 
 **Sustainability**
 
-- [ ] Usage measured and visible; efficiency levers as defaults (minimal context, concise outputs, cached prefixes, bounded loops).
+- [ ] Is usage measured and visible?
+- [ ] Are efficiency levers used as defaults (minimal context, concise outputs, cached prefixes, bounded loops)?
+
+**Context Optimization**
+
+- [ ] Is context separated from memory (task-scoped vs durable)?
+- [ ] Is context budgeted per task/step with explicit allocations?
+- [ ] Is provenance tracked (trusted policy vs untrusted data)?
+- [ ] Is retrieval/context construction minimal and explainable?
+
+**Autonomy & Outcome Governance**
+
+- [ ] Is autonomy level declared (assistive, delegated, bounded autonomous, supervisory)?
+- [ ] Is there a Definition of Done with acceptance checks and evidence per task class?
+- [ ] Are budgets (steps/tools/tokens/time/spend) enforced and visible?
+- [ ] Are escalation triggers and degraded modes defined?
 
 ## Maturity model (scaling autonomy safely)
 

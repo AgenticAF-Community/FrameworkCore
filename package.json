@@ -8,7 +8,9 @@
     "zod": "^3.23.0"
   },
   "scripts": {
-    "build:pdf": "node scripts/build-pdf.js"
+    "build:pdf": "node scripts/build-pdf.js",
+    "sync:from-docs": "node tools/scripts/sync-from-docs.js",
+    "install:docs-sync-hook": "node tools/scripts/install-docs-sync-hook.js"
   },
   "devDependencies": {
     "md-to-pdf": "^5.2.5"

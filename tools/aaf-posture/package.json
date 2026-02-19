@@ -1,0 +1,9 @@
+{
+  "name": "aaf-posture",
+  "version": "0.1.0",
+  "description": "CLI that scans a codebase and produces an AAF posture report (alignment with the six pillars)",
+  "type": "module",
+  "main": "index.js",
+  "bin": { "aaf-posture": "./cli.js" },
+  "engines": { "node": ">=18" }
+}

@@ -10,6 +10,9 @@ Prebuilt instruction sets so agents can apply the Agentic Architecture Framework
 | **aaf-security** | Security pillar guidance: boundaries, tool actuation, epistemic gatekeeping, supply chain. | Security design, tool gateway design, prompt-injection mitigations, privilege separation. |
 | **aaf-epistemic-gates** | When/where to place epistemic gates; candidate → validated → authority; gates scale with risk. | Defining validation vs authority, reducing “AI said so” authority, high-stakes decisions. |
 | **aaf-cost-context** | Cost pillar + context optimization; when to apply budgets, model routing, context discipline. | Cost control, context budgeting, model routing, token economics. |
+| **aaf-cross-cutting** | The two cross-cutting foundations: Context Optimization and Autonomy & Outcome Governance. | Context vs memory, context budgeting, autonomy level, Definition of Done, budgets, escalation. |
+| **aaf-acc-implementation** | Implement Agent Control Contracts (ACC): template, where to place in architecture, how ACC differs from AGENTS.md. | Defining workflow governance, policy envelopes, linking AGENTS.md to governance. |
+| **aaf-orchestration-occ** | Build agent orchestration properly: Orchestrator Capability Contract (OCC), governance above orchestration, gateway-only tool invocation. | Choosing/implementing orchestration (graphs, multi-agent), ensuring Tool Gateway is non-bypassable, OCC compliance. |
 
 ## Usage
 
