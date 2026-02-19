@@ -5,7 +5,7 @@ sidebar_position: 0
 
 # THE AGENTIC ARCHITECTURE FRAMEWORK V1.3
 
-## Note from the AFF Working Group Chair, Dave Maddock
+## The intent behind this framework
 
 I'm not writing this as a definitive expert or as the final word on agentic systems. I'm writing it as a practitioner who has spent years operating at the boundary between conceptual architecture and production reality—first as an enterprise cloud architect, and more recently as an AI solution architect. My working belief is simple: when systems evolve faster than our collective understanding, we need frameworks—conceptual scaffolding that helps teams reason, design, and govern effectively, even when the underlying technology is moving beneath our feet.
 
