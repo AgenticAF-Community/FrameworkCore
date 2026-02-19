@@ -3,8 +3,6 @@ title: "Pillar 1: Security Architecture"
 sidebar_position: 6
 ---
 
-![AAF Security: The Tool Gateway Pattern](./assets/security-pillar-graphic.png)
-
 # **Pillar 1: Security Architecture**
 
 (Constrain agency, reduce impact, and prevent probabilistic outputs from becoming unsafe actions)
@@ -18,6 +16,8 @@ The security objective of an agentic system is therefore not “make the model i
 This is an impact-reduction mindset. The UK NCSC makes this point forcefully in their analysis of prompt injection: prompt injection is not the same as SQL injection, and if we treat it as such we will build the wrong mitigations. The right response is designing systems that reduce risk and reduce impact when the model is manipulated. 
 
 This pillar is organized around the major security surfaces introduced by agents: communication boundaries, tool actuation, privilege separation, secrets, and inter-agent trust.
+
+![AAF Security: The Tool Gateway Pattern](./assets/security-pillar-graphic.png)
 
 ### **5.1 Threat Model: What Changes When a System Becomes Agentic**
 

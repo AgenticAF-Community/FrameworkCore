@@ -3,8 +3,6 @@ title: "Pillar 2: Reliability"
 sidebar_position: 7
 ---
 
-![Reliability: The Verification Checkpoint](./assets/reliability-pillar.png)
-
 # **Pillar 2: Reliability**
 
 (Repeatable outcomes under probabilistic reasoning, tool failures, and real-world variability)
@@ -22,6 +20,8 @@ Modern research reinforces this point. ReliabilityBench argues that single-run s
 (3) fault tolerance under injected tool/API failures. ([arxiv.org](https://arxiv.org/abs/2601.06112?utm_source=chatgpt.com)) This aligns directly with how production engineers think: repeatability, robustness, and graceful degradation.
 
 This pillar lays out the architectural considerations required to build agents that behave consistently in practice.
+
+![Reliability: The Verification Checkpoint](./assets/reliability-pillar.png)
 
 ### **6.1 Reliability Starts With a Correct Definition: Outcomes, Not Narratives**
 

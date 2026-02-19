@@ -3,8 +3,6 @@ title: "Cross-Cutting Foundation: Context Optimization"
 sidebar_position: 12
 ---
 
-![The Curated Backpack: Context Optimization for AI Agents](./assets/context-optimisation.png)
-
 # **Cross-Cutting Foundation: Context Optimization**
 
 (Context is the substrate of autonomy: engineer it deliberately, budget it explicitly, and govern it as a risk surface)
@@ -22,6 +20,8 @@ This is why context optimization cannot sit inside a single pillar. It cross-cut
 The architectural objective is:
 
 *Provide the minimum sufficient context for the task, in a controlled and explainable form, while preserving verification signals and preventing unsafe information flow.*
+
+![The Curated Backpack: Context Optimization for AI Agents](./assets/context-optimisation.png)
 
 Anthropic’s context engineering guidance makes the underlying point practical: agent performance and stability is often less about the model and more about the quality, structure, and discipline of the context being supplied to the agent loop. ([anthropic.com](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents?utm_source=chatgpt.com))
 

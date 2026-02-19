@@ -3,8 +3,6 @@ title: "Pillar 6: Sustainability"
 sidebar_position: 11
 ---
 
-![The Compute Filter: Engineering Sustainable AI Agents](./assets/sustainability-pillar.png)
-
 # **Pillar 6: Sustainability**
 
 (Design agentic systems that scale responsibly: measure footprint, reduce waste, and govern compute like a shared resource)
@@ -16,6 +14,8 @@ The sustainability objective for agentic systems can be stated clearly:
 *Minimize environmental impact per unit of useful outcome, and make that impact visible, governable, and improvable over time.*
 
 This pillar is tightly coupled to cost optimization and performance efficiency because the same architectural levers typically drive all three: model choice, token volume, loop depth, tool orchestration, caching, and scheduling. Sustainability also intersects directly with context optimization and autonomy governance: if you allow runaway context and runaway autonomy, you allow runaway compute.
+
+![The Compute Filter: Engineering Sustainable AI Agents](./assets/sustainability-pillar.png)
 
 ### **10.1 Sustainability Starts With Measurement: You Cannot Optimize What You Cannot See**
 

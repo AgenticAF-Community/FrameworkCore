@@ -3,8 +3,6 @@ title: "Pillar 3: Cost Optimization"
 sidebar_position: 8
 ---
 
-![The Model Router: Precision Economics for Agentic Loops](./assets/cost-optimisation-pillar.png)
-
 ## **Pillar 3: Cost Optimization**
 
 (Prevent runaway autonomy, control token economics, and choose the right compute for the job)
@@ -16,6 +14,8 @@ This pillar therefore starts from a hard constraint:
 *Autonomy without budgets is cost volatility by design.*
 
 A well-architected agentic system treats spend as a controlled resource in the same way we treat CPU, memory, or concurrency. The goal is not simply “reduce cost.” The goal is to ensure the system is economically scalable while maintaining reliability and safety.
+
+![The Model Router: Precision Economics for Agentic Loops](./assets/cost-optimisation-pillar.png)
 
 ### **7.1 What Actually Drives Cost in Agentic Systems**
 

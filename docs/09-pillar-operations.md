@@ -3,8 +3,6 @@ title: "Pillar 4: Operational Excellence"
 sidebar_position: 9
 ---
 
-![The Observable Trace: Operational Excellence in Agentic Systems](./assets/operational-excellence.png)
-
 ## **Pillar 4: Operational Excellence**
 
 (Operate agentic systems as living production systems: observable, evaluable, governable, and improvable)
@@ -20,6 +18,8 @@ Operational excellence is the discipline of running agentic systems safely over 
 * and often composed of multiple interacting components (agents, tools, retrieval systems, policy layers).
 
 This pillar exists to ensure that your agent does not degrade into an opaque system that “usually works” until it fails in ways you cannot explain.
+
+![The Observable Trace: Operational Excellence in Agentic Systems](./assets/operational-excellence.png)
 
 The operational objective can be stated clearly:
 

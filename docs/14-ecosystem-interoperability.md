@@ -3,8 +3,6 @@ title: "Ecosystem and Interoperability"
 sidebar_position: 14
 ---
 
-![Ecosystem and Interoperability](./assets/ecosystem.png)
-
 # **Ecosystem and Interoperability**
 
 (Protocols are plumbing; architecture is governance)
@@ -18,6 +16,8 @@ This section clarifies a critical distinction:
 * Agentic architecture defines how those interactions are governed: identity, policy, budgets, verification, and observability.
 
 The Agentic Architecture Framework is intentionally protocol-agnostic. It is designed to remain stable as protocols evolve—because the governance primitives do not change even as the plumbing does.
+
+![Ecosystem and Interoperability](./assets/ecosystem.png)
 
 ### **13.1 Tool Interoperability: MCP as a Standardized Tool/Context Interface**
 
