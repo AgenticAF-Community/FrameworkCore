@@ -3,6 +3,7 @@
   "buildCommand": "cd website && npm ci && npm run build",
   "outputDirectory": "website/build",
   "framework": null,
+  "cleanUrls": true,
   "installCommand": "npm ci",
   "crons": [
     {
