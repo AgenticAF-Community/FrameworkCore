@@ -7,7 +7,7 @@ sidebar_position: 7
 
 (Repeatable outcomes under probabilistic reasoning, tool failures, and real-world variability)
 
-Reliability is where many agentic systems fail in production—not because the model is “bad,” but because the system is built as though the model were deterministic. An agentic system is a loop: Observe → decide → act → verify → outcome\&stop. That loop is probabilistic at the reasoning layer and dependent on external tools and services at the execution layer. Reliability therefore cannot be defined as “the model usually gives the right answer.” It must be defined as:
+Reliability is where many agentic systems fail in production—not because the model is “bad,” but because the system is built as though the model were deterministic. An agentic system executes a control loop: Trigger → Interpret Context → Decide → Act → Observe Results → Verify → [Adapt / Stop]. That loop is probabilistic at the reasoning layer and dependent on external tools and services at the execution layer. Reliability therefore cannot be defined as “the model usually gives the right answer.” It must be defined as:
 
 *The system can achieve intended outcomes repeatedly, under real-world variability, and it fails in controlled, diagnosable ways when it cannot.*
 
@@ -219,7 +219,7 @@ Two complementary practices matter:
 
 OpenAI’s evaluation guidance explicitly calls out that evaluations should test not only output correctness but also whether the agent selects the correct tools and follows required instruction sequences. ([platform.openai.com](https://platform.openai.com/docs/guides/evaluation-best-practices?utm_source=chatgpt.com))
 
-**2\) Observability of intent → plan → act → verify:**
+**2\) Observability trace (intent → plan → act → verify):**
 
 To diagnose failures, you need traces that include:
 

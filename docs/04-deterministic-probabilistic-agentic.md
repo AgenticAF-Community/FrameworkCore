@@ -82,7 +82,7 @@ Their outputs should be treated as candidates that must be validated.
 
 ### **3.3 Agentic Systems: Probabilistic Reasoning Orchestrating Deterministic Execution**
 
-Agents are not “just probabilistic systems.” They are software systems that loop: interpret context → decide → act via tools → observe results → adapt → verify → stop.
+Agents are not “just probabilistic systems.” They are software systems that execute a control loop: Trigger → Interpret Context → Decide → Act → Observe Results → Verify → [Adapt / Stop].
 
 This is why agents are distinct from workflows. 
 

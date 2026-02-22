@@ -9,7 +9,7 @@ sidebar_position: 16
 
 (Governed autonomy is the differentiator)
 
-Agentic systems are not “chatbots with tools.” They are persistent, probabilistic control loops that can observe, decide, and act across real infrastructure. That combination changes the architectural requirements.
+Agentic systems are not “chatbots with tools.” They are persistent, probabilistic control loops that execute the agentic cycle — Trigger → Interpret Context → Decide → Act → Observe Results → Verify → [Adapt / Stop] — across real infrastructure. That combination changes the architectural requirements.
 
 The Agentic Architecture Framework formalizes the discipline required to build these systems well:
 

@@ -204,7 +204,7 @@ Cost Optimization
 
 Operational Excellence
 
-* Is the full loop observable (observe → decide → act → verify)?
+* Is the full control loop observable (Trigger → Decide → Act → Verify), with observability traces (intent → plan → act → verify) captured?
 
 * Is there an evaluation harness and regression suite?
 
@@ -234,7 +234,7 @@ To operate agents safely, teams need a consistent record of what happened during
 
 OpenAI’s Agents SDK describes built-in tracing as collecting a comprehensive record of events during an agent run—including LLM generations, tool calls, handoffs, guardrails, and custom events—and frames tracing as a way to debug, visualize, and monitor workflows in development and production. 
 
-Architecturally, tracing is not an observability “nice to have.” It is how you make probabilistic loops governable:
+Architecturally, tracing is not an observability “nice to have.” It is how you make the agentic control loop governable:
 
 * you can audit what influenced a decision,
 

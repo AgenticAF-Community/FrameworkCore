@@ -29,3 +29,46 @@
   --ifm-color-primary-lighter: #2694ff;
   --ifm-color-primary-lightest: #4da9ff;
 }
+
+/* Compact TOC in right column */
+.table-of-contents {
+  font-size: 0.72rem;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+}
+
+/* Remove sticky on TOC wrapper so Giscus doesn't overlap */
+.col--3 .thin-scrollbar {
+  position: static !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+}
+.table-of-contents li {
+  margin: 0.15rem 0;
+}
+
+/* Giscus sidebar container (right column, below TOC) */
+.giscus-sidebar {
+  margin-top: 0.75rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--ifm-color-emphasis-300);
+}
+.giscus-sidebar__heading {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  padding-top: 0.25rem;
+  color: var(--ifm-font-color-base);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.giscus-sidebar__note {
+  font-size: 0.7rem;
+  color: var(--ifm-font-color-secondary);
+  margin-bottom: 0.75rem;
+}
+.giscus-sidebar .giscus,
+.giscus-sidebar .giscus iframe {
+  width: 100% !important;
+}
+

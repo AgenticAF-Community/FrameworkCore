@@ -8,7 +8,7 @@ sidebar_position: 2
 
 (From model capability to system discipline)
 
-Agentic systems are rapidly becoming the default shape of applied AI: software that can interpret context, plan, call tools, observe outcomes, and iterate toward completion. The moment a system crosses that line, from producing text to initiating actions—it stops being “an LLM feature” and becomes a production software system with an expanded risk profile: larger attack surface, higher operational complexity, and materially greater blast radius when things go wrong.
+Agentic systems are rapidly becoming the default shape of applied AI: software that can be triggered, interpret context, decide, act via tools, observe results, verify outcomes, and adapt or stop. The moment a system crosses that line, from producing text to initiating actions—it stops being “an LLM feature” and becomes a production software system with an expanded risk profile: larger attack surface, higher operational complexity, and materially greater blast radius when things go wrong.
 
 ![The Epistemic Gate: Turning AI Probability into Production Authority](./assets/section-1-epistemic-gate.png)
 
@@ -20,7 +20,7 @@ Early LLM adoption was dominated by single-turn applications: summarisation, dra
 
 Agentic systems change that. They introduce:
 
-* Loops (plan → act → observe → verify), which compound cost, latency, and failure modes.
+* Control loops (Trigger → Decide → Act → Verify), which compound cost, latency, and failure modes.
 
 * Tool invocation, where outputs become API calls, database writes, deployments, messages, and workflow triggers.
 
@@ -42,22 +42,22 @@ Agentic systems are easiest to reason about when we separate **how work is seque
 
 **Key constraint:** Orchestrators must **never** call tools directly. All tool actuation must be routed through the governance gateway so permissions, budgets, approvals, and auditability remain non-bypassable.
 
-### **1.2 Where This Framework Came From: Building WrangleAI**
+### **1.2 Where This Framework Came From**
 
-The Agentic Architecture Framework is informed by direct engineering experience building WrangleAI, a platform created to help teams govern and optimise AI usage in production: visibility into usage and cost, controls over access and policy, and mechanisms to prevent runaway spend and unsafe usage patterns.
+The Agentic Architecture Framework is informed by direct engineering experience building startups focused on helping teams govern and optimise AI usage in production: visibility into usage and cost, controls over access and policy, and mechanisms to prevent runaway spend and unsafe usage patterns.
 
-While building WrangleAI, a recurring pattern emerged across organisations experimenting with agents and LLM-powered workflows:
+A recurring pattern emerged across organisations experimenting with agents and LLM-powered workflows:
 
 * AI usage scales faster than governance.  
 * Costs become unpredictable because tokens, retries, tool loops, and model selection are rarely budgeted.  
 * Access control is often an afterthought (shared keys, unclear ownership, missing audit trails).  
 * “It works in the demo” collapses under production realities: rate limits, tool failures, drift, and security constraints.
 
-WrangleAI’s own guidance on AI governance frames the problem directly: governance is the set of systems, processes, and controls that help organisations manage use, cost, security, and compliance, precisely the discipline agentic systems require as they become operational infrastructure. 
+Governance is the set of systems, processes, and controls that help organisations manage use, cost, security, and compliance — precisely the discipline agentic systems require as they become operational infrastructure. 
 
-Similarly, WrangleAI’s cost-focused writing highlights why spend is difficult to control in practice: lack of visibility, lack of limits, overuse of expensive models, and prompt waste—each of which becomes more acute in loop-based agent designs. 
+Spend is difficult to control in practice due to lack of visibility, lack of limits, overuse of expensive models, and prompt waste—each of which becomes more acute in loop-based agent designs. 
 
-In short: building WrangleAI forced the same realisation repeatedly—agentic capability is not the bottleneck; governed systems architecture is. This white paper documents the framework that emerged from those practical constraints.
+In short: building in this space forced the same realisation repeatedly—agentic capability is not the bottleneck; governed systems architecture is. This white paper documents the framework that emerged from those practical constraints.
 
 ### **1.3 What This White Paper Covers**
 
@@ -96,7 +96,7 @@ This is written for builders and operators of agentic systems:
 * security and risk teams assessing agentic architectures.  
 * product teams designing agentic workflows with real-world constraints.
 
-It is also relevant for organisations building “AI control planes” (like WrangleAI) or adopting them, because agent governance becomes a shared operational responsibility across engineering, finance, and compliance as usage scales. 
+It is also relevant for organisations building AI control planes or adopting them, because agent governance becomes a shared operational responsibility across engineering, finance, and compliance as usage scales. 
 
 ### **1.5 Positioning: Complementary to Existing Guidance, Focused on Agents in Practice**
 
@@ -118,13 +118,7 @@ This paper complements that work by focusing on architecture discipline: the rep
 4. UK NCSC:  Mistaking AI vulnerability could lead to large-scale breaches  
    https://www.ncsc.gov.uk/news/mistaking-ai-vulnerability-could-lead-to-large-scale-breaches 
 
-5. WrangleAI:  What Is AI Governance? The New Pillar of Machine Learning (governance definition and elements)
 
-   https://wrangleai.com/blog/what-is-ai-governance/ 
-
-6. WrangleAI:  Generative AI cost: What Every CTO Should Know (why cost is hard to control; visibility/limits/model selection/prompt waste
-
-   https://wrangleai.com/blog/generative-ai-cost/ 
 
 7. OpenAI: A practical guide to building agents (deployment best practices and safe/predictable operation framing)
 

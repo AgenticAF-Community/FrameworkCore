@@ -29,7 +29,7 @@ This section establishes:
 
 A practical, engineering-first definition is:
 
-An agent is a software system that uses an AI model to pursue a desired outcome by executing a loop of: interpret context → decide → take action (often via tools) → observe results → adapt until done.
+An agent is a software system that uses an AI model to pursue a desired outcome by executing a control loop: Trigger → Interpret Context → Decide → Act → Observe Results → Verify → [Adapt / Stop].
 
 This definition makes three things explicit:
 
@@ -53,7 +53,7 @@ A system becomes meaningfully agentic when it exhibits most of the following pro
 
 **1\) Persistence over time:** Agents maintain state/context across steps (and often across sessions). This introduces lifecycle concerns: recovery, replay, drift, and governance.
 
-**2\)** **A observe–decide–act-verify loop:** Agentic behavior is iterative. The agent plans, acts, observes the environment, and adapts. The ReAct paradigm is a canonical formulation of this loop: it interweaves reasoning with actions that retrieve information or change state, improving grounding and reducing hallucination and error propagation. 
+**2\)** **The agentic control loop (Trigger → Decide → Act → Verify):** Agentic behavior is iterative. The agent interprets context, decides, acts, observes results, verifies, and adapts or stops. The ReAct paradigm is a canonical formulation of this loop: it interweaves reasoning with actions that retrieve information or change state, improving grounding and reducing hallucination and error propagation. 
 
 **3\) Tool use/actuation:** Tool invocation is the practical line where “AI output” becomes “system behavior.” Tools may query systems, modify records, deploy code, trigger workflows, send messages, or create long-lived artifacts. Once a system can act, it inherits many of the same requirements we associate with automation platforms and distributed systems and our team members. It is also useful to consider this tool use in the same lens as a human using the same tool, identity and access management disciplines are just as applicable to agents as they are to humans. 
 
@@ -189,7 +189,7 @@ In short: once you define an agent as a persistent, outcome-seeking, tool-using 
 
 * **Workflow:** A deterministic or semi-deterministic sequence of steps with predefined control logic. Could be triggered by a skill. 
 
-* **Agent loop:** The iterative control cycle where an agent plans, acts via tools, observes results, and adapts.
+* **Agent loop:** The iterative control cycle: Trigger → Interpret Context → Decide → Act → Observe Results → Verify → [Adapt / Stop]. Simplified: Trigger → Decide → Act → Verify.
 
 * **Context:** Task-scoped information supplied to the model for a specific step.
 

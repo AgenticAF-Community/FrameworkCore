@@ -103,7 +103,7 @@ Why this matters: OWASP defines “Excessive Agency” as a vulnerability catego
 
 **A practical pattern that scales well is:**
 
-*Plan → verify → execute, where planning can be probabilistic, but the execute step is gated by deterministic policy checks (and often human approval for high-risk actions).*
+*Trigger → Decide → Act → Verify, where the Decide step can be probabilistic, but the Act step is gated by deterministic policy checks (and often human approval for high-risk actions).*
 
 OpenAI’s own guidance for MCP-enabled environments makes the same point operationally: require human confirmation for irreversible operations and validate inputs server-side even if the model produced them. 
 

@@ -29,7 +29,7 @@ That sounds obvious. In practice, most agent systems fail this bar because teams
 
 Boundary note: In this paper, Reliability asks “does it work repeatedly and land the right end state?” Operational Excellence asks “can we observe it, operate it, change it safely, and recover when it fails?” The distinction matters because agentic failures are often operationally opaque even when individual runs appear successful.
 
-### **8.1 Observability for Agents: Observe → Decide → Act → Verify**
+### **8.1 Observability for Agents: The Observability Trace (Intent → Plan → Act → Verify)**
 
 Observability is not optional for agents. It is the mechanism that turns stochastic behavior into diagnosable behavior.
 

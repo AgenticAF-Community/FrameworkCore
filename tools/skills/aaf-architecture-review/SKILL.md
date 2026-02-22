@@ -80,7 +80,7 @@ Apply pillars as structured review lenses. Absence of budgets, verification, and
 
 **Operational Excellence**
 
-- [ ] Is the full loop observable (observe → decide → act → verify)?
+- [ ] Is the full control loop observable (Trigger → Decide → Act → Verify), with observability traces (intent → plan → act → verify) captured?
 - [ ] Is there an evaluation harness and regression suite?
 - [ ] Is rollout staged with rollback?
 - [ ] Are skills/tools versioned and reviewed?

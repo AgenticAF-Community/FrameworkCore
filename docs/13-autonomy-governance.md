@@ -230,7 +230,7 @@ A practical implementation model is:
 
 * Escalate on uncertainty, budget exhaustion, or high-risk actions
 
-* Log intent → plan → act → verify traces for audit and improvement
+* Log observability traces (intent → plan → act → verify) for audit and improvement
 
 * Evaluate outcomes continuously (regression + production sampling)
 

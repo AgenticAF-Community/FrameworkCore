@@ -57,7 +57,7 @@ In the agentic context, each pillar is interpreted through an agent-specific len
 
 * Reliability is not only uptime; it is repeatable outcome achievement under probabilistic reasoning and partial failures.
 
-* Operational excellence is not only deployment and monitoring; it is observability of intent → plan → act → verify and controlled learning.
+* Operational excellence is not only deployment and monitoring; it is observability of the full control loop, captured via the observability trace (intent → plan → act → verify), and controlled learning.
 
 ### **4.2 Cross-Cutting Foundations: Context Optimization and Autonomy & Outcome Governance**
 

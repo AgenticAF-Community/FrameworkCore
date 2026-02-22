@@ -19,13 +19,13 @@ Most high-impact failures in AI systems do not happen because the model is proba
 
 This paper documents the Agentic Architecture Framework: a practical method for building agentic systems that are safe, reliable, economically bounded, operationally observable, and scalable.
 
-The framework is informed by direct experience building WrangleAI, a governance and optimisation platform for AI usage. Building WrangleAI surfaced a consistent reality across teams shipping agents: capability is not the bottleneck; governance and architecture discipline are. Without explicit controls, cost becomes unbounded, security boundaries collapse, and reliability degrades in ways teams cannot reproduce or explain.
+The framework is informed by direct experience building startups in the AI governance and optimisation space. That work surfaced a consistent reality across teams shipping agents: capability is not the bottleneck; governance and architecture discipline are. Without explicit controls, cost becomes unbounded, security boundaries collapse, and reliability degrades in ways teams cannot reproduce or explain.
 
 ### **Core definition: what an agent is (in practical terms)**
 
-An agent is a software system that uses an LLM to pursue an outcome by executing a loop of:
+An agent is a software system that uses an LLM to pursue an outcome by executing a control loop:
 
-interpret context → decide → act (via tools) → observe results → adapt → verify → outcome & stop
+Trigger → Interpret Context → Decide → Act → Observe Results → Verify → [Adapt / Stop]
 
 This is why agentic systems must be engineered differently from single-turn LLM apps:
 
@@ -38,7 +38,7 @@ This is why agentic systems must be engineered differently from single-turn LLM 
 * increasingly interoperable (agents and tools coordinate across systems).
 
 **Note 1 :** This framework applies to AI systems broadly, but is optimized for agentic systems (persistent + tool-using + outcome-seeking). Where guidance is general AI-systems architecture, I try to explicitly tie it back to agentic control loops.  
-**Note 2 :** Throughout this paper the loop is simplified down to Observe - Decide - Act - Verify in places.
+**Note 2 :** Throughout this paper the agentic control loop is sometimes simplified to Trigger → Decide → Act → Verify. Separately, observability and tracing sections use the pattern intent → plan → act → verify to describe the audit trail that should be captured — this is the observability trace, not the control loop itself.
 
 ### **The central idea: the architecture of epistemic gates**
 
@@ -88,7 +88,7 @@ The Agentic Architecture Framework applies six “well-architected” pillars (a
 
 4. Operational Excellence. Operate agents as living production systems: observable, evaluable, versioned, and rollback-able.
 
-**Core themes:** intent→plan→act→verify traces, continuous evals, skill/tool supply chain, release discipline.
+**Core themes:** observability traces (intent → plan → act → verify), continuous evals, skill/tool supply chain, release discipline.
 
 5. Performance Efficiency. Choose topology based on task structure, not hype. Multi-agent architectures can introduce coordination overhead and error amplification if not governed.  
     **Core themes:** orchestration patterns, latency vs throughput trade-offs, minimizing tool round trips and context churn.
@@ -168,9 +168,6 @@ The framework is designed for three practical uses:
 * NIST AI RMF (systematic validation and risk management framing):  
    https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf
 
-* WrangleAI overview (platform context that informed this paper):
-
-  https://wrangleai.com/docs/overview/
 
 
 

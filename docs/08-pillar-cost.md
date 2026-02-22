@@ -41,7 +41,7 @@ Agentic cost is typically driven by four interacting factors:
 
 3. **Tool calls (actuation cost):** Many tools have direct cost: API usage, search calls, compute time, database queries, build pipelines, etc.
 
-4. **Iteration count (loop depth):** The number of turns in an agent loop (observe → decide → act → verify) compounds the above costs.
+4. **Iteration count (loop depth):** The number of turns in an agent loop (Trigger → Decide → Act → Verify) compounds the above costs.
 
 This matters because these factors are coupled: large tool catalogs increase context, which increases token usage, which increases cost and latency, which can trigger retries and timeouts, which increases loop depth.
 

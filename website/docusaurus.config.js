@@ -19,6 +19,15 @@ const config = {
   // Kit landing page for gated PDF download
   customFields: {
     pdfDownloadUrl: process.env.PDF_DOWNLOAD_URL || 'https://agentic-architecture-framework.kit.com/fc548b5d10',
+    giscus: {
+      repo: 'AgenticAF-Community/FrameworkCore',
+      repoId: 'R_kgDORSpHHg',
+      category: 'Announcements',
+      categoryId: 'DIC_kwDORSpHHs4C2vxH',
+      mapping: 'title',
+      strict: '0',
+      reactionsEnabled: '1',
+    },
   },
 
   onBrokenLinks: 'warn',
@@ -71,6 +80,11 @@ const config = {
             label: 'Framework',
           },
           {
+            to: '/tools',
+            position: 'left',
+            label: 'Tools & Skills',
+          },
+          {
             href: 'https://github.com/AgenticAF-Community/FrameworkCore',
             label: 'GitHub',
             position: 'right',
@@ -90,6 +104,10 @@ const config = {
               {
                 label: 'Executive Summary',
                 to: '/executive-summary',
+              },
+              {
+                label: 'Tools & Skills',
+                to: '/tools',
               },
               {
                 label: 'GitHub',
