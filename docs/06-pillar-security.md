@@ -15,11 +15,17 @@ The security objective of an agentic system is therefore not “make the model i
 
 This is an impact-reduction mindset. The UK NCSC makes this point forcefully in their analysis of prompt injection: prompt injection is not the same as SQL injection, and if we treat it as such we will build the wrong mitigations. The right response is designing systems that reduce risk and reduce impact when the model is manipulated. 
 
-This pillar is organized around the major security surfaces introduced by agents: communication boundaries, tool actuation, privilege separation, secrets, and inter-agent trust.
+This pillar is organized around the major security surfaces introduced by agents: communication boundaries, tool actuation, privilege separation, secrets, and inter-agent trust. It uses the classical CIA triad — Confidentiality, Integrity, Availability — as an organising lens, but with a weighting that reflects the unique properties of agentic systems:
+
+- **Integrity** is the dominant concern. When a probabilistic reasoning layer can select tools and trigger real-world actions, the central security question is: *can we trust that the action the system is about to take is the action it should take?* Prompt injection, tool misuse, privilege escalation, and unvalidated outputs are all integrity failures. Most of this pillar's controls exist to protect integrity.
+- **Confidentiality** maps directly to secrets management, context handling, and data exfiltration controls. Agentic systems assemble context dynamically and may pass sensitive data through model calls, making confidentiality a design-time concern rather than just an operations concern.
+- **Availability** is less dominant than in traditional systems, but carries a specific agentic risk: the model itself is a critical dependency. If the LLM provider is unavailable, the agent's reasoning layer is offline. Rate limiting, budget controls, and graceful degradation patterns address availability.
 
 ![AAF Security: The Tool Gateway Pattern](./assets/security-pillar-graphic.png)
 
 ### **5.1 Threat Model: What Changes When a System Becomes Agentic**
+
+*CIA mapping: Integrity (instruction manipulation, tool misuse), Confidentiality (data exfiltration), Availability (denial of service, runaway loops)*
 
 Agentic systems expand the attack surface in ways that traditional LLM applications do not:
 
@@ -38,6 +44,8 @@ OWASP’s Top 10 for LLM applications provides a useful baseline taxonomy for th
 A practical consequence is that agent security must be treated as multi-layered controls, not a single prompt or filter.
 
 ### **5.2 Boundary and Communication Controls (Human ↔ Agent ↔ Agent)**
+
+*Primary CIA dimension: Confidentiality and Availability*
 
 The first security boundary is not “the model.” It is the interfaces through which an agent can be influenced. Either immediately or later through malicious or inaccurate context. 
 
@@ -69,6 +77,8 @@ Agent loops can be exploited for:
 
 OWASP explicitly calls out model denial of service and resource-driven attacks as a risk class, which maps directly to rate limiting and quotas at the boundary. 
 
+Availability in agentic systems also includes a dependency that traditional systems do not have: the model itself. If the LLM provider is unavailable, the agent's reasoning layer is offline and the system cannot decide or act. Graceful degradation, fallback behaviour, and provider-failover strategies should be designed in — not treated as an afterthought.
+
 **4\) Treat retrieved content as hostile by default**
 
 In agentic systems, “inputs” are not only user messages. They include:
@@ -86,6 +96,8 @@ In agentic systems, “inputs” are not only user messages. They include:
 This is exactly why prompt injection is so persistent: it often arrives embedded inside content the agent was supposed to read. NCSC’s framing is that treating prompt injection like SQL injection leads to false confidence; you must design around the assumption that the system can be influenced and focus on reducing downstream impact. 
 
 ### **5.3 Privilege Separation and Control-Plane Patterns (Master–Junior + Supervisor Gates)**
+
+*Primary CIA dimension: Integrity*
 
 Privilege separation is one of the most powerful agent-security patterns because it converts “the model is compromised” into “the model is constrained.”
 
@@ -108,6 +120,8 @@ Why this matters: OWASP defines “Excessive Agency” as a vulnerability catego
 OpenAI’s own guidance for MCP-enabled environments makes the same point operationally: require human confirmation for irreversible operations and validate inputs server-side even if the model produced them. 
 
 ### **5.4 Tool Safety, Sandboxing, and Execution Risk**
+
+*Primary CIA dimension: Integrity*
 
 Tool access is the most important security boundary in an agentic system because tools are how an agent converts language into impact.
 
@@ -177,6 +191,8 @@ This converts “the model believes it did it” into “the system verified it.
 
 ### **5.5 Secrets Management and Sensitive Data Controls**
 
+*Primary CIA dimension: Confidentiality*
+
 Agentic systems increase secret risk because they:
 
 * assemble context dynamically,
@@ -208,6 +224,8 @@ Practically, this reinforces the need for:
 * and explicit approval for tool invocation in high-risk settings.
 
 ### **5.6 Prompt Injection: From “Prevention” to “Impact Reduction”**
+
+*Primary CIA dimension: Integrity*
 
 Prompt injection is best treated as a structural risk rather than a bug you patch once.
 
@@ -247,6 +265,8 @@ OWASP’s prompt injection and excessive agency categories map directly to these
 
 ### **5.7 Inter-Agent Trust Boundaries (A2A/MCP-Aware Security)**
 
+*Primary CIA dimension: Integrity and Confidentiality*
+
 As organizations scale, agents will increasingly talk to other agents. That introduces a second class of boundary risk: agent-to-agent coercion.
 
 Key requirements:
@@ -264,6 +284,8 @@ The MCP specification provides a strong baseline here: tools represent arbitrary
 Additionally, MCP security best practices and third-party security engineering reviews emphasize inspecting tool servers, avoiding untrusted tool servers, and thinking carefully about client behavior (e.g., name collisions, untrusted tool output). 
 
 ### **5.8 Security as “Epistemic Gatekeeping”**
+
+*Primary CIA dimension: Integrity*
 
 This pillar connects directly back to the architecture of epistemic gates introduced earlier.
 
