@@ -5,8 +5,15 @@ This directory will contain utilities that make the Agentic Architecture Framewo
 ## Contents
 
 - **skills/** — Prebuilt instruction sets (e.g. Cursor/Claude skills) so agents can apply AAF when designing or reviewing systems.
-- **mcp-server/** — MCP server exposing framework lookup, checklists, and skills for AI assistants.
 - **aaf-posture/** — CLI that scans a codebase and produces an AAF posture report (alignment with the six pillars). See [aaf-posture/README.md](aaf-posture/README.md).
+- **aaf-design/** — Interactive design questionnaire that generates an Agent Control Contract (ACC) and trade-off report.
+- **aaf-build/** — Scaffold generator: reads an ACC and generates an agent project with control loop, gates, budgets, and observability.
+- **aaf-review/** — Compares an ACC against a built codebase and produces a gap report.
+- **engine/** — Deterministic trade-off pattern matcher and doc block renderer.
+- **data/** — Approved trade-off data model (`trade-offs.json`) and pillar questions (`pillars.json`).
+- **scripts/** — Sync pipeline, AI extraction script, and prompts.
+
+The MCP server is hosted at `https://agenticaf.io/api/mcp` (11 tools, see [../api/README.md](../api/README.md)).
 
 The whitepaper remains the single source of truth; these tools expose it in programmatic and reusable form.
 

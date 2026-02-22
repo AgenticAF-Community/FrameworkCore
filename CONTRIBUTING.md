@@ -48,8 +48,7 @@ If you’re a **working group member**, you can contribute directly to the repos
 | `docs/` | Whitepaper sections (markdown). Single source of truth for the framework. |
 | `docs/assets/` | Images and graphics for the whitepaper. |
 | `website/` | Docusaurus site (agenticaf.io). Builds from `docs/` and other content. |
-| `tools/` | Planned: skills, MCP server, posture CLI. See `tools/README.md`. |
-| `Img/` | Additional images (e.g. for website or docs). |
+| `tools/` | Skills, MCP server tools, posture CLI, design/build/review CLIs, trade-off engine. See `tools/README.md`. |
 
 When in doubt, framework text lives in `docs/`; the website reflects it.
 

@@ -16,4 +16,4 @@
 
 After the first cron run (or a manual GET to `/api/refresh-stats` with `Authorization: Bearer <CRON_SECRET>`), `GET /api/stats` serves from Blob so the homepage shows up-to-date figures. Without Blob, the stats API falls back to live GitHub + `AAF_STATS_JSON`.
 
-**Deploying:** Do not deploy to Vercel until the MCP server has been tested locally (see `tools/mcp-server/README.md`). When ready, deploy as usual; the endpoint will be `https://<project>.vercel.app/api/mcp`.
+**MCP endpoint:** `https://agenticaf.io/api/mcp` (Streamable HTTP, 11 tools). Optional auth: set `MCP_API_KEY` in Vercel and send `Authorization: Bearer <key>`.

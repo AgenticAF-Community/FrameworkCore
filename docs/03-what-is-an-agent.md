@@ -23,7 +23,7 @@ This section establishes:
 
 5. A critical concept that sits underneath safe agent design: the architecture of epistemic gates.
 
-![What Is an Agent? The Architecture of Epistemic Gates](../Img/WhatisAnAgent.png)
+![What Is an Agent? The Architecture of Epistemic Gates](./assets/aaf-epistemic-gates-v1.png)
 
 ### **2.1 A Working Definition of an Agent**
 

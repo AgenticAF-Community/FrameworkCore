@@ -15,8 +15,15 @@ website/static/pdf/
 # Vercel link (project id)
 .vercel
 
-# Deploy script contains hardcoded token
+# Deploy script (lives in AAF-Internal private repo)
 scripts/deploy-vercel.sh
+
+# Source design assets (lives in AAF-Internal private repo)
+Img/
+middleware.js
+
+# Local session memory (agent reference, not for public repo)
+memory.md
 
 # IDE
 .idea/
