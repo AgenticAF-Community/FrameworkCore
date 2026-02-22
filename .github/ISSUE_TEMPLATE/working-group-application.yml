@@ -1,0 +1,89 @@
+name: Working Group Application
+description: Apply to join the AAF Working Group
+title: "[Working Group] Application: "
+labels: ["working-group-application"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your interest in joining the Agentic Architecture Framework Working Group.
+        Please complete the fields below. Applications are reviewed by existing members.
+  - type: input
+    id: name
+    attributes:
+      label: Full name
+      placeholder: Jane Smith
+    validations:
+      required: true
+  - type: input
+    id: github-handle
+    attributes:
+      label: GitHub username
+      placeholder: "@janesmith"
+    validations:
+      required: true
+  - type: input
+    id: role
+    attributes:
+      label: Role / Title
+      placeholder: "e.g. Staff Engineer, AI Platform Lead, Solutions Architect"
+    validations:
+      required: true
+  - type: input
+    id: organisation
+    attributes:
+      label: Organisation
+      placeholder: "e.g. Acme Corp (or Independent)"
+    validations:
+      required: false
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Why do you want to join?
+      description: What draws you to the AAF and what do you hope to contribute?
+      placeholder: "I'm building agentic systems at scale and want to help shape governance standards..."
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: Relevant experience
+      description: Brief summary of your experience with agentic systems, AI architecture, or governance frameworks.
+      placeholder: "3 years building LLM-powered agents, led security review for..."
+    validations:
+      required: true
+  - type: dropdown
+    id: contribution-area
+    attributes:
+      label: Primary area of contribution
+      description: Where would you focus your efforts?
+      options:
+        - Framework content (pillar authoring, review)
+        - Tooling (CLI, MCP server, trade-off engine)
+        - Security and governance
+        - Community and adoption
+        - Documentation and education
+        - Testing and quality
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: Anything else?
+      description: Links to relevant work, publications, or anything you'd like us to know.
+    validations:
+      required: false
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Commitments
+      description: By applying, you agree to the following.
+      options:
+        - label: I have read the [Terms of Reference](https://agenticaf.io/working-group)
+          required: true
+        - label: I will participate constructively and respect the Code of Conduct
+          required: true
+        - label: I understand contributions are licensed under CC BY-NC 4.0
+          required: true
