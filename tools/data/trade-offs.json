@@ -1,0 +1,12 @@
+{
+  "_meta": {
+    "generatedAt": null,
+    "provider": null,
+    "promptFile": "tools/scripts/prompts/extract-tradeoffs.md",
+    "docsUsed": [],
+    "schemaValid": true,
+    "schemaErrors": [],
+    "quoteWarnings": []
+  },
+  "tradeoffs": []
+}

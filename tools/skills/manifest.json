@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-02-22T17:22:29.753Z",
+  "skills": [
+    {
+      "id": "aaf-acc-implementation",
+      "title": "AAF Agent Control Contract (ACC) Implementation",
+      "description": "Helps agents and developers implement Agent Control Contracts (ACC) well. Provides a comprehensive template, where to place ACC in the architecture, and how ACC differs from AGENTS.md. Use when defini"
+    },
+    {
+      "id": "aaf-architecture-review",
+      "title": "AAF Architecture Review",
+      "description": "Applies the Agentic Architecture Framework when designing or reviewing agentic systems. Covers pillar checklist, trade-offs, design-time spec and pre-production review. Use when designing agentic syst"
+    },
+    {
+      "id": "aaf-cost-context",
+      "title": "AAF Cost & Context",
+      "description": "Applies AAF Cost pillar and context optimization: budgets, model routing, token economics, context discipline. Use when controlling cost in agentic systems, budgeting context, choosing model routing, "
+    },
+    {
+      "id": "aaf-cross-cutting",
+      "title": "AAF Cross-Cutting Foundations",
+      "description": "Applies the two AAF cross-cutting foundations—Context Optimization and Autonomy & Outcome Governance. Use when designing context vs memory, context budgeting, autonomy levels, Definition of Done, budg"
+    },
+    {
+      "id": "aaf-epistemic-gates",
+      "title": "AAF Epistemic Gates",
+      "description": "Guides when and where to place epistemic gates; candidate → validated → authority; gates scale with risk. Use when defining validation vs authority, reducing \"AI said so\" authority, or designing high-"
+    },
+    {
+      "id": "aaf-orchestration-occ",
+      "title": "AAF Orchestration and OCC (Orchestrator Capability Contract)",
+      "description": "Helps build agent orchestration properly using the Orchestrator Capability Contract (OCC) and governance-above-orchestration pattern. Use when choosing or implementing orchestration (graphs, multi-age"
+    },
+    {
+      "id": "aaf-security",
+      "title": "AAF Security",
+      "description": "Applies the AAF Security pillar: boundaries, tool actuation, epistemic gatekeeping, supply chain. Use when designing security for agentic systems, tool gateways, prompt-injection mitigations, privileg"
+    }
+  ]
+}

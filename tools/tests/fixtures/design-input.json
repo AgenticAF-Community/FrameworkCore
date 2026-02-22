@@ -1,0 +1,13 @@
+{
+  "autonomyLevel": "delegated",
+  "intent": "Customer support agent that drafts email replies",
+  "answers": {
+    "security": {
+      "security-q1": "yes",
+      "security-q2": "partial"
+    },
+    "cost": {
+      "cost-q1": "no"
+    }
+  }
+}

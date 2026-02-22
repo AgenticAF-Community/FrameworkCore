@@ -14,7 +14,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "../..");
 const DOCS_DIR = path.join(REPO_ROOT, "docs");
 const PILLARS_OUT = path.join(REPO_ROOT, "tools", "aaf-posture", "pillars.js");
-const SKILL_ARCH_REVIEW = path.join(REPO_ROOT, "tools", "skills", "aaf-architecture-review", "SKILL.md");
+const PILLARS_JSON_OUT = path.join(REPO_ROOT, "tools", "data", "pillars.json");
+const SKILLS_DIR = path.join(REPO_ROOT, "tools", "skills");
+const SKILL_ARCH_REVIEW = path.join(SKILLS_DIR, "aaf-architecture-review", "SKILL.md");
+const MANIFEST_OUT = path.join(SKILLS_DIR, "manifest.json");
 
 function readDoc(name) {
   const p = path.join(DOCS_DIR, name);
@@ -134,6 +137,38 @@ function updateArchitectureReviewSkillMode2(pillars) {
   console.log("Updated", path.relative(REPO_ROOT, SKILL_ARCH_REVIEW), "(Mode 2 section)");
 }
 
+/**
+ * Auto-discover skills from tools/skills/ and write manifest.json.
+ * Each subdirectory with a SKILL.md is a skill. Extracts the title from the first H1.
+ */
+function generateSkillsManifest() {
+  let dirs;
+  try {
+    dirs = fs.readdirSync(SKILLS_DIR).filter((d) => {
+      const fp = path.join(SKILLS_DIR, d, "SKILL.md");
+      return fs.existsSync(fp);
+    });
+  } catch {
+    console.warn("Warning: could not read skills dir", SKILLS_DIR);
+    return;
+  }
+
+  const skills = dirs.sort().map((id) => {
+    const content = fs.readFileSync(path.join(SKILLS_DIR, id, "SKILL.md"), "utf8");
+    const titleMatch = content.match(/^#\s+(.+)$/m);
+    const fmDescMatch = content.match(/^description:\s*(.+)$/m);
+    return {
+      id,
+      title: titleMatch ? titleMatch[1].trim() : id,
+      description: fmDescMatch ? fmDescMatch[1].trim().slice(0, 200) : "",
+    };
+  });
+
+  const manifest = { generatedAt: new Date().toISOString(), skills };
+  fs.writeFileSync(MANIFEST_OUT, JSON.stringify(manifest, null, 2) + "\n", "utf8");
+  console.log("Wrote", path.relative(REPO_ROOT, MANIFEST_OUT), `(${skills.length} skills)`);
+}
+
 function main() {
   const doc15 = readDoc("15-application-method.md");
   const sixPillars = parseDoc15ReviewSection(doc15);
@@ -143,7 +178,13 @@ function main() {
   fs.writeFileSync(PILLARS_OUT, pillarsJs, "utf8");
   console.log("Wrote", path.relative(REPO_ROOT, PILLARS_OUT));
 
+  const dataDir = path.dirname(PILLARS_JSON_OUT);
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+  fs.writeFileSync(PILLARS_JSON_OUT, JSON.stringify(allPillars, null, 2) + "\n", "utf8");
+  console.log("Wrote", path.relative(REPO_ROOT, PILLARS_JSON_OUT));
+
   updateArchitectureReviewSkillMode2(allPillars);
+  generateSkillsManifest();
 }
 
 main();

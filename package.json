@@ -8,10 +8,16 @@
     "zod": "^3.23.0",
     "@vercel/blob": "^0.26.0"
   },
+  "bin": {
+    "aaf": "./tools/cli.js"
+  },
   "scripts": {
     "build:pdf": "node scripts/build-pdf.js",
     "sync:from-docs": "node tools/scripts/sync-from-docs.js",
-    "install:docs-sync-hook": "node tools/scripts/install-docs-sync-hook.js"
+    "install:docs-sync-hook": "node tools/scripts/install-docs-sync-hook.js",
+    "test": "node --test tools/tests/*.test.js",
+    "test:foundation": "node --test tools/tests/foundation.test.js",
+    "aaf": "node tools/cli.js"
   },
   "devDependencies": {
     "md-to-pdf": "^5.2.5"
