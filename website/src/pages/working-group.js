@@ -1,5 +1,6 @@
 import React from 'react';
 import Layout from '@theme/Layout';
+import MEMBERS from '../data/working-group-members.json';
 
 const sectionStyle = { marginBottom: '2.5rem' };
 const textStyle = { fontSize: '1rem', lineHeight: 1.7, color: 'var(--ifm-font-color-base)' };
@@ -30,7 +31,9 @@ function Callout({ children }) {
   );
 }
 
-function MemberCard({ name, role, github, areas }) {
+const linkStyle = { fontSize: '0.85rem', marginRight: '0.75rem' };
+
+function MemberCard({ name, role, github, linkedin, twitter, areas }) {
   return (
     <div style={{
       border: '1px solid var(--ifm-color-emphasis-300)',
@@ -40,11 +43,17 @@ function MemberCard({ name, role, github, areas }) {
     }}>
       <div style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.25rem' }}>{name}</div>
       <div style={{ fontSize: '0.9rem', color: 'var(--ifm-font-color-secondary)', marginBottom: '0.5rem' }}>{role}</div>
-      {github && (
-        <div style={{ fontSize: '0.85rem', marginBottom: '0.35rem' }}>
-          <a href={`https://github.com/${github}`} target="_blank" rel="noopener noreferrer">@{github}</a>
-        </div>
-      )}
+      <div style={{ marginBottom: '0.35rem' }}>
+        {github && (
+          <a href={`https://github.com/${github}`} target="_blank" rel="noopener noreferrer" style={linkStyle}>GitHub</a>
+        )}
+        {linkedin && (
+          <a href={`https://www.linkedin.com/in/${linkedin}/`} target="_blank" rel="noopener noreferrer" style={linkStyle}>LinkedIn</a>
+        )}
+        {twitter && (
+          <a href={`https://x.com/${twitter}`} target="_blank" rel="noopener noreferrer" style={linkStyle}>X</a>
+        )}
+      </div>
       {areas && (
         <div style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)' }}>
           {areas.join(' · ')}
@@ -53,15 +62,6 @@ function MemberCard({ name, role, github, areas }) {
     </div>
   );
 }
-
-const MEMBERS = [
-  {
-    name: 'David Maddock',
-    role: 'Founding Maintainer',
-    github: 'davidjmaddock',
-    areas: ['Framework content', 'Architecture', 'Tooling'],
-  },
-];
 
 const APPLY_URL = 'https://github.com/AgenticAF-Community/FrameworkCore/issues/new?template=working-group-application.yml';
 
@@ -107,10 +107,20 @@ export default function WorkingGroup() {
 
           <h3 style={{ fontSize: '1.1rem', marginTop: '1.5rem', marginBottom: '0.5rem' }}>Decision-making</h3>
           <p style={textStyle}>
-            Decisions are made by rough consensus among active members. For contentious changes,
-            a simple majority of active members is sufficient. The founding maintainer holds a
-            tie-breaking vote during the bootstrap phase (fewer than 5 active members).
+            During the founding year (through February 2027), the founding maintainer holds final
+            decision authority on all framework changes, membership approvals, and roadmap direction.
+            Members contribute through reviews, PRs, and discussion. After the founding year,
+            decisions move to rough consensus among active members, with a simple majority for
+            contentious changes.
           </p>
+
+          <h3 style={{ fontSize: '1.1rem', marginTop: '1.5rem', marginBottom: '0.5rem' }}>Membership review</h3>
+          <ul style={listStyle}>
+            <li>Membership is reviewed every 6 months</li>
+            <li>Members who have not met the quarterly participation commitment may be moved to emeritus status</li>
+            <li>Membership can be removed at any time by the founding maintainer (during the founding year) or by majority vote of active members (after)</li>
+            <li>Members may voluntarily step down at any time</li>
+          </ul>
 
           <h3 style={{ fontSize: '1.1rem', marginTop: '1.5rem', marginBottom: '0.5rem' }}>Intellectual property</h3>
           <p style={textStyle}>

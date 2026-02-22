@@ -1,0 +1,92 @@
+name: Approve Working Group Member
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  add-member:
+    if: github.event.label.name == 'approved' && contains(github.event.issue.labels.*.name, 'working-group-application')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Parse issue and update members JSON
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = context.payload.issue.body || '';
+
+            function extractField(body, heading) {
+              const pattern = new RegExp(`### ${heading}\\s*\\n\\s*\\n([^\\n]+)`, 'i');
+              const match = body.match(pattern);
+              return match ? match[1].trim() : '';
+            }
+
+            const name = extractField(body, 'Full name');
+            const githubHandle = extractField(body, 'GitHub username').replace(/^@/, '');
+            const role = extractField(body, 'Role / Title') || 'Member';
+            const area = extractField(body, 'Primary area of contribution');
+
+            let linkedin = extractField(body, 'LinkedIn profile \\(optional\\)');
+            if (linkedin) {
+              const linkedinMatch = linkedin.match(/linkedin\.com\/in\/([^\/\s]+)/);
+              if (linkedinMatch) linkedin = linkedinMatch[1];
+            }
+
+            let twitter = extractField(body, 'X / Twitter handle \\(optional\\)');
+            if (twitter) twitter = twitter.replace(/^@/, '').replace(/https?:\/\/(x|twitter)\.com\//, '');
+
+            if (!name || !githubHandle) {
+              core.setFailed('Could not parse required fields (name, GitHub username) from issue body.');
+              return;
+            }
+
+            const membersPath = 'website/src/data/working-group-members.json';
+            const members = JSON.parse(fs.readFileSync(membersPath, 'utf8'));
+
+            if (members.some(m => m.github === githubHandle)) {
+              core.info(`Member @${githubHandle} already exists, skipping.`);
+              return;
+            }
+
+            const newMember = {
+              name,
+              role,
+              github: githubHandle,
+              ...(linkedin && { linkedin }),
+              ...(twitter && { twitter }),
+              areas: area ? [area] : [],
+            };
+
+            members.push(newMember);
+            fs.writeFileSync(membersPath, JSON.stringify(members, null, 2) + '\n');
+            core.exportVariable('NEW_MEMBER_NAME', name);
+            core.exportVariable('NEW_MEMBER_GITHUB', githubHandle);
+            core.exportVariable('ISSUE_NUMBER', context.payload.issue.number);
+
+      - name: Create PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="add-member-${NEW_MEMBER_GITHUB}-${ISSUE_NUMBER}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add website/src/data/working-group-members.json
+          git commit -m "Add ${NEW_MEMBER_NAME} to working group (closes #${ISSUE_NUMBER})"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "Add ${NEW_MEMBER_NAME} to Working Group" \
+            --body "Adds **${NEW_MEMBER_NAME}** (@${NEW_MEMBER_GITHUB}) to the working group members list.
+
+          Closes #${ISSUE_NUMBER}
+
+          This PR was automatically generated when the application issue was labeled \`approved\`." \
+            --base main

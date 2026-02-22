@@ -68,6 +68,20 @@ body:
         - Other
     validations:
       required: true
+  - type: input
+    id: linkedin
+    attributes:
+      label: LinkedIn profile (optional)
+      placeholder: "https://www.linkedin.com/in/yourprofile/"
+    validations:
+      required: false
+  - type: input
+    id: twitter
+    attributes:
+      label: X / Twitter handle (optional)
+      placeholder: "@yourhandle"
+    validations:
+      required: false
   - type: textarea
     id: additional
     attributes:

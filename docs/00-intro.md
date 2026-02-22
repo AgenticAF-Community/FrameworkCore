@@ -13,7 +13,7 @@ Deliver community-driven, vendor-agnostic architecture guidance for the agentic 
 
 - **Join the discussion** — every page on this site has a comment thread. Challenge assumptions, share patterns, flag gaps.
 - **Open issues and PRs** — propose changes directly in the [GitHub repo](https://github.com/AgenticAF-Community/FrameworkCore). All contributions are reviewed by the community.
-- **Join the working group** — a 2-hour monthly commitment. Become a maintainer in the GitHub repo, where every merge requires 3 approvals — governance by design, not by hierarchy.
+- **Join the working group** — apply at [agenticaf.io/working-group](/working-group) to become a maintainer. See the Terms of Reference and current members.
 - **Spread the word** — tell your colleagues, and tell your agents. The framework is available via the [AAF MCP server](/tools) so your AI tools can reference it natively.
 
 ## The intent behind this framework
