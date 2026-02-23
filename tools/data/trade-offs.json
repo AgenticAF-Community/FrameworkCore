@@ -1,12 +1,369 @@
 {
   "_meta": {
-    "generatedAt": null,
-    "provider": null,
+    "generatedAt": "2026-02-23T15:36:23.550Z",
+    "provider": "wrangleai",
+    "model": "gemini-2.5-pro",
+    "gateway": "https://gateway.wrangleai.com/v1",
     "promptFile": "tools/scripts/prompts/extract-tradeoffs.md",
-    "docsUsed": [],
+    "docsUsed": [
+      "05-framework-overview.md",
+      "06-pillar-security.md",
+      "07-pillar-reliability.md",
+      "08-pillar-cost.md",
+      "09-pillar-operations.md",
+      "10-pillar-performance.md",
+      "11-pillar-sustainability.md",
+      "12-context-optimization.md",
+      "13-autonomy-governance.md"
+    ],
     "schemaValid": true,
     "schemaErrors": [],
-    "quoteWarnings": []
+    "quoteWarnings": [
+      "context-optimization-x-security: sourceQuote not found in docs/12-context-optimization.md (first 8 words: \"this creates the core context tension : too\")"
+    ]
   },
-  "tradeoffs": []
+  "tradeoffs": [
+    {
+      "id": "context-optimization-x-cost",
+      "pillars": [
+        "context-optimization",
+        "cost"
+      ],
+      "tension": "Providing excessive context to an agent increases token volume, which directly increases operational costs.",
+      "sourceQuote": "Too much context leads to higher cost, slower performance, and higher risk of accidental leakage or instruction collisions.",
+      "source": {
+        "doc": "docs/05-framework-overview.md",
+        "section": "4.2.A",
+        "lines": "80-82"
+      },
+      "confidence": "explicit",
+      "recommendation": "Architect context management with explicit budgeting, just-in-time retrieval, summarization, and provenance tracking.",
+      "recommendationSource": {
+        "doc": "docs/05-framework-overview.md",
+        "section": "4.2.A"
+      },
+      "indicators": [
+        {
+          "questionId": "cost-q3",
+          "answer": "no",
+          "signal": "The agent's context is growing without bounds, leading to unpredictable and escalating costs."
+        },
+        {
+          "questionId": "context-optimization-q2",
+          "answer": "no",
+          "signal": "Context is not being treated as a budgeted resource, risking cost overruns."
+        }
+      ],
+      "autonomyNotes": {
+        "assistive": "The agent may retrieve and present large volumes of context to the human, increasing token costs for each interaction, even if the human only needed a summary.",
+        "delegated": "The agent proposes a plan that requires a large context payload for execution, forcing the human approver to accept a high-cost action.",
+        "boundedAutonomous": "The agent, in its attempt to gather all possible information, might hit its token or cost budget prematurely by accumulating low-value context, causing the task to fail.",
+        "supervisory": "A supervisory agent may pass large, un-summarized context blobs between worker agents, multiplying token costs across the system for each step."
+      }
+    },
+    {
+      "id": "context-optimization-x-performance",
+      "pillars": [
+        "context-optimization",
+        "performance"
+      ],
+      "tension": "Providing excessive context, such as large tool catalogs, increases model processing time and degrades agent responsiveness (latency).",
+      "sourceQuote": "Too much context leads to higher cost, slower performance, and higher risk of accidental leakage or instruction collisions.",
+      "source": {
+        "doc": "docs/05-framework-overview.md",
+        "section": "4.2.A",
+        "lines": "80-82"
+      },
+      "confidence": "explicit",
+      "recommendation": "Use performance-oriented context patterns like on-demand tool discovery (Tool Search) to reduce the impact of large tool catalogs on the context window.",
+      "recommendationSource": {
+        "doc": "docs/10-pillar-performance.md",
+        "section": "9.4.1"
+      },
+      "indicators": [
+        {
+          "questionId": "performance-q2",
+          "answer": "no",
+          "signal": "The agent requires many round trips with large context payloads, indicating high latency and inefficient tool orchestration."
+        },
+        {
+          "questionId": "context-optimization-q4",
+          "answer": "no",
+          "signal": "Context construction is not minimal, leading to bloated prompts that slow down model inference."
+        }
+      ],
+      "autonomyNotes": {
+        "assistive": "The agent takes a long time to generate suggestions because it is processing a large, unnecessary context, leading to a poor user experience.",
+        "delegated": "The agent's proposed plan involves so much context that the execution step (even after approval) is slow, and the human waits a long time for the result.",
+        "boundedAutonomous": "The agent's loop becomes slow, reducing its overall throughput because each reasoning step is burdened by a large context window, even for simple decisions.",
+        "supervisory": "Coordination between agents slows down as they exchange large context payloads, creating a system-wide latency bottleneck."
+      }
+    },
+    {
+      "id": "context-optimization-x-security",
+      "pillars": [
+        "context-optimization",
+        "security"
+      ],
+      "tension": "Providing insufficient context can lead to unsafe tool use, while providing excessive context increases the risk of data leakage and instruction injection.",
+      "sourceQuote": "This creates the core “context tension”: Too little context → poor decisions, unreliable outcomes, unsafe tool use. Too much context → high cost, slower performance, increased leakage risk, instruction collisions, and degraded reasoning due to noise.",
+      "source": {
+        "doc": "docs/12-context-optimization.md",
+        "section": "11.1",
+        "lines": "25-27"
+      },
+      "confidence": "explicit",
+      "recommendation": "Provide the minimum sufficient context for the task, in a controlled and explainable form, while preserving verification signals and preventing unsafe information flow.",
+      "recommendationSource": {
+        "doc": "docs/12-context-optimization.md",
+        "section": "intro"
+      },
+      "indicators": [
+        {
+          "questionId": "context-optimization-q3",
+          "answer": "no",
+          "signal": "The system does not distinguish between trusted policy and untrusted external data in the context, increasing prompt injection risk."
+        },
+        {
+          "questionId": "security-q4",
+          "answer": "no",
+          "signal": "Retrieved content is being added to the context without being treated as hostile, creating a vector for security vulnerabilities."
+        }
+      ],
+      "autonomyNotes": {
+        "assistive": "The agent might surface sensitive information from a large context in its suggestion, or fail to include critical security constraints, leading the human to make an unsafe decision.",
+        "delegated": "The agent's proposed plan might be based on malicious instructions hidden in the context, or it might leak sensitive data in the plan's details for the human to approve.",
+        "boundedAutonomous": "An agent operating with too much untrusted context is highly susceptible to prompt injection, potentially causing it to execute unsafe tool calls. Too little context might cause it to use a tool with incorrect, unsafe arguments.",
+        "supervisory": "Agents can use context-passing as a data exfiltration channel, or one compromised agent can inject malicious instructions into the context of another, causing cascading security failures."
+      }
+    },
+    {
+      "id": "autonomy-governance-x-security",
+      "pillars": [
+        "autonomy-governance",
+        "security"
+      ],
+      "tension": "Increasing an agent's level of autonomy without sufficient governance controls like permissions and policy gates creates the 'Excessive Agency' security vulnerability.",
+      "sourceQuote": "OWASP explicitly names “Excessive Agency” as a vulnerability where damaging actions are performed in response to unexpected, ambiguous, or manipulated model outputs; it identifies root causes such as excessive functionality, excessive permissions, and excessive autonomy.",
+      "source": {
+        "doc": "docs/05-framework-overview.md",
+        "section": "4.2.B",
+        "lines": "103-107"
+      },
+      "confidence": "explicit",
+      "recommendation": "Grant the minimum necessary autonomy for a task and constrain it with explicit policy gates, least-privilege tool access, and mandatory verification for write actions.",
+      "recommendationSource": {
+        "doc": "docs/13-autonomy-governance.md",
+        "section": "intro"
+      },
+      "indicators": [
+        {
+          "questionId": "autonomy-governance-q1",
+          "answer": "no",
+          "signal": "Autonomy is not a declared, controlled operating mode, indicating a high risk of excessive agency."
+        },
+        {
+          "questionId": "security-q2",
+          "answer": "no",
+          "signal": "The agent has excessive permissions, a primary root cause of the 'Excessive Agency' vulnerability."
+        }
+      ],
+      "autonomyNotes": {
+        "assistive": "Not applicable, as the human is the actuator and the agent has no direct autonomy to pose a security risk through its own actions.",
+        "delegated": "The agent may propose a damaging action (due to manipulation or error), and security relies solely on the human approver catching it.",
+        "boundedAutonomous": "This is the most critical level. An agent with excessive autonomy can be manipulated into performing harmful actions directly, as it operates without a default human-in-the-loop gate.",
+        "supervisory": "A supervisory agent with excessive autonomy could mismanage worker agents, grant them elevated permissions, or approve harmful actions, leading to large-scale security incidents."
+      }
+    },
+    {
+      "id": "autonomy-governance-x-cost",
+      "pillars": [
+        "autonomy-governance",
+        "cost"
+      ],
+      "tension": "Granting an agent high levels of autonomy without enforced budgets for its actions (steps, tool calls, tokens) leads to unpredictable and potentially runaway operational costs.",
+      "sourceQuote": "Autonomy without budgets is cost volatility by design.",
+      "source": {
+        "doc": "docs/08-pillar-cost.md",
+        "section": "intro",
+        "lines": "8-9"
+      },
+      "confidence": "explicit",
+      "recommendation": "Enforce explicit, non-bypassable budgets on steps, tool calls, tokens, time, and spend as a primary mechanism for governing autonomy.",
+      "recommendationSource": {
+        "doc": "docs/13-autonomy-governance.md",
+        "section": "12.5"
+      },
+      "indicators": [
+        {
+          "questionId": "autonomy-governance-q3",
+          "answer": "no",
+          "signal": "Autonomy is not bounded by budgets, creating a risk of uncontrolled cost."
+        },
+        {
+          "questionId": "cost-q1",
+          "answer": "no",
+          "signal": "The absence of runtime budget enforcement means an autonomous agent can enter costly loops without limit."
+        }
+      ],
+      "autonomyNotes": {
+        "assistive": "The agent may propose a long, complex plan that would be costly to execute, but the cost is ultimately controlled by the human's decision to act.",
+        "delegated": "The agent's plan may not include a cost estimate, forcing the human to approve an action with unknown financial impact.",
+        "boundedAutonomous": "A fully autonomous agent without a budget can easily enter a retry loop or perform extensive, low-value exploration, leading to massive cost overruns. This is the highest-risk level for this trade-off.",
+        "supervisory": "A supervisory agent can burn its entire budget orchestrating inefficient worker agents, or a single runaway worker can exhaust the shared budget for the whole team."
+      }
+    },
+    {
+      "id": "performance-x-reliability",
+      "pillars": [
+        "performance",
+        "reliability"
+      ],
+      "tension": "Using multi-agent architectures to increase performance via parallelism can introduce significant coordination overhead and amplify errors, harming system reliability.",
+      "sourceQuote": "Google’s scaling research reports that independent multi-agent systems amplified errors by 17.2×, while centralized systems with an orchestrator constrained error amplification to 4.4× by acting as a “validation bottleneck.”",
+      "source": {
+        "doc": "docs/07-pillar-reliability.md",
+        "section": "6.5",
+        "lines": "80-83"
+      },
+      "confidence": "explicit",
+      "recommendation": "Use a central orchestrator as a reliability control point to validate intermediate outputs and prevent errors from propagating in multi-agent systems.",
+      "recommendationSource": {
+        "doc": "docs/07-pillar-reliability.md",
+        "section": "6.5"
+      },
+      "indicators": [
+        {
+          "questionId": "performance-q1",
+          "answer": "no",
+          "signal": "A multi-agent topology may have been chosen for a non-parallelizable task, degrading both performance and reliability."
+        },
+        {
+          "questionId": "reliability-q1",
+          "answer": "no",
+          "signal": "The system lacks a central validation bottleneck, allowing errors from one agent to cascade and cause a system-level reliability failure."
+        }
+      ],
+      "autonomyNotes": {
+        "assistive": "Not explicitly discussed in source documents",
+        "delegated": "Not explicitly discussed in source documents",
+        "boundedAutonomous": "This trade-off is most apparent at the autonomous and supervisory levels where agents interact without direct human oversight for each step.",
+        "supervisory": "A supervisory architecture is the direct mitigation for this tension, but if designed poorly (e.g., without validation gates), the supervisor can fail to prevent error amplification, sacrificing reliability for perceived parallelism."
+      }
+    },
+    {
+      "id": "performance-x-cost",
+      "pillars": [
+        "performance",
+        "cost"
+      ],
+      "tension": "Improving performance by using more powerful models or longer context windows directly increases token consumption and overall operational cost.",
+      "sourceQuote": "If you reduce latency by using larger models and longer context, you may improve responsiveness while dramatically increasing cost.",
+      "source": {
+        "doc": "docs/10-pillar-performance.md",
+        "section": "intro",
+        "lines": "20-22"
+      },
+      "confidence": "explicit",
+      "recommendation": "Balance accuracy, latency, and cost for the specific workload by selecting the right model, rather than defaulting to the largest.",
+      "recommendationSource": {
+        "doc": "docs/10-pillar-performance.md",
+        "section": "9.7"
+      },
+      "indicators": [
+        {
+          "questionId": "cost-q2",
+          "answer": "no",
+          "signal": "The system may be using a single, expensive model for all tasks, sacrificing cost efficiency for performance without a clear justification."
+        },
+        {
+          "questionId": "cost-q4",
+          "answer": "no",
+          "signal": "The lack of caching means the system re-computes expensive, high-performance calls repeatedly, driving up costs."
+        }
+      ],
+      "autonomyNotes": {
+        "assistive": "The agent proposes a response from a fast, expensive model. The human must constantly make the cost/speed decision for each query.",
+        "delegated": "The agent's proposed plan relies on high-cost, low-latency models, forcing the human approver to either accept the high cost or reject the performant plan.",
+        "boundedAutonomous": "An autonomous agent, optimizing for task completion speed, may default to the most powerful and expensive model, rapidly consuming its budget unless routing policies are strictly enforced.",
+        "supervisory": "A supervisory agent might route all sub-tasks to expensive, high-performance specialist agents by default, failing to optimize the overall cost of the workflow."
+      }
+    },
+    {
+      "id": "cost-x-reliability",
+      "pillars": [
+        "cost",
+        "reliability"
+      ],
+      "tension": "Using the most capable (and expensive) model for all tasks to maximize reliability is often not economically scalable.",
+      "sourceQuote": "Routing everything to the most capable model is rarely economical at scale.",
+      "source": {
+        "doc": "docs/08-pillar-cost.md",
+        "section": "7.1",
+        "lines": "12-13"
+      },
+      "confidence": "explicit",
+      "recommendation": "Use more capable models for planning and high-risk reasoning, while using smaller, cheaper models for routine execution and transformation.",
+      "recommendationSource": {
+        "doc": "docs/08-pillar-cost.md",
+        "section": "7.3"
+      },
+      "indicators": [
+        {
+          "questionId": "cost-q2",
+          "answer": "no",
+          "signal": "Model routing is not risk-aware, indicating the system may be overspending on reliability for low-stakes tasks."
+        },
+        {
+          "questionId": "reliability-q3",
+          "answer": "no",
+          "signal": "The system lacks robust checkpointing, potentially leading to costly retries or the use of expensive models to re-plan from scratch after a failure."
+        }
+      ],
+      "autonomyNotes": {
+        "assistive": "The agent may default to a highly reliable but expensive model for drafting simple text, where a cheaper model would have been sufficient.",
+        "delegated": "The agent proposes a plan using a top-tier model to ensure success, and the human must decide if the reliability gain is worth the cost.",
+        "boundedAutonomous": "An agent might exclusively use a high-capability model to minimize errors, but this will be financially unsustainable. A cost-optimized agent must be architected to escalate to expensive models only when cheaper ones fail verification.",
+        "supervisory": "A supervisory agent that routes all tasks to the 'most reliable' worker agent (which uses the most expensive model) will not be cost-effective."
+      }
+    },
+    {
+      "id": "security-x-cost",
+      "pillars": [
+        "security",
+        "cost"
+      ],
+      "tension": "A lack of security controls, such as rate limiting, makes an agent vulnerable to denial-of-service or runaway loops that cause excessive, uncontrolled costs.",
+      "sourceQuote": "Denial of service and runaway autonomy: attackers (or accidents) can trigger long tool loops, excessive token usage, or resource starvation.",
+      "source": {
+        "doc": "docs/06-pillar-security.md",
+        "section": "5.1",
+        "lines": "38-40"
+      },
+      "confidence": "explicit",
+      "recommendation": "Apply rate limiting and quotas at the agent's communication boundary to mitigate resource-driven attacks.",
+      "recommendationSource": {
+        "doc": "docs/06-pillar-security.md",
+        "section": "5.2"
+      },
+      "indicators": [
+        {
+          "questionId": "security-q1",
+          "answer": "no",
+          "signal": "Unauthenticated entry points allow attackers to trigger costly operations."
+        },
+        {
+          "questionId": "cost-q1",
+          "answer": "no",
+          "signal": "The lack of enforced budgets means a security breach (like a runaway loop) has an unlimited financial blast radius."
+        }
+      ],
+      "autonomyNotes": {
+        "assistive": "An attacker could repeatedly query an assistive agent, driving up inference costs, even if no actions are taken.",
+        "delegated": "An attacker could repeatedly submit plans for approval, consuming resources on the agent side even if the human denies all of them.",
+        "boundedAutonomous": "This is a high-risk level. An attacker who triggers a runaway loop in an autonomous agent can cause significant financial damage before detection, as there is no human gate per-loop.",
+        "supervisory": "An attack on a single worker agent could cause it to enter a costly loop, consuming the budget for an entire team of agents and causing a wider denial of service."
+      }
+    }
+  ]
 }

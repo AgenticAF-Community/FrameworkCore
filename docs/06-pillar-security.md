@@ -309,6 +309,31 @@ This is what turns “AI system” into “governed agentic system.”
 
 ## 
 
+<!-- AAF-ENGINE:START — generated from trade-offs.js, do not edit manually -->
+
+### 5.11 Design Recommendations & Trade-offs
+
+**Key recommendations**
+
+- Provide the minimum sufficient context for the task, in a controlled and explainable form, while preserving verification signals and preventing unsafe information flow.
+- Grant the minimum necessary autonomy for a task and constrain it with explicit policy gates, least-privilege tool access, and mandatory verification for write actions.
+- Apply rate limiting and quotas at the agent's communication boundary to mitigate resource-driven attacks.
+
+**Cross-pillar trade-offs**
+
+- **Security x Context:** Providing insufficient context can lead to unsafe tool use, while providing excessive context increases the risk of data leakage and instruction injection. Provide the minimum sufficient context for the task, in a controlled and explainable form, while preserving verification signals and preventing unsafe information flow. *(source: 11.1)*
+- **Security x Autonomy:** Increasing an agent's level of autonomy without sufficient governance controls like permissions and policy gates creates the 'Excessive Agency' security vulnerability. Grant the minimum necessary autonomy for a task and constrain it with explicit policy gates, least-privilege tool access, and mandatory verification for write actions. *(source: 4.2.B)*
+- **Security x Cost:** A lack of security controls, such as rate limiting, makes an agent vulnerable to denial-of-service or runaway loops that cause excessive, uncontrolled costs. Apply rate limiting and quotas at the agent's communication boundary to mitigate resource-driven attacks. *(source: 5.1)*
+
+**By autonomy level**
+
+- **Assistive:** The agent might surface sensitive information from a large context in its suggestion, or fail to include critical security constraints, leading the human to make an unsafe decision.; Not applicable, as the human is the actuator and the agent has no direct autonomy to pose a security risk through its own actions.; An attacker could repeatedly query an assistive agent, driving up inference costs, even if no actions are taken.
+- **Delegated:** The agent's proposed plan might be based on malicious instructions hidden in the context, or it might leak sensitive data in the plan's details for the human to approve.; The agent may propose a damaging action (due to manipulation or error), and security relies solely on the human approver catching it.; An attacker could repeatedly submit plans for approval, consuming resources on the agent side even if the human denies all of them.
+- **Bounded Autonomous:** An agent operating with too much untrusted context is highly susceptible to prompt injection, potentially causing it to execute unsafe tool calls. Too little context might cause it to use a tool with incorrect, unsafe arguments.; This is the most critical level. An agent with excessive autonomy can be manipulated into performing harmful actions directly, as it operates without a default human-in-the-loop gate.; This is a high-risk level. An attacker who triggers a runaway loop in an autonomous agent can cause significant financial damage before detection, as there is no human gate per-loop.
+- **Supervisory:** Agents can use context-passing as a data exfiltration channel, or one compromised agent can inject malicious instructions into the context of another, causing cascading security failures.; A supervisory agent with excessive autonomy could mismanage worker agents, grant them elevated permissions, or approve harmful actions, leading to large-scale security incidents.; An attack on a single worker agent could cause it to enter a costly loop, consuming the budget for an entire team of agents and causing a wider denial of service.
+
+<!-- AAF-ENGINE:END -->
+
 ## **Section 5 Citations (Sources & Links)**
 
 1. UK NCSC: Prompt injection is not SQL injection (it may be worse)

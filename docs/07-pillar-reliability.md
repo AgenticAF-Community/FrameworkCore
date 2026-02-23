@@ -251,6 +251,29 @@ A reliable agentic architecture therefore makes these gates explicit:
 
 Reliability is the discipline of ensuring that the system’s outcomes remain stable even when its reasoning layer is not.
 
+<!-- AAF-ENGINE:START — generated from trade-offs.js, do not edit manually -->
+
+### 6.15 Design Recommendations & Trade-offs
+
+**Key recommendations**
+
+- Use a central orchestrator as a reliability control point to validate intermediate outputs and prevent errors from propagating in multi-agent systems.
+- Use more capable models for planning and high-risk reasoning, while using smaller, cheaper models for routine execution and transformation.
+
+**Cross-pillar trade-offs**
+
+- **Reliability x Performance:** Using multi-agent architectures to increase performance via parallelism can introduce significant coordination overhead and amplify errors, harming system reliability. Use a central orchestrator as a reliability control point to validate intermediate outputs and prevent errors from propagating in multi-agent systems. *(source: 6.5)*
+- **Reliability x Cost:** Using the most capable (and expensive) model for all tasks to maximize reliability is often not economically scalable. Use more capable models for planning and high-risk reasoning, while using smaller, cheaper models for routine execution and transformation. *(source: 7.1)*
+
+**By autonomy level**
+
+- **Assistive:** The agent may default to a highly reliable but expensive model for drafting simple text, where a cheaper model would have been sufficient.
+- **Delegated:** The agent proposes a plan using a top-tier model to ensure success, and the human must decide if the reliability gain is worth the cost.
+- **Bounded Autonomous:** This trade-off is most apparent at the autonomous and supervisory levels where agents interact without direct human oversight for each step.; An agent might exclusively use a high-capability model to minimize errors, but this will be financially unsustainable. A cost-optimized agent must be architected to escalate to expensive models only when cheaper ones fail verification.
+- **Supervisory:** A supervisory architecture is the direct mitigation for this tension, but if designed poorly (e.g., without validation gates), the supervisor can fail to prevent error amplification, sacrificing reliability for perceived parallelism.; A supervisory agent that routes all tasks to the 'most reliable' worker agent (which uses the most expensive model) will not be cost-effective.
+
+<!-- AAF-ENGINE:END -->
+
 ## **Section 6 Citations (Sources & Links)**
 
 1. Gupta et al.: ReliabilityBench: Evaluating LLM Agent Reliability Under Production-Like Stress Conditions (definitions: consistency, robustness, fault tolerance; fault injection; reliability surface  

@@ -242,6 +242,31 @@ Performance efficiency is not merely “make it faster.” In agentic systems it
 
 A performant agentic system is one that is intentionally constrained. The design goal is not maximum autonomy; it is maximum effective autonomy per unit of compute.
 
+<!-- AAF-ENGINE:START — generated from trade-offs.js, do not edit manually -->
+
+### 9.15 Design Recommendations & Trade-offs
+
+**Key recommendations**
+
+- Use performance-oriented context patterns like on-demand tool discovery (Tool Search) to reduce the impact of large tool catalogs on the context window.
+- Use a central orchestrator as a reliability control point to validate intermediate outputs and prevent errors from propagating in multi-agent systems.
+- Balance accuracy, latency, and cost for the specific workload by selecting the right model, rather than defaulting to the largest.
+
+**Cross-pillar trade-offs**
+
+- **Performance x Context:** Providing excessive context, such as large tool catalogs, increases model processing time and degrades agent responsiveness (latency). Use performance-oriented context patterns like on-demand tool discovery (Tool Search) to reduce the impact of large tool catalogs on the context window. *(source: 4.2.A)*
+- **Performance x Reliability:** Using multi-agent architectures to increase performance via parallelism can introduce significant coordination overhead and amplify errors, harming system reliability. Use a central orchestrator as a reliability control point to validate intermediate outputs and prevent errors from propagating in multi-agent systems. *(source: 6.5)*
+- **Performance x Cost:** Improving performance by using more powerful models or longer context windows directly increases token consumption and overall operational cost. Balance accuracy, latency, and cost for the specific workload by selecting the right model, rather than defaulting to the largest. *(source: intro)*
+
+**By autonomy level**
+
+- **Assistive:** The agent takes a long time to generate suggestions because it is processing a large, unnecessary context, leading to a poor user experience.; The agent proposes a response from a fast, expensive model. The human must constantly make the cost/speed decision for each query.
+- **Delegated:** The agent's proposed plan involves so much context that the execution step (even after approval) is slow, and the human waits a long time for the result.; The agent's proposed plan relies on high-cost, low-latency models, forcing the human approver to either accept the high cost or reject the performant plan.
+- **Bounded Autonomous:** The agent's loop becomes slow, reducing its overall throughput because each reasoning step is burdened by a large context window, even for simple decisions.; This trade-off is most apparent at the autonomous and supervisory levels where agents interact without direct human oversight for each step.; An autonomous agent, optimizing for task completion speed, may default to the most powerful and expensive model, rapidly consuming its budget unless routing policies are strictly enforced.
+- **Supervisory:** Coordination between agents slows down as they exchange large context payloads, creating a system-wide latency bottleneck.; A supervisory architecture is the direct mitigation for this tension, but if designed poorly (e.g., without validation gates), the supervisor can fail to prevent error amplification, sacrificing reliability for perceived parallelism.; A supervisory agent might route all sub-tasks to expensive, high-performance specialist agents by default, failing to optimize the overall cost of the workflow.
+
+<!-- AAF-ENGINE:END -->
+
 ## **Section 9 Citations (Sources & Links)**
 
 1. Google Research — Towards a science of scaling agent systems: When and why agent systems work (blog; highlights performance gains on parallel tasks and degradation on sequential tasks; topology-dependent error amplification).  

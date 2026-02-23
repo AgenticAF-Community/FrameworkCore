@@ -475,54 +475,19 @@ const baseHandler = createMcpHandler(
         filePaths.push(f.file);
       }
 
-      const SECRET_PATTERNS = [
-        /AKIA[0-9A-Z]{16}/g, /\bsk-[a-zA-Z0-9]{20,}/g, /\bsk_live_[a-zA-Z0-9]+/g,
-        /ghp_[a-zA-Z0-9]{36}/g, /-----BEGIN (RSA |EC )?PRIVATE KEY-----/g,
-        /password\s*[:=]\s*["'][^"']{4,}/gi, /secret\s*[:=]\s*["'][^"']{4,}/gi,
-      ];
-      const EXEC_PATTERNS = [/\bexec\s*\(/g, /\bexecSync\s*\(/g, /\beval\s*\(/g, /child_process/g, /subprocess\.run|os\.system/g];
-      const PERM_PATTERNS = [/["'](\*|admin|root|superuser)["']/g, /full_access|FullAccess/g];
-
-      type Finding = { severity: string; cia_dimension: string; check: string; location: string; evidence: string; recommendation: string };
-      const results: Finding[] = [];
-
-      for (const [file, text] of content.entries()) {
-        for (const re of SECRET_PATTERNS) {
-          re.lastIndex = 0;
-          if (re.test(text)) {
-            results.push({ severity: "critical", cia_dimension: "confidentiality", check: "Hardcoded secret", location: file, evidence: "Secret pattern detected", recommendation: "Move to vault or environment variable. See AAF Security 5.5." });
-          }
-        }
-        for (const re of EXEC_PATTERNS) {
-          re.lastIndex = 0;
-          if (re.test(text)) {
-            results.push({ severity: "high", cia_dimension: "integrity", check: "Unsandboxed execution", location: file, evidence: "exec/eval pattern detected", recommendation: "Sandbox execution and validate inputs. See AAF Security 5.4." });
-          }
-        }
-        for (const re of PERM_PATTERNS) {
-          re.lastIndex = 0;
-          if (re.test(text)) {
-            results.push({ severity: "high", cia_dimension: "integrity", check: "Overly broad permissions", location: file, evidence: "Wildcard/admin permission", recommendation: "Use least-privilege scoped grants. See AAF Security 5.3." });
-          }
-        }
-      }
-
-      const hasGateway = [...content.values()].some(t => /gateway|tool_gateway|epistemic.gate|policy.gate/i.test(t));
-      if (!hasGateway) results.push({ severity: "high", cia_dimension: "integrity", check: "No tool gateway", location: "(project)", evidence: "No gateway pattern", recommendation: "Implement non-bypassable Tool Gateway. See AAF Security 5.4." });
-
-      const hasRateLimit = [...content.values()].some(t => /rate.limit|throttle|quota/i.test(t));
-      if (!hasRateLimit) results.push({ severity: "medium", cia_dimension: "availability", check: "No rate limiting", location: "(project)", evidence: "No rate limit pattern", recommendation: "Add rate limiting at entry points. See AAF Security 5.2." });
+      const { runSecurityChecks } = await import("../tools/aaf-security/checks.js") as { runSecurityChecks: (s: { paths: string[]; content: Map<string, string> }) => { findings: any[]; summary: any } };
+      const { findings: allFindings, summary: fullSummary } = runSecurityChecks({ paths: filePaths, content });
 
       const sevOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
       const minSev = severity === "all" || !severity ? 999 : (sevOrder[severity] ?? 999);
-      const filtered = results.filter(f => (sevOrder[f.severity] ?? 999) <= minSev);
+      const filtered = allFindings.filter((f: any) => (sevOrder[f.severity] ?? 999) <= minSev);
 
       const summary = {
         total: filtered.length,
-        critical: filtered.filter(f => f.severity === "critical").length,
-        high: filtered.filter(f => f.severity === "high").length,
-        medium: filtered.filter(f => f.severity === "medium").length,
-        low: filtered.filter(f => f.severity === "low").length,
+        critical: filtered.filter((f: any) => f.severity === "critical").length,
+        high: filtered.filter((f: any) => f.severity === "high").length,
+        medium: filtered.filter((f: any) => f.severity === "medium").length,
+        low: filtered.filter((f: any) => f.severity === "low").length,
       };
 
       return { content: [{ type: "text", text: JSON.stringify({ summary, findings: filtered }, null, 2) }] };

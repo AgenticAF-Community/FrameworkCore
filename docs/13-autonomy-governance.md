@@ -244,6 +244,29 @@ We can explain what the agent is allowed to do, how far it can go, what “done�
 
 If you cannot articulate those elements, you do not have autonomy governance. You have a system that is functioning on trust—and trust is not an architecture.
 
+<!-- AAF-ENGINE:START — generated from trade-offs.js, do not edit manually -->
+
+### 12.10 Design Recommendations & Trade-offs
+
+**Key recommendations**
+
+- Grant the minimum necessary autonomy for a task and constrain it with explicit policy gates, least-privilege tool access, and mandatory verification for write actions.
+- Enforce explicit, non-bypassable budgets on steps, tool calls, tokens, time, and spend as a primary mechanism for governing autonomy.
+
+**Cross-pillar trade-offs**
+
+- **Autonomy x Security:** Increasing an agent's level of autonomy without sufficient governance controls like permissions and policy gates creates the 'Excessive Agency' security vulnerability. Grant the minimum necessary autonomy for a task and constrain it with explicit policy gates, least-privilege tool access, and mandatory verification for write actions. *(source: 4.2.B)*
+- **Autonomy x Cost:** Granting an agent high levels of autonomy without enforced budgets for its actions (steps, tool calls, tokens) leads to unpredictable and potentially runaway operational costs. Enforce explicit, non-bypassable budgets on steps, tool calls, tokens, time, and spend as a primary mechanism for governing autonomy. *(source: intro)*
+
+**By autonomy level**
+
+- **Assistive:** Not applicable, as the human is the actuator and the agent has no direct autonomy to pose a security risk through its own actions.; The agent may propose a long, complex plan that would be costly to execute, but the cost is ultimately controlled by the human's decision to act.
+- **Delegated:** The agent may propose a damaging action (due to manipulation or error), and security relies solely on the human approver catching it.; The agent's plan may not include a cost estimate, forcing the human to approve an action with unknown financial impact.
+- **Bounded Autonomous:** This is the most critical level. An agent with excessive autonomy can be manipulated into performing harmful actions directly, as it operates without a default human-in-the-loop gate.; A fully autonomous agent without a budget can easily enter a retry loop or perform extensive, low-value exploration, leading to massive cost overruns. This is the highest-risk level for this trade-off.
+- **Supervisory:** A supervisory agent with excessive autonomy could mismanage worker agents, grant them elevated permissions, or approve harmful actions, leading to large-scale security incidents.; A supervisory agent can burn its entire budget orchestrating inefficient worker agents, or a single runaway worker can exhaust the shared budget for the whole team.
+
+<!-- AAF-ENGINE:END -->
+
 ## **Section 12 Citations (Sources & Links)**
 
 1. OWASP GenAI Security Project — LLM08: Excessive Agency (definition, root causes: excessive functionality/permissions/autonomy).  

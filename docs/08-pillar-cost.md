@@ -211,6 +211,35 @@ This is why cost optimization sits tightly adjacent to:
 
 In short: cost is a control surface. Architect it accordingly.
 
+<!-- AAF-ENGINE:START — generated from trade-offs.js, do not edit manually -->
+
+### 7.11 Design Recommendations & Trade-offs
+
+**Key recommendations**
+
+- Architect context management with explicit budgeting, just-in-time retrieval, summarization, and provenance tracking.
+- Enforce explicit, non-bypassable budgets on steps, tool calls, tokens, time, and spend as a primary mechanism for governing autonomy.
+- Balance accuracy, latency, and cost for the specific workload by selecting the right model, rather than defaulting to the largest.
+- Use more capable models for planning and high-risk reasoning, while using smaller, cheaper models for routine execution and transformation.
+- Apply rate limiting and quotas at the agent's communication boundary to mitigate resource-driven attacks.
+
+**Cross-pillar trade-offs**
+
+- **Cost x Context:** Providing excessive context to an agent increases token volume, which directly increases operational costs. Architect context management with explicit budgeting, just-in-time retrieval, summarization, and provenance tracking. *(source: 4.2.A)*
+- **Cost x Autonomy:** Granting an agent high levels of autonomy without enforced budgets for its actions (steps, tool calls, tokens) leads to unpredictable and potentially runaway operational costs. Enforce explicit, non-bypassable budgets on steps, tool calls, tokens, time, and spend as a primary mechanism for governing autonomy. *(source: intro)*
+- **Cost x Performance:** Improving performance by using more powerful models or longer context windows directly increases token consumption and overall operational cost. Balance accuracy, latency, and cost for the specific workload by selecting the right model, rather than defaulting to the largest. *(source: intro)*
+- **Cost x Reliability:** Using the most capable (and expensive) model for all tasks to maximize reliability is often not economically scalable. Use more capable models for planning and high-risk reasoning, while using smaller, cheaper models for routine execution and transformation. *(source: 7.1)*
+- **Cost x Security:** A lack of security controls, such as rate limiting, makes an agent vulnerable to denial-of-service or runaway loops that cause excessive, uncontrolled costs. Apply rate limiting and quotas at the agent's communication boundary to mitigate resource-driven attacks. *(source: 5.1)*
+
+**By autonomy level**
+
+- **Assistive:** The agent may retrieve and present large volumes of context to the human, increasing token costs for each interaction, even if the human only needed a summary.; The agent may propose a long, complex plan that would be costly to execute, but the cost is ultimately controlled by the human's decision to act.; The agent proposes a response from a fast, expensive model. The human must constantly make the cost/speed decision for each query.; The agent may default to a highly reliable but expensive model for drafting simple text, where a cheaper model would have been sufficient.; An attacker could repeatedly query an assistive agent, driving up inference costs, even if no actions are taken.
+- **Delegated:** The agent proposes a plan that requires a large context payload for execution, forcing the human approver to accept a high-cost action.; The agent's plan may not include a cost estimate, forcing the human to approve an action with unknown financial impact.; The agent's proposed plan relies on high-cost, low-latency models, forcing the human approver to either accept the high cost or reject the performant plan.; The agent proposes a plan using a top-tier model to ensure success, and the human must decide if the reliability gain is worth the cost.; An attacker could repeatedly submit plans for approval, consuming resources on the agent side even if the human denies all of them.
+- **Bounded Autonomous:** The agent, in its attempt to gather all possible information, might hit its token or cost budget prematurely by accumulating low-value context, causing the task to fail.; A fully autonomous agent without a budget can easily enter a retry loop or perform extensive, low-value exploration, leading to massive cost overruns. This is the highest-risk level for this trade-off.; An autonomous agent, optimizing for task completion speed, may default to the most powerful and expensive model, rapidly consuming its budget unless routing policies are strictly enforced.; An agent might exclusively use a high-capability model to minimize errors, but this will be financially unsustainable. A cost-optimized agent must be architected to escalate to expensive models only when cheaper ones fail verification.; This is a high-risk level. An attacker who triggers a runaway loop in an autonomous agent can cause significant financial damage before detection, as there is no human gate per-loop.
+- **Supervisory:** A supervisory agent may pass large, un-summarized context blobs between worker agents, multiplying token costs across the system for each step.; A supervisory agent can burn its entire budget orchestrating inefficient worker agents, or a single runaway worker can exhaust the shared budget for the whole team.; A supervisory agent might route all sub-tasks to expensive, high-performance specialist agents by default, failing to optimize the overall cost of the workflow.; A supervisory agent that routes all tasks to the 'most reliable' worker agent (which uses the most expensive model) will not be cost-effective.; An attack on a single worker agent could cause it to enter a costly loop, consuming the budget for an entire team of agents and causing a wider denial of service.
+
+<!-- AAF-ENGINE:END -->
+
 ## **Section 7 Citations (Sources & Links)**
 
 1. OpenAI API Docs: Prompt caching (reduced input token costs and latency through caching repeated prompt prefixes)  

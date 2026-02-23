@@ -238,6 +238,31 @@ For any agent task, we can explain what context was provided, why it was provide
 
 If you cannot do that, you do not have context governance. You have prompt accumulation.
 
+<!-- AAF-ENGINE:START — generated from trade-offs.js, do not edit manually -->
+
+### 11.11 Design Recommendations & Trade-offs
+
+**Key recommendations**
+
+- Architect context management with explicit budgeting, just-in-time retrieval, summarization, and provenance tracking.
+- Use performance-oriented context patterns like on-demand tool discovery (Tool Search) to reduce the impact of large tool catalogs on the context window.
+- Provide the minimum sufficient context for the task, in a controlled and explainable form, while preserving verification signals and preventing unsafe information flow.
+
+**Cross-pillar trade-offs**
+
+- **Context x Cost:** Providing excessive context to an agent increases token volume, which directly increases operational costs. Architect context management with explicit budgeting, just-in-time retrieval, summarization, and provenance tracking. *(source: 4.2.A)*
+- **Context x Performance:** Providing excessive context, such as large tool catalogs, increases model processing time and degrades agent responsiveness (latency). Use performance-oriented context patterns like on-demand tool discovery (Tool Search) to reduce the impact of large tool catalogs on the context window. *(source: 4.2.A)*
+- **Context x Security:** Providing insufficient context can lead to unsafe tool use, while providing excessive context increases the risk of data leakage and instruction injection. Provide the minimum sufficient context for the task, in a controlled and explainable form, while preserving verification signals and preventing unsafe information flow. *(source: 11.1)*
+
+**By autonomy level**
+
+- **Assistive:** The agent may retrieve and present large volumes of context to the human, increasing token costs for each interaction, even if the human only needed a summary.; The agent takes a long time to generate suggestions because it is processing a large, unnecessary context, leading to a poor user experience.; The agent might surface sensitive information from a large context in its suggestion, or fail to include critical security constraints, leading the human to make an unsafe decision.
+- **Delegated:** The agent proposes a plan that requires a large context payload for execution, forcing the human approver to accept a high-cost action.; The agent's proposed plan involves so much context that the execution step (even after approval) is slow, and the human waits a long time for the result.; The agent's proposed plan might be based on malicious instructions hidden in the context, or it might leak sensitive data in the plan's details for the human to approve.
+- **Bounded Autonomous:** The agent, in its attempt to gather all possible information, might hit its token or cost budget prematurely by accumulating low-value context, causing the task to fail.; The agent's loop becomes slow, reducing its overall throughput because each reasoning step is burdened by a large context window, even for simple decisions.; An agent operating with too much untrusted context is highly susceptible to prompt injection, potentially causing it to execute unsafe tool calls. Too little context might cause it to use a tool with incorrect, unsafe arguments.
+- **Supervisory:** A supervisory agent may pass large, un-summarized context blobs between worker agents, multiplying token costs across the system for each step.; Coordination between agents slows down as they exchange large context payloads, creating a system-wide latency bottleneck.; Agents can use context-passing as a data exfiltration channel, or one compromised agent can inject malicious instructions into the context of another, causing cascading security failures.
+
+<!-- AAF-ENGINE:END -->
+
 ## **Section 11 Citations (Sources & Links)**
 
 1. Anthropic — Effective context engineering for AI agents (context structure as a primary driver of agent performance and stability).  

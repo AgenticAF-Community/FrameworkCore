@@ -3,30 +3,12 @@
  * Each check scans file content and paths, returning findings with
  * severity, CIA dimension, location, evidence, and an actionable recommendation.
  */
-
-const SECRET_PATTERNS = [
-  { re: /AKIA[0-9A-Z]{16}/g, label: "AWS Access Key" },
-  { re: /\bsk-[a-zA-Z0-9]{20,}/g, label: "OpenAI-style API key" },
-  { re: /\bsk_live_[a-zA-Z0-9]+/g, label: "Stripe live key" },
-  { re: /ghp_[a-zA-Z0-9]{36}/g, label: "GitHub personal access token" },
-  { re: /-----BEGIN (RSA |EC )?PRIVATE KEY-----/g, label: "Private key" },
-  { re: /password\s*[:=]\s*["'][^"']{4,}/gi, label: "Hardcoded password" },
-  { re: /secret\s*[:=]\s*["'][^"']{4,}/gi, label: "Hardcoded secret" },
-];
-
-const INJECTION_PATTERNS = [
-  { re: /\bexec\s*\(/g, label: "exec() call" },
-  { re: /\bexecSync\s*\(/g, label: "execSync() call" },
-  { re: /child_process/g, label: "child_process import" },
-  { re: /\beval\s*\(/g, label: "eval() call" },
-  { re: /subprocess\.run|os\.system|os\.popen/g, label: "Shell execution (Python)" },
-];
-
-const BROAD_PERMISSION_PATTERNS = [
-  { re: /["'](\*|admin|root|superuser)["']/g, label: "Wildcard or admin permission" },
-  { re: /permissions?\s*[:=]\s*\[?\s*["']\*["']/gi, label: "Wildcard permission grant" },
-  { re: /full_access|FullAccess/g, label: "Full access grant" },
-];
+import {
+  SECRET_PATTERNS,
+  INJECTION_PATTERNS,
+  BROAD_PERMISSION_PATTERNS,
+  POSITIVE_PATTERNS,
+} from "./patterns.js";
 
 function findLineNumber(text, index) {
   return text.substring(0, index).split("\n").length;
@@ -89,7 +71,7 @@ export function runSecurityChecks(scanResult) {
     "Move this secret to a vault or environment variable. Never store secrets in source code. See AAF Security Pillar 5.5: Secrets Management."
   ));
 
-  if (!checkAbsence(entries, paths, ["vault", "secret manager", "getsecret", "keyvault"], ["vault", "secret"])) {
+  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.vault, ["vault", "secret"])) {
     findings.push({
       severity: "high", cia_dimension: "confidentiality",
       check: "No vault or secrets manager detected",
@@ -115,7 +97,7 @@ export function runSecurityChecks(scanResult) {
     "Replace wildcard/admin permissions with narrowly scoped, least-privilege grants per tool and action class. See AAF Security Pillar 5.3: Privilege Separation."
   ));
 
-  if (!checkAbsence(entries, paths, ["gateway", "tool_gateway", "toolgateway", "epistemic gate", "policy gate"], ["gateway"])) {
+  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.gateway, ["gateway"])) {
     findings.push({
       severity: "high", cia_dimension: "integrity",
       check: "No tool gateway pattern detected",
@@ -125,7 +107,7 @@ export function runSecurityChecks(scanResult) {
     });
   }
 
-  if (!checkAbsence(entries, paths, ["instruction hierarchy", "system prompt", "data boundary", "content label", "role: system"])) {
+  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.injectionMitigation)) {
     findings.push({
       severity: "medium", cia_dimension: "integrity",
       check: "No prompt injection mitigation detected",
@@ -135,7 +117,7 @@ export function runSecurityChecks(scanResult) {
     });
   }
 
-  if (!checkAbsence(entries, paths, ["verify", "definition of done", "evidence", "assert", "check"], ["verify", "validation"])) {
+  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.verification, ["verify", "validation"])) {
     findings.push({
       severity: "medium", cia_dimension: "integrity",
       check: "No action verification pattern detected",
@@ -147,7 +129,7 @@ export function runSecurityChecks(scanResult) {
 
   // --- AVAILABILITY ---
 
-  if (!checkAbsence(entries, paths, ["rate limit", "throttle", "ratelimit", "rate-limit", "quota"], ["rate.limit", "throttle"])) {
+  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.rateLimit, ["rate.limit", "throttle"])) {
     findings.push({
       severity: "medium", cia_dimension: "availability",
       check: "No rate limiting detected",
@@ -157,7 +139,7 @@ export function runSecurityChecks(scanResult) {
     });
   }
 
-  if (!checkAbsence(entries, paths, ["budget", "max_steps", "max_tokens", "max_tool", "step_limit"])) {
+  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.budget)) {
     findings.push({
       severity: "medium", cia_dimension: "availability",
       check: "No budget enforcement detected",
@@ -167,7 +149,7 @@ export function runSecurityChecks(scanResult) {
     });
   }
 
-  if (!checkAbsence(entries, paths, ["fallback", "graceful degrad", "failover", "circuit breaker"])) {
+  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.fallback)) {
     findings.push({
       severity: "low", cia_dimension: "availability",
       check: "No graceful degradation for model unavailability",
