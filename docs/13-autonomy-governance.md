@@ -260,10 +260,18 @@ If you cannot articulate those elements, you do not have autonomy governance. Yo
 
 **By autonomy level**
 
-- **Assistive:** Not applicable, as the human is the actuator and the agent has no direct autonomy to pose a security risk through its own actions.; The agent may propose a long, complex plan that would be costly to execute, but the cost is ultimately controlled by the human's decision to act.
-- **Delegated:** The agent may propose a damaging action (due to manipulation or error), and security relies solely on the human approver catching it.; The agent's plan may not include a cost estimate, forcing the human to approve an action with unknown financial impact.
-- **Bounded Autonomous:** This is the most critical level. An agent with excessive autonomy can be manipulated into performing harmful actions directly, as it operates without a default human-in-the-loop gate.; A fully autonomous agent without a budget can easily enter a retry loop or perform extensive, low-value exploration, leading to massive cost overruns. This is the highest-risk level for this trade-off.
-- **Supervisory:** A supervisory agent with excessive autonomy could mismanage worker agents, grant them elevated permissions, or approve harmful actions, leading to large-scale security incidents.; A supervisory agent can burn its entire budget orchestrating inefficient worker agents, or a single runaway worker can exhaust the shared budget for the whole team.
+- **Assistive:**
+  - *Autonomy x Security:* Risk is low — the human remains the actuator, but the agent's suggestions can still influence unsafe decisions.
+  - *Autonomy x Cost:* Cost remains human-controlled, but agents should surface cost estimates alongside proposed plans.
+- **Delegated:**
+  - *Autonomy x Security:* Security depends on the human approver catching manipulated or damaging proposed actions.
+  - *Autonomy x Cost:* Plans without cost estimates force approvers to accept unknown financial impact.
+- **Bounded Autonomous:**
+  - *Autonomy x Security:* Highest risk — an agent with excessive autonomy can be manipulated into harmful actions without a human-in-the-loop gate.
+  - *Autonomy x Cost:* Without enforced budgets, retry loops or low-value exploration can cause massive cost overruns.
+- **Supervisory:**
+  - *Autonomy x Security:* A supervisory agent with excessive autonomy can mismanage workers, escalate permissions, or approve harmful actions at scale.
+  - *Autonomy x Cost:* Inefficient worker orchestration or a single runaway worker can exhaust the shared budget for the entire agent team.
 
 <!-- AAF-ENGINE:END -->
 

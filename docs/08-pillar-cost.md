@@ -233,10 +233,30 @@ In short: cost is a control surface. Architect it accordingly.
 
 **By autonomy level**
 
-- **Assistive:** The agent may retrieve and present large volumes of context to the human, increasing token costs for each interaction, even if the human only needed a summary.; The agent may propose a long, complex plan that would be costly to execute, but the cost is ultimately controlled by the human's decision to act.; The agent proposes a response from a fast, expensive model. The human must constantly make the cost/speed decision for each query.; The agent may default to a highly reliable but expensive model for drafting simple text, where a cheaper model would have been sufficient.; An attacker could repeatedly query an assistive agent, driving up inference costs, even if no actions are taken.
-- **Delegated:** The agent proposes a plan that requires a large context payload for execution, forcing the human approver to accept a high-cost action.; The agent's plan may not include a cost estimate, forcing the human to approve an action with unknown financial impact.; The agent's proposed plan relies on high-cost, low-latency models, forcing the human approver to either accept the high cost or reject the performant plan.; The agent proposes a plan using a top-tier model to ensure success, and the human must decide if the reliability gain is worth the cost.; An attacker could repeatedly submit plans for approval, consuming resources on the agent side even if the human denies all of them.
-- **Bounded Autonomous:** The agent, in its attempt to gather all possible information, might hit its token or cost budget prematurely by accumulating low-value context, causing the task to fail.; A fully autonomous agent without a budget can easily enter a retry loop or perform extensive, low-value exploration, leading to massive cost overruns. This is the highest-risk level for this trade-off.; An autonomous agent, optimizing for task completion speed, may default to the most powerful and expensive model, rapidly consuming its budget unless routing policies are strictly enforced.; An agent might exclusively use a high-capability model to minimize errors, but this will be financially unsustainable. A cost-optimized agent must be architected to escalate to expensive models only when cheaper ones fail verification.; This is a high-risk level. An attacker who triggers a runaway loop in an autonomous agent can cause significant financial damage before detection, as there is no human gate per-loop.
-- **Supervisory:** A supervisory agent may pass large, un-summarized context blobs between worker agents, multiplying token costs across the system for each step.; A supervisory agent can burn its entire budget orchestrating inefficient worker agents, or a single runaway worker can exhaust the shared budget for the whole team.; A supervisory agent might route all sub-tasks to expensive, high-performance specialist agents by default, failing to optimize the overall cost of the workflow.; A supervisory agent that routes all tasks to the 'most reliable' worker agent (which uses the most expensive model) will not be cost-effective.; An attack on a single worker agent could cause it to enter a costly loop, consuming the budget for an entire team of agents and causing a wider denial of service.
+- **Assistive:**
+  - *Cost x Context:* Large context volumes increase token costs per interaction even when the human only needs a summary.
+  - *Cost x Autonomy:* Cost remains human-controlled, but agents should surface cost estimates alongside proposed plans.
+  - *Cost x Performance:* Fast, expensive model defaults shift the cost/speed trade-off to the human for every query.
+  - *Cost x Reliability:* Default to cheaper models for simple tasks; expensive models add cost without proportionate reliability gain.
+  - *Cost x Security:* Repeated queries can drive up inference costs even without action execution — apply rate limiting.
+- **Delegated:**
+  - *Cost x Context:* Plans requiring large context payloads force the approver to accept high-cost actions without alternatives.
+  - *Cost x Autonomy:* Plans without cost estimates force approvers to accept unknown financial impact.
+  - *Cost x Performance:* Plans built on high-cost models force approvers to choose between performance and budget.
+  - *Cost x Reliability:* Surface the cost/reliability trade-off in the plan so approvers can make informed decisions.
+  - *Cost x Security:* Repeated plan submissions consume resources regardless of approval outcome — throttle submission frequency.
+- **Bounded Autonomous:**
+  - *Cost x Context:* Unbounded context accumulation can exhaust token or cost budgets before the task completes.
+  - *Cost x Autonomy:* Without enforced budgets, retry loops or low-value exploration can cause massive cost overruns.
+  - *Cost x Performance:* Enforce model routing policies — agents optimizing for speed will default to the most expensive model without them.
+  - *Cost x Reliability:* Escalate to expensive models only when cheaper ones fail verification — exclusive use of top-tier models is financially unsustainable.
+  - *Cost x Security:* A triggered runaway loop causes significant financial damage before detection — enforce per-loop budget caps.
+- **Supervisory:**
+  - *Cost x Context:* Passing un-summarized context between worker agents multiplies token costs at every coordination step.
+  - *Cost x Autonomy:* Inefficient worker orchestration or a single runaway worker can exhaust the shared budget for the entire agent team.
+  - *Cost x Performance:* Route sub-tasks by complexity, not by default — supervisors that always use top-tier workers waste budget.
+  - *Cost x Reliability:* Route tasks by risk level — routing all work to the most reliable (and expensive) worker is not cost-effective.
+  - *Cost x Security:* A single compromised worker entering a costly loop can exhaust the shared budget for the entire agent team.
 
 <!-- AAF-ENGINE:END -->
 

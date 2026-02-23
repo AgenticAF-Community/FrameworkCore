@@ -55,10 +55,10 @@
         }
       ],
       "autonomyNotes": {
-        "assistive": "The agent may retrieve and present large volumes of context to the human, increasing token costs for each interaction, even if the human only needed a summary.",
-        "delegated": "The agent proposes a plan that requires a large context payload for execution, forcing the human approver to accept a high-cost action.",
-        "boundedAutonomous": "The agent, in its attempt to gather all possible information, might hit its token or cost budget prematurely by accumulating low-value context, causing the task to fail.",
-        "supervisory": "A supervisory agent may pass large, un-summarized context blobs between worker agents, multiplying token costs across the system for each step."
+        "assistive": "Large context volumes increase token costs per interaction even when the human only needs a summary.",
+        "delegated": "Plans requiring large context payloads force the approver to accept high-cost actions without alternatives.",
+        "boundedAutonomous": "Unbounded context accumulation can exhaust token or cost budgets before the task completes.",
+        "supervisory": "Passing un-summarized context between worker agents multiplies token costs at every coordination step."
       }
     },
     {
@@ -93,10 +93,10 @@
         }
       ],
       "autonomyNotes": {
-        "assistive": "The agent takes a long time to generate suggestions because it is processing a large, unnecessary context, leading to a poor user experience.",
-        "delegated": "The agent's proposed plan involves so much context that the execution step (even after approval) is slow, and the human waits a long time for the result.",
-        "boundedAutonomous": "The agent's loop becomes slow, reducing its overall throughput because each reasoning step is burdened by a large context window, even for simple decisions.",
-        "supervisory": "Coordination between agents slows down as they exchange large context payloads, creating a system-wide latency bottleneck."
+        "assistive": "Bloated context increases suggestion latency, degrading the interactive experience.",
+        "delegated": "Oversized context payloads slow execution even after approval, increasing end-to-end latency.",
+        "boundedAutonomous": "Each reasoning step is slowed by a large context window, reducing overall loop throughput.",
+        "supervisory": "Large context exchanges between agents create system-wide latency bottlenecks."
       }
     },
     {
@@ -131,10 +131,10 @@
         }
       ],
       "autonomyNotes": {
-        "assistive": "The agent might surface sensitive information from a large context in its suggestion, or fail to include critical security constraints, leading the human to make an unsafe decision.",
-        "delegated": "The agent's proposed plan might be based on malicious instructions hidden in the context, or it might leak sensitive data in the plan's details for the human to approve.",
-        "boundedAutonomous": "An agent operating with too much untrusted context is highly susceptible to prompt injection, potentially causing it to execute unsafe tool calls. Too little context might cause it to use a tool with incorrect, unsafe arguments.",
-        "supervisory": "Agents can use context-passing as a data exfiltration channel, or one compromised agent can inject malicious instructions into the context of another, causing cascading security failures."
+        "assistive": "Oversized context may surface sensitive data in suggestions or omit security constraints, leading to unsafe human decisions.",
+        "delegated": "Malicious instructions hidden in context can shape proposed plans; sensitive data may leak in plan details.",
+        "boundedAutonomous": "Excess untrusted context increases prompt injection risk; insufficient context leads to unsafe tool arguments.",
+        "supervisory": "Context-passing between agents can become a data exfiltration channel or a vector for cascading injection attacks."
       }
     },
     {
@@ -169,10 +169,10 @@
         }
       ],
       "autonomyNotes": {
-        "assistive": "Not applicable, as the human is the actuator and the agent has no direct autonomy to pose a security risk through its own actions.",
-        "delegated": "The agent may propose a damaging action (due to manipulation or error), and security relies solely on the human approver catching it.",
-        "boundedAutonomous": "This is the most critical level. An agent with excessive autonomy can be manipulated into performing harmful actions directly, as it operates without a default human-in-the-loop gate.",
-        "supervisory": "A supervisory agent with excessive autonomy could mismanage worker agents, grant them elevated permissions, or approve harmful actions, leading to large-scale security incidents."
+        "assistive": "Risk is low — the human remains the actuator, but the agent's suggestions can still influence unsafe decisions.",
+        "delegated": "Security depends on the human approver catching manipulated or damaging proposed actions.",
+        "boundedAutonomous": "Highest risk — an agent with excessive autonomy can be manipulated into harmful actions without a human-in-the-loop gate.",
+        "supervisory": "A supervisory agent with excessive autonomy can mismanage workers, escalate permissions, or approve harmful actions at scale."
       }
     },
     {
@@ -207,10 +207,10 @@
         }
       ],
       "autonomyNotes": {
-        "assistive": "The agent may propose a long, complex plan that would be costly to execute, but the cost is ultimately controlled by the human's decision to act.",
-        "delegated": "The agent's plan may not include a cost estimate, forcing the human to approve an action with unknown financial impact.",
-        "boundedAutonomous": "A fully autonomous agent without a budget can easily enter a retry loop or perform extensive, low-value exploration, leading to massive cost overruns. This is the highest-risk level for this trade-off.",
-        "supervisory": "A supervisory agent can burn its entire budget orchestrating inefficient worker agents, or a single runaway worker can exhaust the shared budget for the whole team."
+        "assistive": "Cost remains human-controlled, but agents should surface cost estimates alongside proposed plans.",
+        "delegated": "Plans without cost estimates force approvers to accept unknown financial impact.",
+        "boundedAutonomous": "Without enforced budgets, retry loops or low-value exploration can cause massive cost overruns.",
+        "supervisory": "Inefficient worker orchestration or a single runaway worker can exhaust the shared budget for the entire agent team."
       }
     },
     {
@@ -245,10 +245,10 @@
         }
       ],
       "autonomyNotes": {
-        "assistive": "Not explicitly discussed in source documents",
-        "delegated": "Not explicitly discussed in source documents",
-        "boundedAutonomous": "This trade-off is most apparent at the autonomous and supervisory levels where agents interact without direct human oversight for each step.",
-        "supervisory": "A supervisory architecture is the direct mitigation for this tension, but if designed poorly (e.g., without validation gates), the supervisor can fail to prevent error amplification, sacrificing reliability for perceived parallelism."
+        "assistive": "Minimal impact — single-agent suggestions do not introduce multi-agent coordination risk.",
+        "delegated": "Human approval acts as a natural validation gate, limiting error propagation.",
+        "boundedAutonomous": "Without a central orchestrator, parallel agents can amplify errors without human oversight per step.",
+        "supervisory": "A poorly designed supervisor without validation gates fails to prevent error amplification across workers."
       }
     },
     {
@@ -283,10 +283,10 @@
         }
       ],
       "autonomyNotes": {
-        "assistive": "The agent proposes a response from a fast, expensive model. The human must constantly make the cost/speed decision for each query.",
-        "delegated": "The agent's proposed plan relies on high-cost, low-latency models, forcing the human approver to either accept the high cost or reject the performant plan.",
-        "boundedAutonomous": "An autonomous agent, optimizing for task completion speed, may default to the most powerful and expensive model, rapidly consuming its budget unless routing policies are strictly enforced.",
-        "supervisory": "A supervisory agent might route all sub-tasks to expensive, high-performance specialist agents by default, failing to optimize the overall cost of the workflow."
+        "assistive": "Fast, expensive model defaults shift the cost/speed trade-off to the human for every query.",
+        "delegated": "Plans built on high-cost models force approvers to choose between performance and budget.",
+        "boundedAutonomous": "Enforce model routing policies — agents optimizing for speed will default to the most expensive model without them.",
+        "supervisory": "Route sub-tasks by complexity, not by default — supervisors that always use top-tier workers waste budget."
       }
     },
     {
@@ -321,10 +321,10 @@
         }
       ],
       "autonomyNotes": {
-        "assistive": "The agent may default to a highly reliable but expensive model for drafting simple text, where a cheaper model would have been sufficient.",
-        "delegated": "The agent proposes a plan using a top-tier model to ensure success, and the human must decide if the reliability gain is worth the cost.",
-        "boundedAutonomous": "An agent might exclusively use a high-capability model to minimize errors, but this will be financially unsustainable. A cost-optimized agent must be architected to escalate to expensive models only when cheaper ones fail verification.",
-        "supervisory": "A supervisory agent that routes all tasks to the 'most reliable' worker agent (which uses the most expensive model) will not be cost-effective."
+        "assistive": "Default to cheaper models for simple tasks; expensive models add cost without proportionate reliability gain.",
+        "delegated": "Surface the cost/reliability trade-off in the plan so approvers can make informed decisions.",
+        "boundedAutonomous": "Escalate to expensive models only when cheaper ones fail verification — exclusive use of top-tier models is financially unsustainable.",
+        "supervisory": "Route tasks by risk level — routing all work to the most reliable (and expensive) worker is not cost-effective."
       }
     },
     {
@@ -359,10 +359,10 @@
         }
       ],
       "autonomyNotes": {
-        "assistive": "An attacker could repeatedly query an assistive agent, driving up inference costs, even if no actions are taken.",
-        "delegated": "An attacker could repeatedly submit plans for approval, consuming resources on the agent side even if the human denies all of them.",
-        "boundedAutonomous": "This is a high-risk level. An attacker who triggers a runaway loop in an autonomous agent can cause significant financial damage before detection, as there is no human gate per-loop.",
-        "supervisory": "An attack on a single worker agent could cause it to enter a costly loop, consuming the budget for an entire team of agents and causing a wider denial of service."
+        "assistive": "Repeated queries can drive up inference costs even without action execution — apply rate limiting.",
+        "delegated": "Repeated plan submissions consume resources regardless of approval outcome — throttle submission frequency.",
+        "boundedAutonomous": "A triggered runaway loop causes significant financial damage before detection — enforce per-loop budget caps.",
+        "supervisory": "A single compromised worker entering a costly loop can exhaust the shared budget for the entire agent team."
       }
     }
   ]

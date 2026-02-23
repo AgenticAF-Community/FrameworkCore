@@ -260,10 +260,22 @@ A performant agentic system is one that is intentionally constrained. The design
 
 **By autonomy level**
 
-- **Assistive:** The agent takes a long time to generate suggestions because it is processing a large, unnecessary context, leading to a poor user experience.; The agent proposes a response from a fast, expensive model. The human must constantly make the cost/speed decision for each query.
-- **Delegated:** The agent's proposed plan involves so much context that the execution step (even after approval) is slow, and the human waits a long time for the result.; The agent's proposed plan relies on high-cost, low-latency models, forcing the human approver to either accept the high cost or reject the performant plan.
-- **Bounded Autonomous:** The agent's loop becomes slow, reducing its overall throughput because each reasoning step is burdened by a large context window, even for simple decisions.; This trade-off is most apparent at the autonomous and supervisory levels where agents interact without direct human oversight for each step.; An autonomous agent, optimizing for task completion speed, may default to the most powerful and expensive model, rapidly consuming its budget unless routing policies are strictly enforced.
-- **Supervisory:** Coordination between agents slows down as they exchange large context payloads, creating a system-wide latency bottleneck.; A supervisory architecture is the direct mitigation for this tension, but if designed poorly (e.g., without validation gates), the supervisor can fail to prevent error amplification, sacrificing reliability for perceived parallelism.; A supervisory agent might route all sub-tasks to expensive, high-performance specialist agents by default, failing to optimize the overall cost of the workflow.
+- **Assistive:**
+  - *Performance x Context:* Bloated context increases suggestion latency, degrading the interactive experience.
+  - *Performance x Reliability:* Minimal impact — single-agent suggestions do not introduce multi-agent coordination risk.
+  - *Performance x Cost:* Fast, expensive model defaults shift the cost/speed trade-off to the human for every query.
+- **Delegated:**
+  - *Performance x Context:* Oversized context payloads slow execution even after approval, increasing end-to-end latency.
+  - *Performance x Reliability:* Human approval acts as a natural validation gate, limiting error propagation.
+  - *Performance x Cost:* Plans built on high-cost models force approvers to choose between performance and budget.
+- **Bounded Autonomous:**
+  - *Performance x Context:* Each reasoning step is slowed by a large context window, reducing overall loop throughput.
+  - *Performance x Reliability:* Without a central orchestrator, parallel agents can amplify errors without human oversight per step.
+  - *Performance x Cost:* Enforce model routing policies — agents optimizing for speed will default to the most expensive model without them.
+- **Supervisory:**
+  - *Performance x Context:* Large context exchanges between agents create system-wide latency bottlenecks.
+  - *Performance x Reliability:* A poorly designed supervisor without validation gates fails to prevent error amplification across workers.
+  - *Performance x Cost:* Route sub-tasks by complexity, not by default — supervisors that always use top-tier workers waste budget.
 
 <!-- AAF-ENGINE:END -->
 

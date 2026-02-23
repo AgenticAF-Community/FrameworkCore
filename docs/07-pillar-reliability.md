@@ -267,10 +267,18 @@ Reliability is the discipline of ensuring that the system’s outcomes remain st
 
 **By autonomy level**
 
-- **Assistive:** The agent may default to a highly reliable but expensive model for drafting simple text, where a cheaper model would have been sufficient.
-- **Delegated:** The agent proposes a plan using a top-tier model to ensure success, and the human must decide if the reliability gain is worth the cost.
-- **Bounded Autonomous:** This trade-off is most apparent at the autonomous and supervisory levels where agents interact without direct human oversight for each step.; An agent might exclusively use a high-capability model to minimize errors, but this will be financially unsustainable. A cost-optimized agent must be architected to escalate to expensive models only when cheaper ones fail verification.
-- **Supervisory:** A supervisory architecture is the direct mitigation for this tension, but if designed poorly (e.g., without validation gates), the supervisor can fail to prevent error amplification, sacrificing reliability for perceived parallelism.; A supervisory agent that routes all tasks to the 'most reliable' worker agent (which uses the most expensive model) will not be cost-effective.
+- **Assistive:**
+  - *Reliability x Performance:* Minimal impact — single-agent suggestions do not introduce multi-agent coordination risk.
+  - *Reliability x Cost:* Default to cheaper models for simple tasks; expensive models add cost without proportionate reliability gain.
+- **Delegated:**
+  - *Reliability x Performance:* Human approval acts as a natural validation gate, limiting error propagation.
+  - *Reliability x Cost:* Surface the cost/reliability trade-off in the plan so approvers can make informed decisions.
+- **Bounded Autonomous:**
+  - *Reliability x Performance:* Without a central orchestrator, parallel agents can amplify errors without human oversight per step.
+  - *Reliability x Cost:* Escalate to expensive models only when cheaper ones fail verification — exclusive use of top-tier models is financially unsustainable.
+- **Supervisory:**
+  - *Reliability x Performance:* A poorly designed supervisor without validation gates fails to prevent error amplification across workers.
+  - *Reliability x Cost:* Route tasks by risk level — routing all work to the most reliable (and expensive) worker is not cost-effective.
 
 <!-- AAF-ENGINE:END -->
 

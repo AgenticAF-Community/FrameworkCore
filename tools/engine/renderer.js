@@ -76,10 +76,12 @@ export function renderPillarBlock(pillarId, tradeoffs) {
   if (hasAutonomyNotes) {
     lines.push("**By autonomy level**");
     lines.push("");
-    const merged = mergeAutonomyNotes(pillarId, pillarTradeoffs);
-    for (const [level, note] of Object.entries(merged)) {
-      if (note) {
-        lines.push(`- **${formatAutonomyLevel(level)}:** ${note}`);
+    for (const level of ["assistive", "delegated", "boundedAutonomous", "supervisory"]) {
+      const notesForLevel = collectAutonomyNotes(pillarId, pillarTradeoffs, level);
+      if (!notesForLevel.length) continue;
+      lines.push(`- **${formatAutonomyLevel(level)}:**`);
+      for (const { otherPillar, note } of notesForLevel) {
+        lines.push(`  - *${formatPillarName(pillarId)} x ${formatPillarName(otherPillar)}:* ${note}`);
       }
     }
     lines.push("");
@@ -176,18 +178,17 @@ function extractRecommendations(pillarId, tradeoffs) {
   return [...recs];
 }
 
-function mergeAutonomyNotes(pillarId, tradeoffs) {
-  const merged = { assistive: null, delegated: null, boundedAutonomous: null, supervisory: null };
+function collectAutonomyNotes(pillarId, tradeoffs, level) {
+  const notes = [];
   for (const t of tradeoffs) {
     if (!t.autonomyNotes) continue;
-    for (const level of Object.keys(merged)) {
-      const note = t.autonomyNotes[level];
-      if (note && !note.startsWith("Not explicitly")) {
-        merged[level] = merged[level] ? `${merged[level]}; ${note}` : note;
-      }
+    const note = t.autonomyNotes[level];
+    if (note && !note.startsWith("Not explicitly")) {
+      const otherPillar = t.pillars.find((p) => p !== pillarId) || t.pillars[1];
+      notes.push({ otherPillar, note });
     }
   }
-  return merged;
+  return notes;
 }
 
 function formatPillarName(id) {

@@ -256,10 +256,22 @@ If you cannot do that, you do not have context governance. You have prompt accum
 
 **By autonomy level**
 
-- **Assistive:** The agent may retrieve and present large volumes of context to the human, increasing token costs for each interaction, even if the human only needed a summary.; The agent takes a long time to generate suggestions because it is processing a large, unnecessary context, leading to a poor user experience.; The agent might surface sensitive information from a large context in its suggestion, or fail to include critical security constraints, leading the human to make an unsafe decision.
-- **Delegated:** The agent proposes a plan that requires a large context payload for execution, forcing the human approver to accept a high-cost action.; The agent's proposed plan involves so much context that the execution step (even after approval) is slow, and the human waits a long time for the result.; The agent's proposed plan might be based on malicious instructions hidden in the context, or it might leak sensitive data in the plan's details for the human to approve.
-- **Bounded Autonomous:** The agent, in its attempt to gather all possible information, might hit its token or cost budget prematurely by accumulating low-value context, causing the task to fail.; The agent's loop becomes slow, reducing its overall throughput because each reasoning step is burdened by a large context window, even for simple decisions.; An agent operating with too much untrusted context is highly susceptible to prompt injection, potentially causing it to execute unsafe tool calls. Too little context might cause it to use a tool with incorrect, unsafe arguments.
-- **Supervisory:** A supervisory agent may pass large, un-summarized context blobs between worker agents, multiplying token costs across the system for each step.; Coordination between agents slows down as they exchange large context payloads, creating a system-wide latency bottleneck.; Agents can use context-passing as a data exfiltration channel, or one compromised agent can inject malicious instructions into the context of another, causing cascading security failures.
+- **Assistive:**
+  - *Context x Cost:* Large context volumes increase token costs per interaction even when the human only needs a summary.
+  - *Context x Performance:* Bloated context increases suggestion latency, degrading the interactive experience.
+  - *Context x Security:* Oversized context may surface sensitive data in suggestions or omit security constraints, leading to unsafe human decisions.
+- **Delegated:**
+  - *Context x Cost:* Plans requiring large context payloads force the approver to accept high-cost actions without alternatives.
+  - *Context x Performance:* Oversized context payloads slow execution even after approval, increasing end-to-end latency.
+  - *Context x Security:* Malicious instructions hidden in context can shape proposed plans; sensitive data may leak in plan details.
+- **Bounded Autonomous:**
+  - *Context x Cost:* Unbounded context accumulation can exhaust token or cost budgets before the task completes.
+  - *Context x Performance:* Each reasoning step is slowed by a large context window, reducing overall loop throughput.
+  - *Context x Security:* Excess untrusted context increases prompt injection risk; insufficient context leads to unsafe tool arguments.
+- **Supervisory:**
+  - *Context x Cost:* Passing un-summarized context between worker agents multiplies token costs at every coordination step.
+  - *Context x Performance:* Large context exchanges between agents create system-wide latency bottlenecks.
+  - *Context x Security:* Context-passing between agents can become a data exfiltration channel or a vector for cascading injection attacks.
 
 <!-- AAF-ENGINE:END -->
 

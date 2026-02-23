@@ -327,10 +327,22 @@ This is what turns “AI system” into “governed agentic system.”
 
 **By autonomy level**
 
-- **Assistive:** The agent might surface sensitive information from a large context in its suggestion, or fail to include critical security constraints, leading the human to make an unsafe decision.; Not applicable, as the human is the actuator and the agent has no direct autonomy to pose a security risk through its own actions.; An attacker could repeatedly query an assistive agent, driving up inference costs, even if no actions are taken.
-- **Delegated:** The agent's proposed plan might be based on malicious instructions hidden in the context, or it might leak sensitive data in the plan's details for the human to approve.; The agent may propose a damaging action (due to manipulation or error), and security relies solely on the human approver catching it.; An attacker could repeatedly submit plans for approval, consuming resources on the agent side even if the human denies all of them.
-- **Bounded Autonomous:** An agent operating with too much untrusted context is highly susceptible to prompt injection, potentially causing it to execute unsafe tool calls. Too little context might cause it to use a tool with incorrect, unsafe arguments.; This is the most critical level. An agent with excessive autonomy can be manipulated into performing harmful actions directly, as it operates without a default human-in-the-loop gate.; This is a high-risk level. An attacker who triggers a runaway loop in an autonomous agent can cause significant financial damage before detection, as there is no human gate per-loop.
-- **Supervisory:** Agents can use context-passing as a data exfiltration channel, or one compromised agent can inject malicious instructions into the context of another, causing cascading security failures.; A supervisory agent with excessive autonomy could mismanage worker agents, grant them elevated permissions, or approve harmful actions, leading to large-scale security incidents.; An attack on a single worker agent could cause it to enter a costly loop, consuming the budget for an entire team of agents and causing a wider denial of service.
+- **Assistive:**
+  - *Security x Context:* Oversized context may surface sensitive data in suggestions or omit security constraints, leading to unsafe human decisions.
+  - *Security x Autonomy:* Risk is low — the human remains the actuator, but the agent's suggestions can still influence unsafe decisions.
+  - *Security x Cost:* Repeated queries can drive up inference costs even without action execution — apply rate limiting.
+- **Delegated:**
+  - *Security x Context:* Malicious instructions hidden in context can shape proposed plans; sensitive data may leak in plan details.
+  - *Security x Autonomy:* Security depends on the human approver catching manipulated or damaging proposed actions.
+  - *Security x Cost:* Repeated plan submissions consume resources regardless of approval outcome — throttle submission frequency.
+- **Bounded Autonomous:**
+  - *Security x Context:* Excess untrusted context increases prompt injection risk; insufficient context leads to unsafe tool arguments.
+  - *Security x Autonomy:* Highest risk — an agent with excessive autonomy can be manipulated into harmful actions without a human-in-the-loop gate.
+  - *Security x Cost:* A triggered runaway loop causes significant financial damage before detection — enforce per-loop budget caps.
+- **Supervisory:**
+  - *Security x Context:* Context-passing between agents can become a data exfiltration channel or a vector for cascading injection attacks.
+  - *Security x Autonomy:* A supervisory agent with excessive autonomy can mismanage workers, escalate permissions, or approve harmful actions at scale.
+  - *Security x Cost:* A single compromised worker entering a costly loop can exhaust the shared budget for the entire agent team.
 
 <!-- AAF-ENGINE:END -->
 
