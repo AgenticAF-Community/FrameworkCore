@@ -34,7 +34,8 @@ const DOC_ORDER = [
   '14-ecosystem-interoperability',
   '15-application-method',
   '16-conclusion',
-  '17-annex-agent-control-contracts',
+  '18-ethics',
+  '19-annex-agent-control-contracts',
 ];
 
 function stripFrontmatter(content) {

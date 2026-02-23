@@ -23,6 +23,7 @@ const MCP_TOOLS = [
   { name: 'aaf_posture_interpret', desc: 'Interpret posture report with trade-off tensions.', phase: 'Review' },
   { name: 'aaf_review_against_acc', desc: 'Gap analysis: ACC vs actual implementation.', phase: 'Review' },
   { name: 'aaf_pillar_guidance', desc: 'Targeted design guidance for a specific pillar.', phase: 'Cross-cutting' },
+  { name: 'aaf_security_scan', desc: 'CIA-aligned security scan with actionable recommendations.', phase: 'Security' },
 ];
 
 const sectionStyle = { marginBottom: '2rem' };

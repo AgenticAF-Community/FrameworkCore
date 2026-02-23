@@ -118,7 +118,7 @@ Agent-enforced governance (supervisor reading ACC) is **not** sufficient for:
 
 ## Additional resources
 
-- Annex: Agent Control Contracts: `docs/17-annex-agent-control-contracts.md`
+- Annex: Agent Control Contracts: `docs/19-annex-agent-control-contracts.md`
 - Application method (design-time, ACC template): `docs/15-application-method.md`
 - Governance vs orchestration: `docs/02-introduction.md`
 - Whitepaper: https://agenticaf.io/

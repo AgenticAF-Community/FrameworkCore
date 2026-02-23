@@ -72,7 +72,8 @@ The whitepaper lives in `docs/` with one file per major section:
 | `14-ecosystem-interoperability.md` | Ecosystem and Interoperability |
 | `15-application-method.md` | How to Apply the Framework |
 | `16-conclusion.md` | Conclusion |
-| `17-annex-agent-control-contracts.md` | Annex: Agent Control Contracts |
+| `18-ethics.md` | Ethical Considerations (Draft) |
+| `19-annex-agent-control-contracts.md` | Annex: Agent Control Contracts |
 
 Images for the whitepaper go in `docs/assets/`.
 

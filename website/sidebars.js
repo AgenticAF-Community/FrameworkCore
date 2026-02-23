@@ -18,6 +18,7 @@ const sidebars = {
     'ecosystem-interoperability',
     'application-method',
     'conclusion',
+    'ethics',
     'annex-agent-control-contracts',
   ],
 };

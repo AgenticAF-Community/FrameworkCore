@@ -1,6 +1,6 @@
 ---
 title: "Annex: Agent Control Contracts"
-sidebar_position: 17
+sidebar_position: 19
 ---
 
 # **Annex - Agent Control Contracts** 

@@ -5,6 +5,7 @@
  *
  * Usage:
  *   aaf posture [path] [--format json|markdown|html]
+ *   aaf security <path> [--format json|markdown|html] [--severity critical|high|medium|all]
  *   aaf design [--json answers.json] [--output acc.yaml]
  *   aaf build <acc-file> [--output <dir>] [--manifest]
  *   aaf review <acc-file> <codebase-path> [--format json|markdown]
@@ -16,10 +17,11 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const COMMANDS = {
-  posture: path.join(__dirname, "aaf-posture", "cli.js"),
-  design:  path.join(__dirname, "aaf-design", "cli.js"),
-  build:   path.join(__dirname, "aaf-build", "cli.js"),
-  review:  path.join(__dirname, "aaf-review", "cli.js"),
+  posture:  path.join(__dirname, "aaf-posture", "cli.js"),
+  security: path.join(__dirname, "aaf-security", "cli.js"),
+  design:   path.join(__dirname, "aaf-design", "cli.js"),
+  build:    path.join(__dirname, "aaf-build", "cli.js"),
+  review:   path.join(__dirname, "aaf-review", "cli.js"),
 };
 
 const subcommand = process.argv[2];
@@ -33,12 +35,14 @@ Usage:
 
 Commands:
   posture   Scan a codebase and report AAF pillar alignment
+  security  CIA-aligned security scan with actionable recommendations
   design    Interactive design questionnaire → ACC + trade-off report
   build     Generate scaffolded agent project from an ACC
   review    Compare ACC against built codebase → gap report
 
 Examples:
   aaf posture ./my-agent --format html
+  aaf security ./my-agent --severity high
   aaf design --output my-agent.acc.yaml
   aaf design --json answers.json --output my-agent.acc.yaml
   aaf build my-agent.acc.yaml --output ./my-agent

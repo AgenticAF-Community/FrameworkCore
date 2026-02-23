@@ -73,9 +73,9 @@ describe("MCP server structure", () => {
     });
   }
 
-  it("should have exactly 11 tools registered", () => {
+  it("should have exactly 12 tools registered", () => {
     const count = (mcpSource.match(/server\.registerTool\(/g) || []).length;
-    assert.equal(count, 11, `Expected 11 tools, found ${count}`);
+    assert.equal(count, 12, `Expected 12 tools, found ${count}`);
   });
 
   it("should read trade-offs.json", () => {

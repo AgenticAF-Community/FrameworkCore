@@ -45,6 +45,20 @@ const HEURISTICS = {
     },
     "Are untrusted inputs (including retrieved content) treated as hostile?": (cl) =>
       hasPattern(cl, ["untrusted", "sanitize", "validate", "hostile", "injection", "user input"]),
+    "Are secrets externalized (no hardcoded keys, tokens, or passwords)?": (cl) =>
+      hasPattern(cl, ["AKIA", "sk-", "sk_live", "password=", "secret=", "token="]).status === "found"
+        ? { status: "not_found", evidence: "Possible hardcoded secret detected" }
+        : hasPattern(cl, ["vault", "secret manager", "getSecret", "env(", "process.env"]),
+    "Are rate limits and abuse controls in place?": (cl, paths) => {
+      const r = hasPattern(cl, ["rate limit", "throttle", "rateLimit", "rate-limit", "quota"]);
+      return r.status === "not_found" ? hasPath(paths, ["rate.limit", "throttle", "quota"]) : r;
+    },
+    "Is prompt injection mitigated (instruction hierarchy, content labelling)?": (cl) =>
+      hasPattern(cl, ["system prompt", "instruction hierarchy", "content label", "data boundary", "role.*system"]),
+    "Are permissions narrowly scoped (no wildcard or admin grants)?": (cl) =>
+      hasPattern(cl, ["\"*\"", "'*'", "admin.*all", "full_access", "superuser"]).status === "found"
+        ? { status: "not_found", evidence: "Overly broad permission detected" }
+        : hasPattern(cl, ["scope", "permission", "role"]),
   },
 
   reliability: {
