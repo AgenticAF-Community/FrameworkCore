@@ -13,7 +13,7 @@ This directory will contain utilities that make the Agentic Architecture Framewo
 - **data/** — Approved trade-off data model (`trade-offs.json`) and pillar questions (`pillars.json`).
 - **scripts/** — Sync pipeline, AI extraction script, and prompts.
 
-The MCP server is hosted at `https://agenticaf.io/api/mcp` (11 tools, see [../api/README.md](../api/README.md)).
+The MCP server is hosted at `https://www.agenticaf.io/api/mcp` (11 tools, see [../api/README.md](../api/README.md)).
 
 The whitepaper remains the single source of truth; these tools expose it in programmatic and reusable form.
 

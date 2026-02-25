@@ -16,7 +16,7 @@ Prebuilt instruction sets so agents can apply the Agentic Architecture Framework
 
 ## Usage
 
-- **Via MCP (recommended):** Connect to `https://agenticaf.io/api/mcp` and call the `aaf_get_skill` tool with a skill id (e.g. `aaf-architecture-review`).
+- **Via MCP (recommended):** Connect to `https://www.agenticaf.io/api/mcp` and call the `aaf_get_skill` tool with a skill id (e.g. `aaf-architecture-review`).
 - **Local/copy:** Use the skill directories under `tools/skills/` and copy or reference `SKILL.md` in Cursor (e.g. project or personal skills).
 
 ## Source

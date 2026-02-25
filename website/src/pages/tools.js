@@ -93,11 +93,22 @@ export default function Tools() {
             ))}
           </ul>
           <p style={{ fontSize: '0.85rem', color: 'var(--ifm-font-color-secondary)', marginTop: '0.75rem' }}>
-            <strong>Connect your agent:</strong> Add the MCP server URL to your assistant's MCP configuration:
+            <strong>Connect your agent:</strong> Add the MCP server to your client's configuration:
           </p>
           <pre style={{ fontSize: '0.8rem', padding: '0.75rem', borderRadius: '6px', overflow: 'auto' }}>
-{JSON.stringify({ "mcpServers": { "aaf": { "url": "https://agenticaf.io/api/mcp" } } }, null, 2)}
+{JSON.stringify({ "mcpServers": { "aaf": { "url": "https://www.agenticaf.io/api/mcp" } } }, null, 2)}
           </pre>
+          <div style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginTop: '0.5rem', lineHeight: 1.6 }}>
+            <strong>Where to put this config:</strong>
+            <ul style={{ paddingLeft: '1.25rem', marginTop: '0.25rem', marginBottom: 0 }}>
+              <li><strong>Cursor</strong> — <code>~/.cursor/mcp.json</code> (global) or <code>&lt;project&gt;/.cursor/mcp.json</code> (workspace). Reload after saving.</li>
+              <li><strong>Claude Desktop</strong> — <code>~/Library/Application Support/Claude/claude_desktop_config.json</code> (macOS) or <code>%APPDATA%\Claude\claude_desktop_config.json</code> (Windows).</li>
+              <li><strong>Windsurf</strong> — <code>~/.windsurf/mcp.json</code> (global) or <code>&lt;project&gt;/.windsurf/mcp.json</code> (workspace).</li>
+            </ul>
+            <p style={{ marginTop: '0.35rem', marginBottom: 0 }}>
+              Note: some clients prefix the server name (e.g. Cursor registers <code>aaf</code> as <code>user-aaf</code>). This is normal client behaviour and doesn't affect functionality.
+            </p>
+          </div>
         </div>
 
         <div style={sectionStyle}>
