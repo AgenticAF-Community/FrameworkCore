@@ -1,0 +1,111 @@
+name: Case Study Submission
+description: Submit a case study that demonstrates AAF principles in practice
+title: "[Case Study] "
+labels: ["case-study"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for submitting a case study to the Agentic Architecture Framework.
+        Accepted case studies are published as section-aligned pages in the framework
+        (e.g. 9.CaseStudy.1 under the Performance pillar). Please complete the fields below.
+  - type: input
+    id: title
+    attributes:
+      label: Case study title
+      placeholder: "e.g. How Constraints Improve AI Agent Performance"
+    validations:
+      required: true
+  - type: dropdown
+    id: framework-section
+    attributes:
+      label: Which AAF section does this support?
+      description: Select the pillar or foundation this case study best aligns with.
+      options:
+        - "Pillar 1: Security Architecture"
+        - "Pillar 2: Reliability Architecture"
+        - "Pillar 3: Cost Architecture"
+        - "Pillar 4: Operational Excellence"
+        - "Pillar 5: Performance Efficiency"
+        - "Pillar 6: Sustainability"
+        - "Foundation: Context Optimization"
+        - "Foundation: Autonomy & Outcome Governance"
+        - "Cross-cutting / Multiple pillars"
+        - "Ethics"
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: 2-3 sentences describing what this case study demonstrates.
+      placeholder: "We built an autonomous coding agent and found that explicit budget, tool, and quality constraints improved performance compared to unconstrained equivalents..."
+    validations:
+      required: true
+  - type: textarea
+    id: system-description
+    attributes:
+      label: System description
+      description: What was built? What does the agent do? What is the deployment context?
+      placeholder: "The agent receives tasks via GitHub issues, implements code changes, verifies output against a Definition of Done, and opens pull requests..."
+    validations:
+      required: true
+  - type: textarea
+    id: key-findings
+    attributes:
+      label: Key findings
+      description: Quantitative or qualitative results. Include metrics, pass rates, resource usage, or behavioural observations.
+      placeholder: "Budget-aware agents used 11-18% of token budget. Test pass rate improved from 67% to 100% after adding verification constraints..."
+    validations:
+      required: true
+  - type: textarea
+    id: constraints-applied
+    attributes:
+      label: Constraints applied
+      description: What budgets, tool restrictions, quality gates, or governance mechanisms were used?
+      placeholder: "ACC with 5 iteration limit, 50 tool-call cap, 100k token budget. Tool allowlist/blocklist. Definition of Done with acceptance checks..."
+    validations:
+      required: true
+  - type: textarea
+    id: lessons-learned
+    attributes:
+      label: Lessons learned
+      description: Practical takeaways that other teams could apply.
+      placeholder: "1. Budget awareness beats budget caps — inject remaining budget into agent context. 2. Verification gates need artifact access..."
+    validations:
+      required: true
+  - type: input
+    id: write-up-link
+    attributes:
+      label: Link to full write-up (optional)
+      description: If the case study is published elsewhere, link it here.
+      placeholder: "https://example.com/my-case-study"
+    validations:
+      required: false
+  - type: input
+    id: author
+    attributes:
+      label: Author name and affiliation
+      placeholder: "Jane Smith, Acme Corp"
+    validations:
+      required: true
+  - type: input
+    id: github-handle
+    attributes:
+      label: GitHub username
+      placeholder: "@janesmith"
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Submission terms
+      description: By submitting, you agree to the following.
+      options:
+        - label: I confirm the content is original or I have permission to share it
+          required: true
+        - label: I agree for the case study to be published under CC BY-NC 4.0 if accepted
+          required: true
+        - label: I understand the maintainers may edit the submission for framework consistency
+          required: true
