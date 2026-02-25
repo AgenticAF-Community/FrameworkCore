@@ -1,6 +1,7 @@
 ---
 title: "Conclusion"
 sidebar_position: 16
+description: "Conclusion: governed autonomy is the differentiator for production agentic AI systems."
 ---
 
 ## 

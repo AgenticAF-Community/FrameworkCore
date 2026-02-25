@@ -61,9 +61,25 @@ const config = {
     ],
   ],
 
+  headTags: [
+    {
+      tagName: 'script',
+      attributes: { type: 'application/ld+json' },
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Agentic Architecture Framework',
+        url: 'https://agenticaf.io',
+        logo: 'https://agenticaf.io/img/aaf-logo.png',
+        description: 'Community-driven, vendor-agnostic architecture guidance for the agentic era.',
+      }),
+    },
+  ],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      image: 'img/aaf-og-image.png',
       navbar: {
         title: 'AAF Framework',
         logo: {
@@ -83,6 +99,11 @@ const config = {
             to: '/tools',
             position: 'left',
             label: 'Tools & Skills',
+          },
+          {
+            to: '/faq',
+            position: 'left',
+            label: 'FAQ',
           },
           {
             href: 'https://github.com/AgenticAF-Community/FrameworkCore',
@@ -108,6 +129,10 @@ const config = {
               {
                 label: 'Tools & Skills',
                 to: '/tools',
+              },
+              {
+                label: 'FAQ',
+                to: '/faq',
               },
               {
                 label: 'GitHub',

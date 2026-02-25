@@ -1,0 +1,38 @@
+# Agentic Architecture Framework
+
+> Community-driven, vendor-agnostic architecture guidance for building safe, reliable, and governed agentic AI systems. Six pillars, two cross-cutting foundations, and the agentic control loop.
+
+## Framework Core
+
+- [Introduction](https://agenticaf.io/intro): Mission, contribution guidance, and how to get involved.
+- [Executive Summary](https://agenticaf.io/executive-summary): Why this framework exists—governance-first architecture for agentic systems.
+- [What Is an Agent?](https://agenticaf.io/what-is-an-agent): Foundational definition, epistemic gates, and the spectrum from assistive to supervisory agency.
+- [Deterministic, Probabilistic, and Agentic Systems](https://agenticaf.io/deterministic-probabilistic-agentic): Choosing the right paradigm and combining them safely.
+- [Framework Overview](https://agenticaf.io/framework-overview): The six pillars, two foundations, agentic control loop, and autonomy levels.
+
+## Six Pillars
+
+- [Pillar 1: Security Architecture](https://agenticaf.io/pillar-security): Threat models, tool gateways, privilege separation, prompt injection defence, CIA triad for agents.
+- [Pillar 2: Reliability](https://agenticaf.io/pillar-reliability): Repeatable outcomes under probabilistic reasoning, fallback strategies, verification patterns.
+- [Pillar 3: Cost Optimization](https://agenticaf.io/pillar-cost): Token economics, compute budgets, model routing, runaway loop prevention.
+- [Pillar 4: Operational Excellence](https://agenticaf.io/pillar-operations): Observability, evaluation, deployment, incident response for agent systems.
+- [Pillar 5: Performance Efficiency](https://agenticaf.io/pillar-performance): Latency budgets, throughput, caching, harness engineering, deliberate constraint.
+- [Pillar 6: Sustainability](https://agenticaf.io/pillar-sustainability): Compute footprint, resource governance, responsible scaling.
+
+## Cross-Cutting Foundations
+
+- [Context Optimization](https://agenticaf.io/context-optimization): Engineering working memory, token budgeting, context as a risk surface.
+- [Autonomy & Outcome Governance](https://agenticaf.io/autonomy-governance): Autonomy levels, human-in-the-loop controls, escalation policies, epistemic gates.
+
+## Application & Governance
+
+- [Ecosystem and Interoperability](https://agenticaf.io/ecosystem-interoperability): Multi-agent coordination, protocols (MCP, A2A), vendor integration.
+- [How to Apply the Framework](https://agenticaf.io/application-method): Design method, architecture review, maturity model.
+- [Agent Control Contracts](https://agenticaf.io/annex-agent-control-contracts): Structured governance specs for permissions, tool access, and audit.
+- [Ethical Considerations](https://agenticaf.io/ethics): Non-technical ethical dimensions of agentic AI.
+
+## Tools & Resources
+
+- [Tools & Skills](https://agenticaf.io/tools): CLI tools, MCP server, and programmatic access to the framework.
+- [FAQ](https://agenticaf.io/faq): Common questions about AI agents and the framework.
+- [Full Framework Text](https://agenticaf.io/llms-full.txt): Complete framework content in plain markdown for LLM consumption.

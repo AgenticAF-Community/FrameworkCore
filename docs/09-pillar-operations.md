@@ -1,6 +1,8 @@
 ---
 title: "Pillar 4: Operational Excellence"
 sidebar_position: 9
+description: "Operational excellence for agentic AI: observability, evaluation, incident response, deployment, and continuous improvement for production agent systems."
+keywords: [AI agent operations, agent observability, agentic deployment, agent incident response, MLOps agents]
 ---
 
 ## **Pillar 4: Operational Excellence**

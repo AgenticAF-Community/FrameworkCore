@@ -1,6 +1,8 @@
 ---
 title: "Deterministic, Probabilistic, and Agentic Systems"
 sidebar_position: 4
+description: "Understanding the spectrum from deterministic to probabilistic to agentic systems, and how to combine them safely in production."
+keywords: [deterministic vs probabilistic AI, agentic systems, AI system paradigms, hybrid AI architecture]
 ---
 
 # 

@@ -1,6 +1,8 @@
 ---
 title: "The Agentic Architecture Framework v1.3"
 sidebar_position: 0
+description: "Community-driven, vendor-agnostic architecture guidance for building safe, reliable, and governed agentic AI systems."
+keywords: [agentic architecture framework, AI agent governance, vendor-agnostic AI, agentic AI guide]
 ---
 
 # THE AGENTIC ARCHITECTURE FRAMEWORK V1.3

@@ -1,6 +1,8 @@
 ---
 title: "The Agentic Architecture Framework (Overview)"
 sidebar_position: 5
+description: "Overview of the Agentic Architecture Framework: six pillars, two cross-cutting foundations, the agentic control loop, and autonomy levels."
+keywords: [agentic architecture overview, AI agent framework, six pillars, agentic control loop]
 ---
 
 # 

@@ -1,6 +1,8 @@
 ---
 title: "Ethical Considerations (Draft)"
 sidebar_position: 18
+description: "Ethical considerations for agentic AI: what should agents do, human purpose, friction as growth, and non-technical governance questions."
+keywords: [AI ethics, agentic AI ethics, responsible AI, human purpose AI, AI governance ethics]
 ---
 
 # **Ethical Considerations — Draft**

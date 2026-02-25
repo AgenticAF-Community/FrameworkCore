@@ -1,6 +1,8 @@
 ---
 title: "Pillar 3: Cost Optimization"
 sidebar_position: 8
+description: "Cost optimization for AI agents: controlling token economics, preventing runaway loops, compute budgets, and choosing the right model for the job."
+keywords: [AI agent cost, token economics, LLM cost optimization, agent compute budget, runaway loop prevention]
 ---
 
 ## **Pillar 3: Cost Optimization**

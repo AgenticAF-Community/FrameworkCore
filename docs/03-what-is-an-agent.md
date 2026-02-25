@@ -1,6 +1,8 @@
 ---
 title: "What Is an Agent?"
 sidebar_position: 3
+description: "What defines an AI agent: autonomy, tool use, reasoning, epistemic gates, and the spectrum from assistive to supervisory agency."
+keywords: [what is an AI agent, AI agent definition, epistemic gates, autonomy levels, agent architecture]
 ---
 
 ## 

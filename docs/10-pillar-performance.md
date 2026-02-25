@@ -1,6 +1,8 @@
 ---
 title: "Pillar 5: Performance Efficiency"
 sidebar_position: 10
+description: "Performance efficiency for agentic AI: latency budgets, throughput, model routing, caching, harness engineering, and deliberate constraint as a performance strategy."
+keywords: [AI agent performance, agent latency, model routing, harness engineering, agent throughput, constraint performance]
 ---
 
 ## 

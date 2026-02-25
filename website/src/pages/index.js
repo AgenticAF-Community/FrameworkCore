@@ -10,7 +10,7 @@ export default function Home() {
   const pdfUrl = siteConfig.customFields?.pdfDownloadUrl || useBaseUrl('/pdf/agentic-architecture-framework-v1.pdf');
 
   return (
-    <Layout title="Home" description="The Agentic Architecture Framework - A governance-first architecture for agentic AI systems">
+    <Layout title="Vendor-Agnostic Architecture for AI Agents" description="The Agentic Architecture Framework — community-driven, governance-first architecture guidance for building safe, reliable, and scalable agentic AI systems.">
       <main style={{ padding: '2rem 1rem', maxWidth: '900px', margin: '0 auto' }}>
         <div style={{ marginBottom: '2rem' }}>
           <h1 style={{ fontSize: '1.75rem', marginBottom: '1rem' }}>
