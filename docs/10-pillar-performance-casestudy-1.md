@@ -11,6 +11,8 @@ sidebar_position: 10.1
 
 ---
 
+![How Constraints Improve AI Agent Performance](./assets/aaf-constraint-casestudy-v1.png)
+
 ## 9.CS1.1 The Counterintuitive Finding
 
 When building autonomous AI coding agents, the instinct is to give them maximum freedom: unlimited tokens, unrestricted tool access, no iteration caps. More resources should mean better results.
