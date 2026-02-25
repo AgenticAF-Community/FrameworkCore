@@ -1,8 +1,8 @@
 ---
 title: "9.CaseStudy.1: How Constraints Improve AI Agent Performance"
 sidebar_position: 10.1
-description: "Case study: how deliberate constraints on token budgets, tool access, and elapsed time improved AI agent task completion rates from tried to 85%."
-keywords: [AI agent constraints, harness engineering case study, agent performance improvement, Cloud Dev Agents]
+description: "Case study: how deliberate constraints on token budgets, tool access, and elapsed time improved AI agent task completion rates to 100%."
+keywords: [AI agent constraints, harness engineering case study, agent performance improvement, agent budget awareness]
 image: /img/og-performance-casestudy.png
 ---
 
@@ -10,7 +10,7 @@ image: /img/og-performance-casestudy.png
 
 **Author:** Dave Maddock, WrangleAI
 **Date:** February 2026
-**Context:** Cloud Dev Agents MVP — an autonomous agent that receives tasks via GitHub issues, implements code changes, and opens pull requests with evidence bundles.
+**Context:** An autonomous coding agent that receives tasks via GitHub issues, implements code changes, and opens pull requests with evidence bundles.
 
 ---
 
@@ -30,7 +30,7 @@ This case study documents what we built, what we measured, and the seven enginee
 
 ## 9.CS1.2 What We Built
 
-The Cloud Dev Agent is an autonomous coding agent deployed on Google Cloud Run. It receives a task via a GitHub issue, clones the target repo, implements changes, verifies its own output against a Definition of Done (DoD), and opens a pull request with a full evidence bundle.
+The agent is an autonomous coding agent deployed on a serverless container runtime. It receives a task via a GitHub issue, clones the target repo, implements changes, verifies its own output against a Definition of Done (DoD), and opens a pull request with a full evidence bundle.
 
 The agent operates under an **Agent Control Contract (ACC)** — a YAML policy file that defines its constraints:
 
@@ -82,10 +82,10 @@ This is the difference between a budget-**capped** agent and a budget-**aware** 
 
 | Version | Constraints Added | Test 1 (CRUD) | Test 2 (Bugfix) | Test 3 (Docs) | Pass Rate |
 |---------|-------------------|---------------|-----------------|---------------|-----------|
-| v0.1.3 | Budget caps only | PASS | PASS | FAIL | 67% |
-| v0.1.4 | + Codebase context, verification read-back, retry loop | PASS | PASS (via retry) | PASS | 100% |
+| v1 | Budget caps only | PASS | PASS | FAIL | 67% |
+| v2 | + Codebase context, verification read-back, retry loop | PASS | PASS (via retry) | PASS | 100% |
 
-The v0.1.3 documentation test failed because the verifier couldn't read the actual file content — it only confirmed the file existed. Adding content read-back (a verification constraint) and a retry loop (a self-correction mechanism) brought the pass rate from 67% to 100%.
+The v1 documentation test failed because the verifier couldn't read the actual file content — it only confirmed the file existed. Adding content read-back (a verification constraint) and a retry loop (a self-correction mechanism) brought the pass rate from 67% to 100%.
 
 ### Enforcement Events: Zero Budget Exhaustions
 
@@ -213,7 +213,7 @@ The key insight is that these dimensions interact. Budget awareness makes the ag
 
 ## 9.CS1.6 Quantitative Summary
 
-**Across all structured tests (v0.1.3 – v0.4.0):**
+**Across all structured tests:**
 
 - Average token utilisation: **11–18%** of budget (the agent is efficient, not just compliant)
 - Test pass rate improved from **67% to 100%** after adding codebase context and verification read-back
@@ -234,4 +234,4 @@ The practical implication for teams building autonomous agents: invest as much i
 
 ---
 
-*This case study is based on work conducted as part of the WrangleAI Agentic Architecture Framework (AAF) v1.1 validation programme. The Cloud Dev Agents project is open for discussion — contact WrangleAI for details.*
+*This case study was contributed to the Agentic Architecture Framework as first-party evidence for Section 9.9.*
