@@ -28,6 +28,7 @@ const DOC_ORDER = [
   '08-pillar-cost',
   '09-pillar-operations',
   '10-pillar-performance',
+  '10-pillar-performance-casestudy-1',
   '11-pillar-sustainability',
   '12-context-optimization',
   '13-autonomy-governance',

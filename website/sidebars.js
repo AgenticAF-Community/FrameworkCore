@@ -11,7 +11,15 @@ const sidebars = {
     'pillar-reliability',
     'pillar-cost',
     'pillar-operations',
-    'pillar-performance',
+    {
+      type: 'category',
+      label: 'Pillar 5: Performance Efficiency',
+      collapsed: false,
+      items: [
+        'pillar-performance',
+        'pillar-performance-casestudy-1',
+      ],
+    },
     'pillar-sustainability',
     'context-optimization',
     'autonomy-governance',
