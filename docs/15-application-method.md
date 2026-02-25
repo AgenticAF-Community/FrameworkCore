@@ -11,6 +11,8 @@ keywords: [AI agent design method, architecture review, agent maturity model, fr
 
 (Design method, review method, and maturity model)
 
+![How to Apply the Agentic Architecture Framework](./assets/aaf-application-method-v1.png)
+
 A framework is only valuable if it changes engineering outcomes. This section translates the Agentic Architecture Framework into a practical operating model for teams building and deploying agentic systems.
 
 ### **Usage patterns we expect**

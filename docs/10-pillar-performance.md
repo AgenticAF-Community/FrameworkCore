@@ -246,6 +246,8 @@ A performant agentic system is one that is intentionally constrained. The design
 
 ### **9.9 Deliberate Constraint as a Performance Strategy**
 
+![Harness Engineering: Deliberate Constraint as a Performance Strategy](./assets/aaf-harness-engineering-v1.png)
+
 The principle stated above — that constraint improves performance — may appear counterintuitive. The instinct when building autonomous agents is to give them maximum freedom: unlimited tokens, unrestricted tool access, no iteration caps. More resources should mean better results. The evidence, from both established management theory and emerging agent engineering research, says the opposite.
 
 #### **9.9.1 The Human Precedent: The Iron Triangle**
