@@ -7,6 +7,8 @@ keywords: [agentic architecture framework, AI agent governance, vendor-agnostic 
 
 # THE AGENTIC ARCHITECTURE FRAMEWORK V1.3
 
+![Agentic Architecture Framework — Mission](./assets/aaf-mission-intro-v1.png)
+
 ## Mission
 
 Deliver community-driven, vendor-agnostic architecture guidance for the agentic era.
