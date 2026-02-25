@@ -3,6 +3,7 @@ title: "Ecosystem and Interoperability"
 sidebar_position: 14
 description: "Ecosystem and interoperability for agentic AI: protocols, multi-agent coordination, vendor integration, and governance-aware interop standards."
 keywords: [AI agent interoperability, multi-agent systems, agent protocols, MCP, A2A, agent coordination]
+image: /img/og-ecosystem-interoperability.png
 ---
 
 # **Ecosystem and Interoperability**

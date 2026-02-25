@@ -3,6 +3,7 @@ title: "Annex: Agent Control Contracts"
 sidebar_position: 19
 description: "Agent Control Contracts (ACCs): structured governance specifications for AI agent permissions, tool access, escalation policies, and audit requirements."
 keywords: [agent control contract, ACC, AI agent governance spec, agent permissions, agent policy]
+image: /img/og-agent-control-contracts.png
 ---
 
 # **Annex - Agent Control Contracts** 

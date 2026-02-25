@@ -3,6 +3,7 @@ title: "How to Apply the Framework in Practice"
 sidebar_position: 15
 description: "Practical application of the Agentic Architecture Framework: design method, architecture review process, and maturity model for agentic systems."
 keywords: [AI agent design method, architecture review, agent maturity model, framework application]
+image: /img/og-application-method.png
 ---
 
 ## 

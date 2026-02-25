@@ -3,6 +3,7 @@ title: "9.CaseStudy.1: How Constraints Improve AI Agent Performance"
 sidebar_position: 10.1
 description: "Case study: how deliberate constraints on token budgets, tool access, and elapsed time improved AI agent task completion rates from tried to 85%."
 keywords: [AI agent constraints, harness engineering case study, agent performance improvement, Cloud Dev Agents]
+image: /img/og-performance-casestudy.png
 ---
 
 # **9.CaseStudy.1: How Constraints Improve AI Agent Performance**

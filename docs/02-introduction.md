@@ -3,6 +3,7 @@ title: "Introduction"
 sidebar_position: 2
 description: "Why agentic architecture matters: moving from model capability to system discipline for production AI agents."
 keywords: [agentic architecture, AI systems engineering, production AI agents]
+image: /img/og-introduction.png
 ---
 
 

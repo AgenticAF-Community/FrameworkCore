@@ -3,6 +3,7 @@ title: "Cross-Cutting Foundation: Autonomy & Outcome Governance"
 sidebar_position: 13
 description: "Autonomy and outcome governance for AI agents: autonomy levels, human-in-the-loop controls, escalation policies, and epistemic gates."
 keywords: [AI agent autonomy, human-in-the-loop, autonomy levels, outcome governance, epistemic gates, agent escalation]
+image: /img/og-autonomy-governance.png
 ---
 
 ## 

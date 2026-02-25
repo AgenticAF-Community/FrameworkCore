@@ -3,6 +3,7 @@ title: "Pillar 2: Reliability"
 sidebar_position: 7
 description: "Reliability engineering for agentic AI: repeatable outcomes under probabilistic reasoning, tool failures, fallback strategies, and verification patterns."
 keywords: [AI agent reliability, agent testing, fallback strategies, probabilistic verification, agentic control loop]
+image: /img/og-pillar-reliability.png
 ---
 
 # **Pillar 2: Reliability**

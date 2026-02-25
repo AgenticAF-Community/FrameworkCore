@@ -3,6 +3,7 @@ title: "Pillar 6: Sustainability"
 sidebar_position: 11
 description: "Sustainability for agentic AI: measuring compute footprint, reducing waste, governing resources, and designing agent systems that scale responsibly."
 keywords: [AI sustainability, agent compute footprint, green AI, responsible AI scaling, agent resource governance]
+image: /img/og-pillar-sustainability.png
 ---
 
 # **Pillar 6: Sustainability**

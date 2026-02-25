@@ -3,6 +3,7 @@ title: "Executive Summary"
 sidebar_position: 1
 description: "Executive summary of the Agentic Architecture Framework: six pillars, two foundations, and the agentic control loop for governing AI agents."
 keywords: [agentic AI executive summary, AI agent pillars, governance-first architecture]
+image: /img/og-executive-summary.png
 ---
 
 ## Executive Summary

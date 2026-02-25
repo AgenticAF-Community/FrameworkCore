@@ -3,6 +3,7 @@ title: "Cross-Cutting Foundation: Context Optimization"
 sidebar_position: 12
 description: "Context optimization for AI agents: engineering working memory, budgeting tokens, governing context as a risk surface, and managing the substrate of autonomy."
 keywords: [AI agent context, context window optimization, token budgeting, prompt engineering architecture, agent working memory]
+image: /img/og-context-optimization.png
 ---
 
 # **Cross-Cutting Foundation: Context Optimization**

@@ -3,6 +3,7 @@ title: "Pillar 1: Security Architecture"
 sidebar_position: 6
 description: "Security architecture for agentic AI: threat models, tool gateways, privilege separation, prompt injection defence, and the CIA triad applied to AI agents."
 keywords: [AI agent security, prompt injection defence, tool gateway, OWASP agents, least privilege AI, CIA triad agents]
+image: /img/og-pillar-security.png
 ---
 
 # **Pillar 1: Security Architecture**
