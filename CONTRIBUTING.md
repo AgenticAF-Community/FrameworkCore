@@ -72,6 +72,7 @@ The whitepaper lives in `docs/` with one file per major section:
 | `14-ecosystem-interoperability.md` | Ecosystem and Interoperability |
 | `15-application-method.md` | How to Apply the Framework |
 | `16-conclusion.md` | Conclusion |
+| `17-emerging-thought.md` | Emerging Thought (exploratory) |
 | `18-ethics.md` | Ethical Considerations (Draft) |
 | `19-annex-agent-control-contracts.md` | Annex: Agent Control Contracts |
 
@@ -88,7 +89,7 @@ Contributions should:
 - Preserve citations and sources.
 - Be suitable for an open, vendor-agnostic community.
 
-The framework focuses on **architecture discipline** for agentic AI systems, not implementation or product-specific guidance.
+The framework focuses on **architecture discipline** for agentic AI systems, not implementation or product-specific guidance. The **Emerging Thought** section is for ideas observed across the agentic landscape that may mature into the framework; it is exploratory, not normative.
 
 ---
 

@@ -27,6 +27,7 @@ const sidebars = {
     'application-method',
     'conclusion',
     'ethics',
+    'emerging-thought',
     'annex-agent-control-contracts',
   ],
 };

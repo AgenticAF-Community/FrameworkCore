@@ -32,6 +32,7 @@ const DOC_ORDER = [
   '15-application-method',
   '16-conclusion',
   '18-ethics',
+  '17-emerging-thought',
   '19-annex-agent-control-contracts',
 ];
 
