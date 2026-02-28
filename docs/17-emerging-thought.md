@@ -1,5 +1,6 @@
 ---
 title: "Emerging Thought"
+id: emerging-thought
 sidebar_position: 17
 slug: /emerging-thought
 description: "Concepts and issues observed across the agentic landscape that are not yet part of the framework but may mature into it."
