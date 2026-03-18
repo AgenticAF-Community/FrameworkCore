@@ -16,4 +16,56 @@
 
 After the first cron run (or a manual GET to `/api/refresh-stats` with `Authorization: Bearer <CRON_SECRET>`), `GET /api/stats` serves from Blob so the homepage shows up-to-date figures. Without Blob, the stats API falls back to live GitHub + `AAF_STATS_JSON`.
 
-**MCP endpoint:** `https://www.agenticaf.io/api/mcp` (Streamable HTTP, 11 tools). Optional auth: set `MCP_API_KEY` in Vercel and send `Authorization: Bearer <key>`.
+**MCP endpoint:** `https://www.agenticaf.io/api/mcp` (Streamable HTTP, 12 tools). Optional auth: set `MCP_API_KEY` in Vercel and send `Authorization: Bearer <key>`.
+
+### Google Antigravity IDE (and other stdio-only clients)
+
+Antigravity uses **`mcp_config.json`** with **`command` + `args`** (local stdio), not a bare `url` field like Cursor. Use the community **`mcp-remote`** proxy so the IDE talks to the hosted AAF server over HTTP:
+
+1. Open **Agent panel → Manage MCP Servers → View raw config** (or edit `mcp_config.json`).
+2. Merge this under `mcpServers` (requires **Node.js 18+** on the machine):
+
+```json
+{
+  "mcpServers": {
+    "aaf": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://www.agenticaf.io/api/mcp",
+        "--transport",
+        "http-first"
+      ]
+    }
+  }
+}
+```
+
+`http-first` matches the AAF server’s Streamable HTTP transport (mcp-remote’s default is also `http-first`; the flag makes intent explicit).
+
+If **`MCP_API_KEY`** is set on the deployment, add a header (avoid spaces after `:` in `args` on some Windows clients; put the full value in `env`):
+
+```json
+{
+  "mcpServers": {
+    "aaf": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://www.agenticaf.io/api/mcp",
+        "--transport",
+        "http-first",
+        "--header",
+        "Authorization:${AAF_MCP_AUTHORIZATION}"
+      ],
+      "env": {
+        "AAF_MCP_AUTHORIZATION": "Bearer YOUR_MCP_API_KEY"
+      }
+    }
+  }
+}
+```
+
+Save, restart Antigravity (or reload MCP). Ask the agent what MCP tools are available; you should see `aaf_lookup`, `aaf_checklist`, etc.

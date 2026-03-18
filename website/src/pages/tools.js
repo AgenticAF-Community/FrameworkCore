@@ -92,23 +92,81 @@ export default function Tools() {
               </li>
             ))}
           </ul>
-          <p style={{ fontSize: '0.85rem', color: 'var(--ifm-font-color-secondary)', marginTop: '0.75rem' }}>
-            <strong>Connect your agent:</strong> Add the MCP server to your client's configuration:
+          <h3 style={{ ...headingStyle, marginTop: '1.25rem' }}>Using the MCP server in different IDEs</h3>
+          <p style={{ fontSize: '0.9rem', lineHeight: 1.65, color: 'var(--ifm-font-color-base)', marginBottom: '0.75rem' }}>
+            The hosted AAF server speaks <strong>HTTP (Streamable MCP)</strong>. Editors differ in how they connect:
+          </p>
+          <ul style={{ ...textStyle, paddingLeft: '1.5rem', marginBottom: '0.75rem' }}>
+            <li><strong>Direct URL</strong> — Some clients let you register the server by URL only (no local process). Fastest when supported.</li>
+            <li><strong>Local bridge (<code>mcp-remote</code>)</strong> — Many IDEs only launch <strong>stdio</strong> MCP servers. Use <code>npx mcp-remote …</code> so the editor talks to localhost while the bridge forwards to <code>agenticaf.io</code>. Requires <strong>Node.js 18+</strong>.</li>
+          </ul>
+          <div style={{ overflowX: 'auto', marginBottom: '1rem' }}>
+            <table style={{ width: '100%', fontSize: '0.8rem', borderCollapse: 'collapse', border: '1px solid var(--ifm-color-emphasis-300)' }}>
+              <thead>
+                <tr style={{ background: 'var(--ifm-color-emphasis-100)' }}>
+                  <th style={{ textAlign: 'left', padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-300)' }}>IDE / product</th>
+                  <th style={{ textAlign: 'left', padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-300)' }}>How to connect</th>
+                  <th style={{ textAlign: 'left', padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-300)' }}>Where to configure</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}><strong>Cursor</strong></td>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}>Direct URL (snippet below)</td>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}><code>~/.cursor/mcp.json</code> or project <code>.cursor/mcp.json</code></td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}><strong>VS Code</strong> (GitHub Copilot agent / MCP)</td>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}>Use <strong>MCP: Add Server</strong> — HTTP/SSE URL when offered; otherwise same <code>mcp-remote</code> block as Claude Desktop</td>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}>Command Palette → MCP; see <a href="https://code.visualstudio.com/docs/copilot/guides/mcp-developer-guide" target="_blank" rel="noopener noreferrer">VS Code MCP docs</a></td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}><strong>Google Antigravity</strong></td>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}><code>mcp-remote</code> (stdio bridge)</td>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}>Agent panel → Manage MCP Servers → View raw config</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}><strong>Claude Desktop</strong></td>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}><code>mcp-remote</code> (hosted server is not stdio)</td>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}><code>~/Library/Application Support/Claude/claude_desktop_config.json</code> (macOS) or <code>%APPDATA%\Claude\</code> (Windows)</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}><strong>Windsurf</strong></td>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}><code>mcp-remote</code> (same pattern as Claude)</td>
+                  <td style={{ padding: '0.5rem 0.65rem', borderBottom: '1px solid var(--ifm-color-emphasis-200)', verticalAlign: 'top' }}><code>~/.codeium/windsurf/mcp_config.json</code> — <a href="https://docs.codeium.com/windsurf/mcp" target="_blank" rel="noopener noreferrer">Windsurf MCP</a></td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.65rem', verticalAlign: 'top' }}><strong>Other MCP clients</strong></td>
+                  <td style={{ padding: '0.5rem 0.65rem', verticalAlign: 'top' }} colSpan={2}>If the app only lists <code>command</code> + <code>args</code>, paste the <code>mcp-remote</code> JSON below. If it accepts a server URL for HTTP MCP, use the URL snippet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginBottom: '0.35rem' }}>
+            <strong>Option A — Direct URL</strong> (Cursor and clients that support remote HTTP MCP):
           </p>
           <pre style={{ fontSize: '0.8rem', padding: '0.75rem', borderRadius: '6px', overflow: 'auto' }}>
 {JSON.stringify({ "mcpServers": { "aaf": { "url": "https://www.agenticaf.io/api/mcp" } } }, null, 2)}
           </pre>
-          <div style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginTop: '0.5rem', lineHeight: 1.6 }}>
-            <strong>Where to put this config:</strong>
-            <ul style={{ paddingLeft: '1.25rem', marginTop: '0.25rem', marginBottom: 0 }}>
-              <li><strong>Cursor</strong> — <code>~/.cursor/mcp.json</code> (global) or <code>&lt;project&gt;/.cursor/mcp.json</code> (workspace). Reload after saving.</li>
-              <li><strong>Claude Desktop</strong> — <code>~/Library/Application Support/Claude/claude_desktop_config.json</code> (macOS) or <code>%APPDATA%\Claude\claude_desktop_config.json</code> (Windows).</li>
-              <li><strong>Windsurf</strong> — <code>~/.windsurf/mcp.json</code> (global) or <code>&lt;project&gt;/.windsurf/mcp.json</code> (workspace).</li>
-            </ul>
-            <p style={{ marginTop: '0.35rem', marginBottom: 0 }}>
-              Note: some clients prefix the server name (e.g. Cursor registers <code>aaf</code> as <code>user-aaf</code>). This is normal client behaviour and doesn't affect functionality.
-            </p>
-          </div>
+          <p style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginTop: '0.75rem', marginBottom: '0.35rem' }}>
+            <strong>Option B — <code>mcp-remote</code> bridge</strong> (Antigravity, Claude Desktop, Windsurf, and any stdio-only MCP host). Merge under <code>mcpServers</code>:
+          </p>
+          <pre style={{ fontSize: '0.8rem', padding: '0.75rem', borderRadius: '6px', overflow: 'auto' }}>
+{JSON.stringify({
+  mcpServers: {
+    aaf: {
+      command: 'npx',
+      args: ['-y', 'mcp-remote', 'https://www.agenticaf.io/api/mcp', '--transport', 'http-first'],
+    },
+  },
+}, null, 2)}
+          </pre>
+          <p style={{ fontSize: '0.75rem', color: 'var(--ifm-font-color-secondary)', marginTop: '0.35rem', marginBottom: '0.75rem' }}>
+            After saving, restart the app or reload MCP. Ask the assistant what tools it has — you should see <code>aaf_lookup</code>, <code>aaf_checklist</code>, etc. If the deployment requires an API key, add <code>--header</code> <code>Authorization:${AAF_MCP_AUTHORIZATION}</code> and set <code>AAF_MCP_AUTHORIZATION</code> to <code>Bearer &lt;key&gt;</code> in <code>env</code> — see <a href="https://github.com/AgenticAF-Community/FrameworkCore/blob/main/api/README.md">api/README.md</a>.
+          </p>
+          <p style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginTop: 0, marginBottom: 0, lineHeight: 1.6 }}>
+            <strong>Note:</strong> Some clients rename the server (e.g. <code>user-aaf</code>). That is normal. Windsurf MCP availability may depend on your plan — check Codeium’s docs.
+          </p>
         </div>
 
         <div style={sectionStyle}>

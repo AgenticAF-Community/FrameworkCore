@@ -24,14 +24,30 @@ The framework is applied in three main ways, aligned with the modes below (desig
 - **Reviewers and gatekeepers** use it before deployment as structured review lenses across the six pillars and cross-cutting foundations, to identify missing boundaries, verification, budgets, and observability (Mode 2).
 - **Operators** use tracing, evidence, and continuous evaluation to run agents safely, and follow the maturity model to scale autonomy only as verification, tooling, and observability improve (Modes 3 and 4).
 
-In practice, teams can access the framework in three ways: **(1)** reading and applying the whitepaper and docs directly; **(2)** using the **AAF MCP server** so AI assistants (e.g. Cursor, Claude) can look up terms, run checklists, and load skills on demand; and **(3)** running the **AAF Posture** CLI to produce a codebase-level alignment report. The next two subsections describe the MCP server and the Posture tool.
+In practice, teams can access the framework in three ways: **(1)** reading and applying the whitepaper and docs directly; **(2)** using the **AAF MCP server** so AI assistants (e.g. Cursor, Google Antigravity, Claude) can look up terms, run checklists, and load skills on demand; and **(3)** running the **AAF Posture** CLI to produce a codebase-level alignment report. The next two subsections describe the MCP server and the Posture tool.
 
 ### **Accessing the framework: MCP server and skills**
 
 The AAF MCP server exposes framework content and prebuilt skills so that MCP-capable clients can apply the framework during design or review without leaving the IDE.
 
-**Setup (recommended: local stdio)**  
-Run the server on your machine; no network or auth required. From the repo root, install and run from `tools/mcp-server` (see `tools/mcp-server/README.md`). Configure your MCP client (e.g. Cursor Settings → MCP) with the server command pointing at `tools/mcp-server/index.js` and the working directory set to the repo root. The server reads from `docs/` and `tools/skills/` and is read-only.
+**Setup (hosted HTTP — Cursor and similar)**  
+Many clients accept a remote URL: `https://www.agenticaf.io/api/mcp` (Streamable HTTP). See the Tools page on agenticaf.io for the exact JSON snippet.
+
+**Setup (Google Antigravity IDE and other stdio-only clients)**  
+Antigravity uses `mcp_config.json` with `command` + `args`, not a bare URL. Use the **`mcp-remote`** bridge (requires Node.js on the machine):
+
+```json
+{
+  "mcpServers": {
+    "aaf": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://www.agenticaf.io/api/mcp", "--transport", "http-first"]
+    }
+  }
+}
+```
+
+Add this via **Manage MCP Servers → View raw config**. If `MCP_API_KEY` is enabled on the deployment, pass `Authorization: Bearer <key>` via `--header` and `env` (see `api/README.md` in the repo).
 
 **Tools (four)**  
 | Tool | Purpose |
@@ -53,7 +69,7 @@ Run the server on your machine; no network or auth required. From the repo root,
 | **aaf-orchestration-occ** | Orchestrator Capability Contract (OCC); governance above orchestration; gateway-only tool invocation. |
 
 **Typical MCP workflow**  
-Use **aaf_lookup** for quick concept checks; **aaf_checklist** for a structured design or pre-production review pass; **aaf_get_skill** when you need full guidance (e.g. `aaf-security` for tool gateway design, `aaf-acc-implementation` for ACC placement). The same server can be deployed to Vercel for HTTP access (optional API-key auth); see `tools/mcp-server/README.md`.
+Use **aaf_lookup** for quick concept checks; **aaf_checklist** for a structured design or pre-production review pass; **aaf_get_skill** when you need full guidance (e.g. `aaf-security` for tool gateway design, `aaf-acc-implementation` for ACC placement). Hosted endpoint and Antigravity setup: see `api/README.md` in the repo.
 
 ### **AAF Posture Review and Reporting tool**
 
