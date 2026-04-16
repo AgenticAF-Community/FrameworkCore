@@ -51,7 +51,7 @@ const config = {
           routeBasePath: '/',
           sidebarPath: './sidebars.js',
           editUrl: 'https://github.com/AgenticAF-Community/FrameworkCore/tree/main/',
-          showLastUpdateTime: false,
+          showLastUpdateTime: true,
         },
         blog: false,
         theme: {
