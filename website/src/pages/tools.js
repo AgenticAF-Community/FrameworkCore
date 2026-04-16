@@ -162,7 +162,7 @@ export default function Tools() {
 }, null, 2)}
           </pre>
           <p style={{ fontSize: '0.75rem', color: 'var(--ifm-font-color-secondary)', marginTop: '0.35rem', marginBottom: '0.75rem' }}>
-            After saving, restart the app or reload MCP. Ask the assistant what tools it has — you should see <code>aaf_lookup</code>, <code>aaf_checklist</code>, etc. If the deployment requires an API key, add <code>--header</code> <code>Authorization:${AAF_MCP_AUTHORIZATION}</code> and set <code>AAF_MCP_AUTHORIZATION</code> to <code>Bearer &lt;key&gt;</code> in <code>env</code> — see <a href="https://github.com/AgenticAF-Community/FrameworkCore/blob/main/api/README.md">api/README.md</a>.
+            After saving, restart the app or reload MCP. Ask the assistant what tools it has — you should see <code>aaf_lookup</code>, <code>aaf_checklist</code>, etc. If the deployment requires an API key, add <code>--header</code> <code>{'Authorization:${AAF_MCP_AUTHORIZATION}'}</code> and set <code>AAF_MCP_AUTHORIZATION</code> to <code>Bearer &lt;key&gt;</code> in <code>env</code> — see <a href="https://github.com/AgenticAF-Community/FrameworkCore/blob/main/api/README.md">api/README.md</a>.
           </p>
           <p style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginTop: 0, marginBottom: 0, lineHeight: 1.6 }}>
             <strong>Note:</strong> Some clients rename the server (e.g. <code>user-aaf</code>). That is normal. Windsurf MCP availability may depend on your plan — check Codeium’s docs.
