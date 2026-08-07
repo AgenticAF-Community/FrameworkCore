@@ -46,8 +46,13 @@ async function main() {
   // Stripe
   try {
     const sk = process.env.STRIPE_SECRET_KEY || "";
-    if (!sk.startsWith("sk_test_") && !sk.startsWith("sk_live_")) {
-      fail("STRIPE_SECRET_KEY missing or not a Stripe secret key");
+    const skOk =
+      sk.startsWith("sk_test_") ||
+      sk.startsWith("sk_live_") ||
+      sk.startsWith("rk_test_") ||
+      sk.startsWith("rk_live_");
+    if (!skOk) {
+      fail("STRIPE_SECRET_KEY missing or not a Stripe secret/restricted key");
     } else {
       const stripe = new Stripe(sk);
       const priceId = process.env.STRIPE_PRICE_ID;
