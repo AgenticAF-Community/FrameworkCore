@@ -3,6 +3,26 @@
 - **`mcp.ts`** — AAF MCP server (Streamable HTTP) for Vercel.
 - **`stats.ts`** — Public stats for the homepage: GitHub repo, MCP tool calls, posture reports, pillar averages. Reads from Vercel Blob when available (see below).
 - **`refresh-stats.ts`** — Cron handler: fetches GitHub + `AAF_STATS_JSON`, writes to Vercel Blob. Invoked by Vercel Cron (see `vercel.json`).
+- **`lib/`** — Shared billing/auth helpers (`config`, `kv`, `keys`, `stripe`) for paid MCP access (£3/mo, 1,000 requests hard cap).
+
+## MCP billing env (names only)
+
+Set these in local `.env` and Vercel (Preview first; keep Production `MCP_AUTH_REQUIRED=false` until cutover):
+
+| Variable | Role |
+|----------|------|
+| `STRIPE_SECRET_KEY` | Stripe secret (`sk_test_` until live) |
+| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable (optional for Checkout Sessions) |
+| `STRIPE_PRICE_ID` | £3/month subscription price |
+| `STRIPE_WEBHOOK_SECRET` | Webhook signature verify |
+| `STRIPE_CUSTOMER_PORTAL_URL` | Customer portal login link |
+| `KV_REST_API_URL` / `KV_REST_API_TOKEN` | Upstash Redis REST |
+| `AUTH_SECRET` | HMAC for API-key hashes + magic links |
+| `APP_BASE_URL` | Checkout success/cancel + magic-link base |
+| `RESEND_API_KEY` / `RESEND_FROM_EMAIL` | Magic-link email (`support@agenticaf.io`) |
+| `MCP_AUTH_REQUIRED` | `true` to enforce Bearer API keys on MCP |
+
+Verify locally: `node tools/scripts/verify-billing-infra.js`
 
 ## Stats and cron (get homepage stats live)
 
