@@ -38,10 +38,20 @@ export default function Home() {
           <a
             href={pdfUrl}
             className="button button--primary button--lg"
-            style={{ textDecoration: 'none' }}
+            style={{ textDecoration: 'none', marginRight: '0.75rem' }}
           >
             Download Full PDF
           </a>
+          <a
+            href="/api/stripe/checkout"
+            className="button button--secondary button--lg"
+            style={{ textDecoration: 'none' }}
+          >
+            Get MCP Access
+          </a>
+          <p style={{ marginTop: '0.75rem', fontSize: '0.95rem', color: 'var(--ifm-font-color-secondary)' }}>
+            £3/month · 1,000 MCP requests · hard cap
+          </p>
         </div>
 
         <HomepageStats />
