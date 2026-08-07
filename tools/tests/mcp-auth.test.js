@@ -48,12 +48,14 @@ async function authenticateMcpRequest(req, redis) {
   }
 
   const included = customer.includedCalls || 1000;
-  const usedBefore = Number((await redis.get(`aaf:customer:${customerId}:calls`)) ?? customer.callsUsed ?? 0);
+  const period = new Date().toISOString().slice(0, 7);
+  const counterKey = `aaf:customer:${customerId}:calls:${period}`;
+  const usedBefore = Number((await redis.get(counterKey)) ?? 0);
   if (usedBefore >= included) {
     return { ok: false, status: 429, error: "Monthly request limit reached (1000)" };
   }
 
-  const nextUsed = await redis.incr(`aaf:customer:${customerId}:calls`);
+  const nextUsed = await redis.incr(counterKey);
   await redis.set(`aaf:customer:${customerId}`, { ...customer, callsUsed: nextUsed, includedCalls: included });
 
   if (nextUsed > included) {
@@ -87,14 +89,14 @@ describe("mcp-auth", () => {
       callsUsed: 0,
       includedCalls: 1000,
     });
-    await redis.set(`aaf:customer:${customerId}:calls`, 0);
+    await redis.set(`aaf:customer:${customerId}:calls:${new Date().toISOString().slice(0, 7)}`, 0);
     await redis.set(`aaf:key:${keyHash}`, customerId);
   });
 
   after(async () => {
     if (!redis || !customerId) return;
     await redis.del(`aaf:customer:${customerId}`);
-    await redis.del(`aaf:customer:${customerId}:calls`);
+    await redis.del(`aaf:customer:${customerId}:calls:${new Date().toISOString().slice(0, 7)}`);
     await redis.del(`aaf:key:${keyHash}`);
   });
 
@@ -127,7 +129,8 @@ describe("mcp-auth", () => {
   });
 
   it("returns 429 when callsUsed is at cap", async () => {
-    await redis.set(`aaf:customer:${customerId}:calls`, 1000);
+    const period = new Date().toISOString().slice(0, 7);
+    await redis.set(`aaf:customer:${customerId}:calls:${period}`, 1000);
     const customer = await redis.get(`aaf:customer:${customerId}`);
     await redis.set(`aaf:customer:${customerId}`, { ...customer, callsUsed: 1000 });
     const req = new Request("https://example.com/api/mcp", {
@@ -139,7 +142,8 @@ describe("mcp-auth", () => {
   });
 
   it("returns 401 when subscription inactive", async () => {
-    await redis.set(`aaf:customer:${customerId}:calls`, 0);
+    const period = new Date().toISOString().slice(0, 7);
+    await redis.set(`aaf:customer:${customerId}:calls:${period}`, 0);
     const customer = await redis.get(`aaf:customer:${customerId}`);
     await redis.set(`aaf:customer:${customerId}`, { ...customer, status: "inactive", callsUsed: 0 });
     const req = new Request("https://example.com/api/mcp", {

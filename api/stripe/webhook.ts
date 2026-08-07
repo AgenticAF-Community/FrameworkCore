@@ -46,14 +46,8 @@ export async function POST(req: Request): Promise<Response> {
           stripeSubscriptionId: subscriptionId,
         });
 
-        // Stash reveal token against checkout session for success page fallback
-        const { getKv, KV_PREFIX } = await import("../lib/kv");
-        const kv = getKv();
-        await kv.set(
-          `${KV_PREFIX.reveal}session:${session.id}`,
-          { revealToken: result.revealToken, customerId: result.customerId },
-          { ex: 3600 }
-        );
+        const { bindCheckoutSessionReveal } = await import("../lib/access");
+        await bindCheckoutSessionReveal(session.id, result.revealToken, result.customerId);
         break;
       }
       case "customer.subscription.deleted":

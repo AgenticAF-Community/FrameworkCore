@@ -4,6 +4,7 @@
 import { getBillingConfig } from "./config";
 import { getKv, KV_PREFIX } from "./kv";
 import { generateApiKey, generateToken, hashApiKey } from "./keys";
+import { callsKey } from "./mcp-auth";
 import type { CustomerRecord } from "./mcp-auth";
 
 export type ActivateInput = {
@@ -18,6 +19,7 @@ export type ActivateResult = {
   customerId: string;
   revealToken: string;
   apiKey: string;
+  reused?: boolean;
 };
 
 export async function activateSubscription(input: ActivateInput): Promise<ActivateResult> {
@@ -35,7 +37,7 @@ export async function activateSubscription(input: ActivateInput): Promise<Activa
       { customerId, apiKey: null, reused: true },
       { ex: 3600 }
     );
-    return { customerId, revealToken, apiKey: "" };
+    return { customerId, revealToken, apiKey: "", reused: true };
   }
 
   const apiKey = generateApiKey();
@@ -58,7 +60,7 @@ export async function activateSubscription(input: ActivateInput): Promise<Activa
   }
 
   await kv.set(`${KV_PREFIX.customer}${customerId}`, record);
-  await kv.set(`${KV_PREFIX.customer}${customerId}:calls`, 0);
+  await kv.set(callsKey(customerId), 0);
   await kv.set(`${KV_PREFIX.keyHash}${keyHash}`, customerId);
   await kv.set(`${KV_PREFIX.email}${email}`, customerId);
 
@@ -69,7 +71,7 @@ export async function activateSubscription(input: ActivateInput): Promise<Activa
     { ex: 3600 }
   );
 
-  return { customerId, revealToken, apiKey };
+  return { customerId, revealToken, apiKey, reused: false };
 }
 
 export async function deactivateSubscription(stripeCustomerId: string): Promise<void> {
@@ -95,4 +97,18 @@ export async function consumeRevealToken(
     apiKey: data.apiKey,
     reused: !!data.reused,
   };
+}
+
+/** Map checkout session → reveal token for success page. */
+export async function bindCheckoutSessionReveal(
+  sessionId: string,
+  revealToken: string,
+  customerId: string
+): Promise<void> {
+  const kv = getKv();
+  await kv.set(
+    `${KV_PREFIX.reveal}session:${sessionId}`,
+    { revealToken, customerId },
+    { ex: 3600 }
+  );
 }

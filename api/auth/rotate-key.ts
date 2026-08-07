@@ -3,8 +3,8 @@
  */
 import { generateApiKey, generateToken, hashApiKey } from "../lib/keys";
 import { getKv, KV_PREFIX } from "../lib/kv";
-import { getBillingConfig } from "../lib/config";
 import { getCustomer, getSessionFromRequest } from "../lib/magic";
+import { resolveAppBaseUrl } from "../lib/urls";
 
 export async function POST(req: Request): Promise<Response> {
   try {
@@ -37,10 +37,10 @@ export async function POST(req: Request): Promise<Response> {
       { ex: 3600 }
     );
 
-    const cfg = getBillingConfig();
+    const appBase = resolveAppBaseUrl(req);
     return json({
       ok: true,
-      revealUrl: `${cfg.appBaseUrl}/access/success?token=${encodeURIComponent(revealToken)}`,
+      revealUrl: `${appBase}/access/success?token=${encodeURIComponent(revealToken)}`,
       revealToken,
     });
   } catch (e: any) {

@@ -3,8 +3,9 @@
  * POST /api/auth/signout — clear cookie.
  */
 import { getBillingConfig } from "../lib/config";
-import { getKv, KV_PREFIX } from "../lib/kv";
 import { SESSION_COOKIE, getCustomer, getSessionFromRequest } from "../lib/magic";
+import { getCustomerCallsUsed } from "../lib/mcp-auth";
+import { isHttpsBase, resolveAppBaseUrl } from "../lib/urls";
 
 export async function GET(req: Request): Promise<Response> {
   const session = getSessionFromRequest(req);
@@ -13,8 +14,7 @@ export async function GET(req: Request): Promise<Response> {
   const customer = await getCustomer(session.customerId);
   if (!customer) return json({ authenticated: false }, 401);
 
-  const kv = getKv();
-  const calls = Number((await kv.get(`${KV_PREFIX.customer}${session.customerId}:calls`)) ?? customer.callsUsed ?? 0);
+  const calls = await getCustomerCallsUsed(session.customerId);
   const cfg = getBillingConfig();
 
   return json({
@@ -29,9 +29,8 @@ export async function GET(req: Request): Promise<Response> {
 }
 
 export async function POST(req: Request): Promise<Response> {
-  // sign out
-  const cfg = getBillingConfig();
-  const secure = cfg.appBaseUrl.startsWith("https");
+  const appBase = resolveAppBaseUrl(req);
+  const secure = isHttpsBase(appBase);
   const cookie = `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure ? "; Secure" : ""}`;
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,

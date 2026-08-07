@@ -3,6 +3,7 @@
  */
 import { getBillingConfig } from "../lib/config";
 import { getStripe } from "../lib/stripe";
+import { resolveAppBaseUrl } from "../lib/urls";
 
 export async function GET(req: Request): Promise<Response> {
   return startCheckout(req);
@@ -18,12 +19,13 @@ async function startCheckout(req: Request): Promise<Response> {
     const stripe = getStripe();
     const url = new URL(req.url);
     const email = url.searchParams.get("email") || undefined;
+    const appBase = resolveAppBaseUrl(req);
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: cfg.stripePriceId, quantity: 1 }],
-      success_url: `${cfg.appBaseUrl}/access/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${cfg.appBaseUrl}/tools`,
+      success_url: `${appBase}/access/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appBase}/tools`,
       ...(email ? { customer_email: email } : {}),
       allow_promotion_codes: true,
       billing_address_collection: "auto",

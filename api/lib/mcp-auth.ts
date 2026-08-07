@@ -1,5 +1,6 @@
 /**
  * MCP Bearer auth + monthly quota (hard cap).
+ * Usage counters are keyed by calendar month (UTC) so the 1000 cap resets each month.
  */
 import { getBillingConfig } from "./config";
 import { getKv, KV_PREFIX } from "./kv";
@@ -40,8 +41,12 @@ function extractBearer(req: Request): string | null {
   return m ? m[1].trim() : null;
 }
 
-function callsKey(customerId: string): string {
-  return `${KV_PREFIX.customer}${customerId}:calls`;
+export function currentPeriodId(d = new Date()): string {
+  return d.toISOString().slice(0, 7); // YYYY-MM UTC
+}
+
+export function callsKey(customerId: string, periodId = currentPeriodId()): string {
+  return `${KV_PREFIX.customer}${customerId}:calls:${periodId}`;
 }
 
 export async function authenticateMcpRequest(req: Request): Promise<AuthResult> {
@@ -69,9 +74,10 @@ export async function authenticateMcpRequest(req: Request): Promise<AuthResult> 
   }
 
   const included = customer.includedCalls || cfg.includedCallsPerMonth;
-  const counterKey = callsKey(customerId);
+  const periodId = currentPeriodId();
+  const counterKey = callsKey(customerId, periodId);
   const usedBeforeRaw = await kv.get<number | string>(counterKey);
-  const usedBefore = Number(usedBeforeRaw ?? customer.callsUsed ?? 0);
+  const usedBefore = Number(usedBeforeRaw ?? 0);
   if (usedBefore >= included) {
     return { ok: false, status: 429, error: "Monthly request limit reached (1000)" };
   }
@@ -81,6 +87,7 @@ export async function authenticateMcpRequest(req: Request): Promise<AuthResult> 
     ...customer,
     callsUsed: nextUsed,
     includedCalls: included,
+    periodStart: `${periodId}-01`,
   });
 
   if (nextUsed > included) {
@@ -121,4 +128,10 @@ export async function setCustomerCallsUsed(customerId: string, callsUsed: number
     await kv.set(`${KV_PREFIX.customer}${customerId}`, { ...customer, callsUsed });
   }
   await kv.set(callsKey(customerId), callsUsed);
+}
+
+export async function getCustomerCallsUsed(customerId: string): Promise<number> {
+  const kv = getKv();
+  const raw = await kv.get<number | string>(callsKey(customerId));
+  return Number(raw ?? 0);
 }

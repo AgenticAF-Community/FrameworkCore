@@ -13,16 +13,18 @@ const SESSION_TTL_SEC = 60 * 60 * 24 * 7;
 
 export { SESSION_COOKIE };
 
-export async function createMagicLink(email: string): Promise<{ ok: true; token: string; link: string } | { ok: false; error: string }> {
+export async function createMagicLink(
+  email: string,
+  appBaseUrl?: string
+): Promise<{ ok: true; token: string; link: string } | { ok: false; error: string }> {
   const cfg = getBillingConfig();
+  const base = (appBaseUrl || cfg.appBaseUrl).replace(/\/$/, "");
   const normalized = email.trim().toLowerCase();
   if (!normalized.includes("@")) return { ok: false, error: "Invalid email" };
 
   const kv = getKv();
   const customerId = await kv.get<string>(`${KV_PREFIX.email}${normalized}`);
   if (!customerId) {
-    // Do not leak whether email exists — still return ok to caller for UX,
-    // but signal no-send for tests via token empty? Prefer generic success without send.
     return { ok: false, error: "No subscription found for that email" };
   }
 
@@ -33,7 +35,7 @@ export async function createMagicLink(email: string): Promise<{ ok: true; token:
     { ex: MAGIC_TTL_SEC }
   );
 
-  const link = `${cfg.appBaseUrl}/api/auth/verify?token=${encodeURIComponent(token)}`;
+  const link = `${base}/api/auth/verify?token=${encodeURIComponent(token)}`;
   return { ok: true, token, link };
 }
 

@@ -52,7 +52,7 @@ async function activateSubscription(redis, input) {
     createdAt: new Date().toISOString(),
   };
   await redis.set(`aaf:customer:${customerId}`, record);
-  await redis.set(`aaf:customer:${customerId}:calls`, 0);
+  await redis.set(`aaf:customer:${customerId}:calls:${new Date().toISOString().slice(0, 7)}`, 0);
   await redis.set(`aaf:key:${keyHash}`, customerId);
   await redis.set(`aaf:email:${input.email}`, customerId);
 
@@ -106,7 +106,7 @@ describe("stripe-webhook + checkout", () => {
 
     const customerId = `cus_test_phase2_${Date.now()}`;
     const email = `phase2-${Date.now()}@agenticaf.io`;
-    cleanup.push(`aaf:customer:${customerId}`, `aaf:customer:${customerId}:calls`, `aaf:email:${email}`);
+    cleanup.push(`aaf:customer:${customerId}`, `aaf:customer:${customerId}:calls:${new Date().toISOString().slice(0, 7)}`, `aaf:email:${email}`);
 
     const first = await activateSubscription(redis, {
       email,

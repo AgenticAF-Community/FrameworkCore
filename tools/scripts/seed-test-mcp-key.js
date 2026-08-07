@@ -44,7 +44,7 @@ async function main() {
   };
 
   await redis.set(`aaf:customer:${customerId}`, customer);
-  await redis.set(`aaf:customer:${customerId}:calls`, 0);
+  await redis.set(`aaf:customer:${customerId}:calls:${new Date().toISOString().slice(0, 7)}`, 0);
   await redis.set(`aaf:key:${keyHash}`, customerId);
   await redis.set(`aaf:email:${customer.email}`, customerId);
 

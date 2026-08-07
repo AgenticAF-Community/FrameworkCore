@@ -7,19 +7,23 @@ export default function ManageAccess() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [me, setMe] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [checking, setChecking] = useState(true);
   const [busy, setBusy] = useState(false);
 
-  const refresh = () => {
-    setLoading(true);
-    fetch('/api/auth/me', { credentials: 'include' })
-      .then(async (r) => {
-        const data = await r.json();
-        if (r.ok && data.authenticated) setMe(data);
-        else setMe(null);
-      })
-      .catch(() => setMe(null))
-      .finally(() => setLoading(false));
+  const refresh = async () => {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const r = await fetch('/api/auth/me', { credentials: 'include', signal: controller.signal });
+      clearTimeout(timer);
+      const data = await r.json();
+      if (r.ok && data.authenticated) setMe(data);
+      else setMe(null);
+    } catch {
+      setMe(null);
+    } finally {
+      setChecking(false);
+    }
   };
 
   useEffect(() => {
@@ -75,34 +79,42 @@ export default function ManageAccess() {
 
   return (
     <Layout title="Manage MCP Access" description="Manage your AAF MCP subscription and API key">
-      <main style={{ padding: '2rem 1rem', maxWidth: '640px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>Manage MCP Access</h1>
+      <main style={{ padding: '2rem 1rem', maxWidth: '640px', margin: '0 auto', color: 'var(--ifm-font-color-base)' }}>
+        <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem', color: 'var(--ifm-heading-color)' }}>Manage MCP Access</h1>
         <p style={{ color: 'var(--ifm-font-color-secondary)', marginBottom: '1.5rem' }}>
           £3/month · 1,000 MCP requests · hard cap
         </p>
 
-        {loading && <p>Loading…</p>}
+        {checking && <p style={{ fontSize: '0.9rem', color: 'var(--ifm-font-color-secondary)' }}>Checking session…</p>}
 
-        {error && <p style={{ color: 'var(--ifm-color-danger)' }}>{error}</p>}
+        {error && <p style={{ color: 'var(--ifm-color-danger-darkest, #b00020)' }}>{error}</p>}
         {message && <p style={{ color: 'var(--ifm-color-success-darkest)' }}>{message}</p>}
 
-        {!loading && !me && (
-          <form onSubmit={requestLink}>
-            <p style={{ lineHeight: 1.6 }}>
+        {!me && (
+          <form onSubmit={requestLink} style={{ opacity: checking ? 0.7 : 1 }}>
+            <p style={{ lineHeight: 1.6, color: 'var(--ifm-font-color-base)' }}>
               Enter the email you used at checkout. We will send a one-time magic link
               (subject: <strong>AAF MAGIC LINK FOR SIGN IN</strong>).
             </p>
-            <label htmlFor="email" style={{ display: 'block', marginBottom: '0.35rem' }}>Email</label>
+            <label htmlFor="email" style={{ display: 'block', marginBottom: '0.35rem', color: 'var(--ifm-font-color-base)' }}>Email</label>
             <input
               id="email"
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={{ width: '100%', maxWidth: 360, padding: '0.5rem', marginBottom: '0.75rem' }}
+              style={{
+                width: '100%',
+                maxWidth: 360,
+                padding: '0.5rem',
+                marginBottom: '0.75rem',
+                color: 'var(--ifm-font-color-base)',
+                background: 'var(--ifm-background-color)',
+                border: '1px solid var(--ifm-color-emphasis-300)',
+              }}
             />
             <div>
-              <button type="submit" className="button button--primary" disabled={busy}>
+              <button type="submit" className="button button--primary" disabled={busy || checking}>
                 {busy ? 'Sending…' : 'Email magic link'}
               </button>
             </div>
@@ -114,14 +126,14 @@ export default function ManageAccess() {
           </form>
         )}
 
-        {!loading && me && (
+        {me && (
           <div>
             <p><strong>Signed in as</strong> {me.email}</p>
             <p>
               Status: <code>{me.status}</code>
             </p>
             <p>
-              Usage: <strong>{me.callsUsed}</strong> / {me.includedCalls}
+              Usage this month: <strong>{me.callsUsed}</strong> / {me.includedCalls}
             </p>
             {me.periodEnd && <p>Period end: {me.periodEnd}</p>}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '1rem' }}>

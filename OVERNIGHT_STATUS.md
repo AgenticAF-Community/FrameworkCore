@@ -25,7 +25,25 @@ Automated tests create Checkout Sessions but **do not** complete payment. Clicki
 - Vercel **Preview**: `true`
 - Vercel **Production**: `false` (hosted MCP still open until you cut over)
 
-## Local review (you)
+## E2E user-path review (local)
+
+Ran against `vercel dev` as a buyer/manager (no live card payment completed).
+
+**Fixed after review**
+- Request-aware base URL (localhost / Preview no longer bounce to production)
+- Session cookies no longer force `Secure` on http://localhost
+- Success page polls + can activate from Stripe session if webhook is slow
+- Copy API key button on success page
+- Monthly quota counters keyed by UTC month (cap actually resets)
+- Manage-access form visible while session check runs; dark-mode contrast
+
+**Still manual / dashboard**
+- Stripe Checkout merchant name shows **WrangleAI** (account branding in Stripe Dashboard)
+- Configure live webhook endpoint → `/api/stripe/webhook` before relying on real purchases
+- Production `MCP_AUTH_REQUIRED` still false until cutover
+
+Probe script: `E2E_BASE_URL=http://127.0.0.1:3000 node tools/scripts/e2e-user-path.js`
+
 
 ```bash
 git checkout feat/mcp-billing-auth

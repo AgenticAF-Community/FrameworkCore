@@ -67,12 +67,12 @@ describe("magic-link", () => {
       callsUsed: 3,
       includedCalls: 1000,
     });
-    await redis.set(`aaf:customer:${customerId}:calls`, 3);
+    await redis.set(`aaf:customer:${customerId}:calls:${new Date().toISOString().slice(0, 7)}`, 3);
     await redis.set(`aaf:key:${keyHash}`, customerId);
     await redis.set(`aaf:email:${email}`, customerId);
     cleanup.push(
       `aaf:customer:${customerId}`,
-      `aaf:customer:${customerId}:calls`,
+      `aaf:customer:${customerId}:calls:${new Date().toISOString().slice(0, 7)}`,
       `aaf:key:${keyHash}`,
       `aaf:email:${email}`
     );
