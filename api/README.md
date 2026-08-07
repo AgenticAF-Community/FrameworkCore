@@ -36,7 +36,13 @@ Verify locally: `node tools/scripts/verify-billing-infra.js`
 
 After the first cron run (or a manual GET to `/api/refresh-stats` with `Authorization: Bearer <CRON_SECRET>`), `GET /api/stats` serves from Blob so the homepage shows up-to-date figures. Without Blob, the stats API falls back to live GitHub + `AAF_STATS_JSON`.
 
-**MCP endpoint:** `https://www.agenticaf.io/api/mcp` (Streamable HTTP, 12 tools). Optional auth: set `MCP_API_KEY` in Vercel and send `Authorization: Bearer <key>`.
+**MCP endpoint:** `https://www.agenticaf.io/api/mcp` (Streamable HTTP, 12 tools).
+
+**Paid access:** £3/month · 1,000 requests · hard cap. Checkout: `GET /api/stripe/checkout`. After purchase, keys are shown once at `/access/success`. Manage/rotate via `/manage-access` (Resend magic link, subject `AAF MAGIC LINK FOR SIGN IN`).
+
+When `MCP_AUTH_REQUIRED=true`, send `Authorization: Bearer <aaf_live_…>`. When `false`, the endpoint stays open (legacy / pre-cutover). Optional legacy single key: `MCP_API_KEY`.
+
+Stripe webhook: `POST /api/stripe/webhook` (raw body + `stripe-signature`).
 
 ### Google Antigravity IDE (and other stdio-only clients)
 

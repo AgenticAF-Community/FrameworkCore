@@ -30,8 +30,10 @@ In practice, teams can access the framework in three ways: **(1)** reading and a
 
 The AAF MCP server exposes framework content and prebuilt skills so that MCP-capable clients can apply the framework during design or review without leaving the IDE.
 
+**Hosted MCP access** is £3/month with a hard cap of 1,000 requests (docs and GitHub stay free). Get a key via **Get MCP Access** on [agenticaf.io](https://www.agenticaf.io) or the Tools page; manage or rotate it at `/manage-access` (magic-link email). When auth is required, send `Authorization: Bearer <key>`.
+
 **Setup (hosted HTTP — Cursor and similar)**  
-Many clients accept a remote URL: `https://www.agenticaf.io/api/mcp` (Streamable HTTP). See the Tools page on agenticaf.io for the exact JSON snippet.
+Many clients accept a remote URL: `https://www.agenticaf.io/api/mcp` (Streamable HTTP), plus an `Authorization` header with your API key. See the Tools page on agenticaf.io for the exact JSON snippet.
 
 **Setup (Google Antigravity IDE and other stdio-only clients)**  
 Antigravity uses `mcp_config.json` with `command` + `args`, not a bare URL. Use the **`mcp-remote`** bridge (requires Node.js on the machine):
@@ -41,13 +43,24 @@ Antigravity uses `mcp_config.json` with `command` + `args`, not a bare URL. Use 
   "mcpServers": {
     "aaf": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://www.agenticaf.io/api/mcp", "--transport", "http-first"]
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://www.agenticaf.io/api/mcp",
+        "--transport",
+        "http-first",
+        "--header",
+        "Authorization:${AAF_MCP_AUTHORIZATION}"
+      ],
+      "env": {
+        "AAF_MCP_AUTHORIZATION": "Bearer YOUR_AAF_API_KEY"
+      }
     }
   }
 }
 ```
 
-Add this via **Manage MCP Servers → View raw config**. If `MCP_API_KEY` is enabled on the deployment, pass `Authorization: Bearer <key>` via `--header` and `env` (see `api/README.md` in the repo).
+Add this via **Manage MCP Servers → View raw config**. See `api/README.md` in the repo for Checkout, webhooks, and manage-access details.
 
 **Tools (four)**  
 | Tool | Purpose |
