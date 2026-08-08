@@ -123,6 +123,10 @@ export default function ManageAccess() {
               {' · '}
               <Link to="/tools">Tools</Link>
             </p>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--ifm-font-color-secondary)' }}>
+              By purchasing you agree to our <Link to="/terms">Terms</Link> and{' '}
+              <Link to="/privacy">Privacy Policy</Link>.
+            </p>
           </form>
         )}
 
@@ -151,6 +155,10 @@ export default function ManageAccess() {
             </div>
             <p style={{ marginTop: '1.25rem' }}>
               <Link to="/tools">Back to Tools</Link>
+              {' · '}
+              <Link to="/terms">Terms</Link>
+              {' · '}
+              <Link to="/privacy">Privacy</Link>
             </p>
           </div>
         )}

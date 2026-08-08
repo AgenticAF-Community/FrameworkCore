@@ -154,6 +154,10 @@ export default function AccessSuccess() {
               <Link to="/tools">Back to Tools</Link>
               {' · '}
               <Link to="/manage-access">Manage access</Link>
+              {' · '}
+              <Link to="/terms">Terms</Link>
+              {' · '}
+              <Link to="/privacy">Privacy</Link>
             </p>
           </div>
         )}

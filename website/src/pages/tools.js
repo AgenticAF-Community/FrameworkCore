@@ -92,7 +92,8 @@ export default function Tools() {
             </a>
             <p style={{ ...textStyle, marginTop: '0.5rem', marginBottom: 0 }}>
               £3/month · 1,000 MCP requests · hard cap. After purchase, send your API key as{' '}
-              <code>Authorization: Bearer &lt;key&gt;</code>.
+              <code>Authorization: Bearer &lt;key&gt;</code>. By purchasing you agree to our{' '}
+              <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.
             </p>
           </div>
           <ul style={{ ...textStyle, paddingLeft: '1.5rem', marginTop: '0.75rem' }}>
