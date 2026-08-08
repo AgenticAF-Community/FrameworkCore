@@ -235,14 +235,36 @@ export function getGuide(intent?: string, question?: string): any {
   const playbook = loadPlaybook();
   const key = (intent || "general").toLowerCase();
   const entry = playbook.intents?.[key] || playbook.intents?.general;
-  return {
+  const out: any = {
     intent: key,
     question: question || null,
     summary: entry?.summary || "Call aaf_guide with intent design|workload|tradeoffs|review|security|lookup|build.",
     steps: entry?.steps || [],
-    tip: "For new systems prefer workload-first: aaf_list_workloads → aaf_workload_guidance → design → trade-offs → ACC.",
+    tip: "For new systems prefer workload-first: aaf_list_workloads → aaf_workload_guidance → design → trade-offs → ACC. For codebase review: run the posture CLI in the terminal, then aaf_posture_interpret.",
     complexityHeuristic: loadWorkloadsData().complexityHeuristic || [],
   };
+  if (entry?.terminalFirst || key === "review" || key === "security") {
+    out.postureCli = playbook.postureCli || null;
+    out.agentDirective =
+      "If reviewing a repo: run the postureCli.preferredCommand (or commands[]) in the project terminal now, read the JSON output, then call aaf_posture_interpret with that JSON as report.";
+  }
+  return out;
+}
+
+/** Normalize CLI JSON ({ pillars: { id: { items } } }) or flat pillar→items map. */
+export function normalizePostureReport(report: any): Record<string, any[]> {
+  if (!report || typeof report !== "object") return {};
+  const src = report.pillars && typeof report.pillars === "object" ? report.pillars : report;
+  const out: Record<string, any[]> = {};
+  for (const [id, val] of Object.entries(src)) {
+    if (id === "path" || id === "scannedFiles" || id === "name") continue;
+    if (Array.isArray(val)) {
+      out[id] = val as any[];
+    } else if (val && typeof val === "object" && Array.isArray((val as any).items)) {
+      out[id] = (val as any).items;
+    }
+  }
+  return out;
 }
 
 export function listSkills(): any[] {

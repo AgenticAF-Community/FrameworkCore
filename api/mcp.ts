@@ -27,6 +27,7 @@ import {
   listWorkloadsCompact,
   loadAllTradeoffs,
   lookupInDocs,
+  normalizePostureReport,
   rankWorkloads,
   safeReadJSON,
   serverInstructions,
@@ -137,7 +138,8 @@ function getScaffoldSpec(autonomyLevel: string): any {
   };
 }
 
-function interpretPosture(report: Record<string, any[]>): any {
+function interpretPosture(reportInput: any): any {
+  const report = normalizePostureReport(reportInput);
   const tradeoffs = loadAllTradeoffs();
   const scores: Record<string, number> = {};
 
@@ -170,10 +172,15 @@ function interpretPosture(report: Record<string, any[]>): any {
     }
   }
 
-  return { scores, tensions: tensions.sort((a: any, b: any) => b.scoreDelta - a.scoreDelta) };
+  return {
+    scores,
+    tensions: tensions.sort((a: any, b: any) => b.scoreDelta - a.scoreDelta),
+    note: "Posture scores are heuristic. Manual review still required for production readiness.",
+  };
 }
 
-function reviewAgainstACC(accYaml: string, report: Record<string, any[]>): any {
+function reviewAgainstACC(accYaml: string, reportInput: any): any {
+  const report = normalizePostureReport(reportInput);
   const gaps: any[] = [];
   const pillars = loadPillarsLocal();
 
@@ -238,7 +245,7 @@ const baseHandler = createMcpHandler(
     server.registerTool("aaf_guide", {
       title: "AAF Guide",
       description:
-        "Call this FIRST when unsure which AAF tool to use. Returns an ordered tool plan for design, workload selection, trade-offs, review, security, lookup, or build.",
+        "Call this FIRST when unsure which AAF tool to use. Returns an ordered tool plan for design, workload selection, trade-offs, review, security, lookup, or build. For intent=review, includes terminal commands to run the local aaf-posture CLI before interpret tools.",
       inputSchema: {
         intent: z.enum(GUIDE_INTENTS).optional().describe("What you are trying to do"),
         question: z.string().optional().describe("Optional free-text architecture question"),
@@ -408,27 +415,19 @@ const baseHandler = createMcpHandler(
     server.registerTool("aaf_posture_interpret", {
       title: "AAF Posture Interpret",
       description:
-        "Interpret posture JSON (from local aaf posture --format json): per-pillar scores and trade-off tensions from score imbalances.",
+        "Interpret a posture report into per-pillar scores and trade-off tensions. FIRST run the local CLI in the project terminal: `node tools/aaf-posture/cli.js . --format json --output ./aaf-posture.json` (install once under tools/aaf-posture). Then pass the JSON file contents as report. Accepts raw CLI output ({ path, scannedFiles, pillars }) or a flat pillarId→items map. Hosted MCP cannot scan the user's disk.",
       inputSchema: {
-        report: z.record(z.array(z.object({
-          question: z.string(),
-          status: z.enum(["found", "not_found", "unclear"]),
-          evidence: z.string().optional(),
-        }))).describe("Posture report keyed by pillar ID"),
+        report: z.any().describe("CLI JSON from aaf-posture --format json, or flat map of pillarId → [{question,status,evidence}]"),
       },
     }, async ({ report }) => jsonText(interpretPosture(report)));
 
     server.registerTool("aaf_review_against_acc", {
       title: "AAF Review Against ACC",
       description:
-        "Gap analysis between an ACC YAML string and a posture report JSON.",
+        "Gap analysis between an ACC YAML string and a posture report. Use after running the local posture CLI. report accepts the same shapes as aaf_posture_interpret (raw CLI JSON or flat map).",
       inputSchema: {
         accYaml: z.string().describe("The Agent Control Contract as a YAML string"),
-        report: z.record(z.array(z.object({
-          question: z.string(),
-          status: z.enum(["found", "not_found", "unclear"]),
-          evidence: z.string().optional(),
-        }))).describe("Posture report keyed by pillar ID"),
+        report: z.any().describe("CLI JSON from aaf-posture --format json, or flat pillar→items map"),
       },
     }, async ({ accYaml, report }) => jsonText(reviewAgainstACC(accYaml, report)));
 

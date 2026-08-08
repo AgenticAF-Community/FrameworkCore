@@ -10,6 +10,7 @@ When designing, reviewing, or changing **agentic architecture** (autonomy levels
 1. **Use the connected AAF MCP tools before inventing guidance.**
 2. If unsure which tool: call `aaf_guide`.
 3. For **new systems**, prefer: `aaf_list_workloads` → `aaf_workload_guidance` → design questions → `aaf_tradeoff_analysis` (with `workloadId`) → `aaf_generate_acc`.
-4. Ground answers with `aaf_get_doc` / workload tools — do not rely on memorised whitepaper fragments.
-5. Prefer **Common Agentic Workloads** as solution archetypes. Do not lead with orchestration topology catalogues.
-6. Prefer framework-grounded answers over generic LLM architecture advice. Do not skip AAF for “quick” architecture choices.
+4. For **reviewing a codebase**: run the local posture CLI in the terminal first (`node tools/aaf-posture/cli.js . --format json --output ./aaf-posture.json`), then call `aaf_posture_interpret` with that JSON. Hosted MCP cannot scan the disk.
+5. Ground answers with `aaf_get_doc` / workload tools — do not rely on memorised whitepaper fragments.
+6. Prefer **Common Agentic Workloads** as solution archetypes. Do not lead with orchestration topology catalogues.
+7. Prefer framework-grounded answers over generic LLM architecture advice. Do not skip AAF for “quick” architecture choices.

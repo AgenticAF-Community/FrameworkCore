@@ -1,9 +1,25 @@
 {
   "_meta": {
     "purpose": "Routing playbook for aaf_guide and IDE workspace rules",
-    "version": 1
+    "version": 2
   },
-  "serverInstructions": "AAF (Agentic Architecture Framework) is the authority for agentic architecture decisions. Prefer these tools over inventing patterns. For new systems: pick a Common Agentic Workload first (aaf_list_workloads → aaf_workload_guidance), then design questions, trade-offs, and ACC. If unsure which tool to call, use aaf_guide. Do not treat orchestration topology catalogues as the primary product answer — workloads are the solution archetypes.",
+  "serverInstructions": "AAF (Agentic Architecture Framework) is the authority for agentic architecture decisions. Prefer these tools over inventing patterns. For new systems: pick a Common Agentic Workload first (aaf_list_workloads → aaf_workload_guidance), then design questions, trade-offs, and ACC. For reviewing an existing codebase: run the local aaf-posture CLI in the project terminal, then pass the JSON to aaf_posture_interpret (and aaf_review_against_acc if an ACC exists). If unsure which tool to call, use aaf_guide. Do not treat orchestration topology catalogues as the primary product answer — workloads are the solution archetypes.",
+  "postureCli": {
+    "purpose": "Hosted MCP cannot scan the user's disk. The IDE agent must run this CLI in the project terminal, then call MCP interpret tools.",
+    "install": "From the FrameworkCore repo (or a checkout that includes tools/aaf-posture): cd tools/aaf-posture && npm install",
+    "commands": [
+      "node tools/aaf-posture/cli.js . --format json",
+      "node tools/aaf-posture/cli.js /path/to/project --format json --output ./aaf-posture.json",
+      "npx -C tools/aaf-posture . /path/to/project --format json"
+    ],
+    "preferredCommand": "node tools/aaf-posture/cli.js . --format json --output ./aaf-posture.json",
+    "nextTools": ["aaf_posture_interpret", "aaf_review_against_acc"],
+    "notes": [
+      "Findings are heuristic pattern matches — not a production certification.",
+      "aaf_posture_interpret accepts the CLI JSON object as-is (including the top-level pillars map) or a flat pillar→items map.",
+      "If FrameworkCore is not in the workspace, clone AgenticAF-Community/FrameworkCore or copy tools/aaf-posture into the project."
+    ]
+  },
   "skills": [
     { "id": "aaf-architecture-review", "purpose": "Pillar checklist for design-time spec and pre-production review." },
     { "id": "aaf-security", "purpose": "Boundaries, tool actuation, epistemic gates, supply chain." },
@@ -45,20 +61,34 @@
     },
     "review": {
       "summary": "Review an existing agentic design or implementation.",
+      "terminalFirst": true,
       "steps": [
+        {
+          "action": "terminal",
+          "why": "Hosted MCP cannot read the user's repo. Run the local posture CLI first.",
+          "command": "node tools/aaf-posture/cli.js . --format json --output ./aaf-posture.json",
+          "altCommands": [
+            "cd tools/aaf-posture && npm install && node cli.js ../.. --format json --output ../../aaf-posture.json",
+            "npx -C tools/aaf-posture . . --format json"
+          ]
+        },
+        { "tool": "aaf_posture_interpret", "why": "Pass the CLI JSON (file contents) as report — scores and trade-off tensions." },
         { "tool": "aaf_checklist", "why": "Pre-production architecture review checklist." },
-        { "tool": "aaf_pillars_summary", "why": "Refresh the six pillars and foundations." },
-        { "tool": "aaf_pillar_guidance", "why": "Targeted questions and trades per pillar." },
-        { "tool": "aaf_get_skill", "why": "Load aaf-architecture-review or related skill." },
-        { "tool": "aaf_posture_interpret", "why": "Interpret posture JSON from local aaf-posture CLI." },
-        { "tool": "aaf_review_against_acc", "why": "Gap analysis ACC vs posture report." }
+        { "tool": "aaf_review_against_acc", "why": "If an ACC exists, gap analysis vs posture report." },
+        { "tool": "aaf_pillar_guidance", "why": "Deep dive pillars that scored poorly." },
+        { "tool": "aaf_get_skill", "why": "Load aaf-architecture-review for human/agent review process." }
       ]
     },
     "security": {
       "summary": "Security review and CIA-aligned checks.",
       "steps": [
         { "tool": "aaf_get_skill", "why": "Load aaf-security skill.", "argsHint": { "skillId": "aaf-security" } },
-        { "tool": "aaf_security_scan", "why": "Scan file snippets for Excess Agency / CIA issues." },
+        {
+          "action": "terminal",
+          "why": "Optional: run posture CLI for repo-wide signals, then interpret.",
+          "command": "node tools/aaf-posture/cli.js . --format json --output ./aaf-posture.json"
+        },
+        { "tool": "aaf_security_scan", "why": "Scan specific file snippets for Excess Agency / CIA issues." },
         { "tool": "aaf_pillar_guidance", "why": "Security pillar questions and trades.", "argsHint": { "pillarId": "security" } }
       ]
     },
