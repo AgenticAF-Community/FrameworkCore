@@ -27,8 +27,8 @@ const MCP_TOOLS = [
   { name: 'aaf_tradeoff_analysis', desc: 'Deterministic trade-off analysis (optional workloadId).', phase: 'Design' },
   { name: 'aaf_generate_acc', desc: 'Generate an Agent Control Contract from design answers.', phase: 'Design' },
   { name: 'aaf_scaffold_spec', desc: 'File manifest for agent code scaffold generation.', phase: 'Build' },
-  { name: 'aaf_posture_interpret', desc: 'Interpret posture report with trade-off tensions.', phase: 'Review' },
-  { name: 'aaf_review_against_acc', desc: 'Gap analysis: ACC vs actual implementation.', phase: 'Review' },
+  { name: 'aaf_posture_interpret', desc: 'Interpret posture CLI JSON (run local aaf-posture first).', phase: 'Review' },
+  { name: 'aaf_review_against_acc', desc: 'Gap analysis: ACC vs posture report (CLI JSON accepted).', phase: 'Review' },
   { name: 'aaf_pillar_guidance', desc: 'Targeted design guidance for a specific pillar.', phase: 'Cross-cutting' },
   { name: 'aaf_security_scan', desc: 'CIA-aligned security scan with actionable recommendations.', phase: 'Security' },
 ];
@@ -228,8 +228,9 @@ When designing, reviewing, or changing **agentic architecture**:
 1. Use the connected AAF MCP tools before inventing guidance.
 2. If unsure which tool: call \`aaf_guide\`.
 3. For new systems: \`aaf_list_workloads\` → \`aaf_workload_guidance\` → design → trade-offs → ACC.
-4. Ground with \`aaf_get_doc\` / workload tools. Prefer Common Agentic Workloads over inventing hybrids.
-5. Do not skip AAF for “quick” architecture choices.
+4. For codebase review: run \`node tools/aaf-posture/cli.js . --format json --output ./aaf-posture.json\` in the terminal, then \`aaf_posture_interpret\` (hosted MCP cannot scan disk).
+5. Ground with \`aaf_get_doc\` / workload tools. Prefer Common Agentic Workloads over inventing hybrids.
+6. Do not skip AAF for “quick” architecture choices.
 `}
             </pre>
           </div>
@@ -253,8 +254,8 @@ When designing, reviewing, or changing **agentic architecture**:
         </h2>
         <ul style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--ifm-font-color-base)', paddingLeft: '1.5rem' }}>
           <li><strong>Humans:</strong> Run the posture CLI on your repo; read the report. Use the framework docs and skills as checklists during design reviews.</li>
-          <li><strong>Agents:</strong> Load an AAF skill for architecture or security guidance. Use the MCP server to query the framework and run posture checks from within your assistant.</li>
-          <li><strong>CI/CD:</strong> Add <code>aaf-posture --format json</code> to your pipeline; fail or warn on low posture scores or specific pillars.</li>
+          <li><strong>Agents:</strong> Use the MCP server for workloads, trade-offs, ACC, and docs. For codebase posture, run the local <code>aaf-posture</code> CLI in the terminal, then call <code>aaf_posture_interpret</code> (hosted MCP cannot scan your disk).</li>
+          <li><strong>CI/CD:</strong> Add <code>aaf-posture --format json</code> to your pipeline as a heuristic signal — not a production certification. Fail or warn only with thresholds you have calibrated.</li>
         </ul>
 
         <h2 style={{ fontSize: '1.35rem', marginTop: '2rem', marginBottom: '0.75rem' }}>
