@@ -16,9 +16,9 @@ const config = {
   projectName: 'FrameworkCore',
   trailingSlash: false,
 
-  // Kit landing page for gated PDF download
+  // WrangleAI landing page for full PDF download
   customFields: {
-    pdfDownloadUrl: process.env.PDF_DOWNLOAD_URL || 'https://agentic-architecture-framework.kit.com/fc548b5d10',
+    pdfDownloadUrl: process.env.PDF_DOWNLOAD_URL || 'https://wrangleai.com/agentic-architecture-framework',
     giscus: {
       repo: 'AgenticAF-Community/FrameworkCore',
       repoId: 'R_kgDORSpHHg',

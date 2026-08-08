@@ -39,6 +39,8 @@ export default function Home() {
             href={pdfUrl}
             className="button button--primary button--lg"
             style={{ textDecoration: 'none', marginRight: '0.75rem' }}
+            target="_blank"
+            rel="noopener noreferrer"
           >
             Download Full PDF
           </a>
