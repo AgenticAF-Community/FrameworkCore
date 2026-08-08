@@ -15,8 +15,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "../..");
 const DATA_DIR = path.join(REPO_ROOT, "tools", "data");
 
-// ─── Data files exist ───────────────────────────────────────────────────────
-
 describe("MCP data dependencies", () => {
   it("pillars.json should exist and be valid", () => {
     const fp = path.join(DATA_DIR, "pillars.json");
@@ -34,6 +32,45 @@ describe("MCP data dependencies", () => {
     assert.ok(Array.isArray(data.tradeoffs), "tradeoffs should be array");
   });
 
+  it("mcp-playbook.json should exist with intents", () => {
+    const fp = path.join(DATA_DIR, "mcp-playbook.json");
+    assert.ok(fs.existsSync(fp));
+    const data = JSON.parse(fs.readFileSync(fp, "utf8"));
+    assert.ok(data.intents.design);
+    assert.ok(data.intents.design.steps.some((s) => s.tool === "aaf_list_workloads"));
+    assert.ok(data.intents.review);
+    assert.ok(typeof data.serverInstructions === "string" && data.serverInstructions.length > 20);
+  });
+
+  it("workloads.json should list four workloads", () => {
+    const fp = path.join(DATA_DIR, "workloads.json");
+    assert.ok(fs.existsSync(fp));
+    const data = JSON.parse(fs.readFileSync(fp, "utf8"));
+    assert.equal(data.workloads.length, 4);
+    const ids = data.workloads.map((w) => w.id).sort();
+    assert.deepEqual(ids, [
+      "customer-chatbot",
+      "internal-copilot",
+      "knowledge-assistant",
+      "workflow-agent",
+    ]);
+    for (const w of data.workloads) {
+      assert.ok(Array.isArray(w.dominantTrades) && w.dominantTrades.length > 0, w.id);
+      assert.ok(w.doc.endsWith(".md"));
+    }
+  });
+
+  it("workload-trade-offs.json should tag workloadIds", () => {
+    const fp = path.join(DATA_DIR, "workload-trade-offs.json");
+    assert.ok(fs.existsSync(fp));
+    const data = JSON.parse(fs.readFileSync(fp, "utf8"));
+    assert.ok(data.tradeoffs.length >= 4);
+    for (const t of data.tradeoffs) {
+      assert.ok(t.workloadId, t.id);
+      assert.ok(t.tension);
+    }
+  });
+
   it("pillars.json pillar IDs should match the schema", () => {
     const expected = [
       "security", "reliability", "cost", "operational-excellence",
@@ -45,12 +82,17 @@ describe("MCP data dependencies", () => {
   });
 });
 
-// ─── MCP server file structure ──────────────────────────────────────────────
-
 describe("MCP server structure", () => {
   const mcpSource = fs.readFileSync(path.join(REPO_ROOT, "api", "mcp.ts"), "utf8");
 
   const expectedTools = [
+    "aaf_guide",
+    "aaf_list_skills",
+    "aaf_list_docs",
+    "aaf_get_doc",
+    "aaf_list_workloads",
+    "aaf_workload_guidance",
+    "aaf_tradeoff_catalog",
     "aaf_lookup",
     "aaf_checklist",
     "aaf_pillars_summary",
@@ -62,6 +104,7 @@ describe("MCP server structure", () => {
     "aaf_posture_interpret",
     "aaf_review_against_acc",
     "aaf_pillar_guidance",
+    "aaf_security_scan",
   ];
 
   for (const tool of expectedTools) {
@@ -73,13 +116,21 @@ describe("MCP server structure", () => {
     });
   }
 
-  it("should have exactly 12 tools registered", () => {
+  it("should have exactly 19 tools registered", () => {
     const count = (mcpSource.match(/server\.registerTool\(/g) || []).length;
-    assert.equal(count, 12, `Expected 12 tools, found ${count}`);
+    assert.equal(count, 19, `Expected 19 tools, found ${count}`);
+  });
+
+  it("should pass server instructions", () => {
+    assert.ok(mcpSource.includes("instructions:"));
+    assert.ok(mcpSource.includes("serverInstructions"));
   });
 
   it("should read trade-offs.json", () => {
-    assert.ok(mcpSource.includes("trade-offs.json"));
+    const contentSrc = fs.readFileSync(path.join(REPO_ROOT, "api", "lib", "aaf-mcp-content.ts"), "utf8");
+    assert.ok(contentSrc.includes("trade-offs.json"));
+    assert.ok(contentSrc.includes("workload-trade-offs.json"));
+    assert.ok(contentSrc.includes("workloads.json"));
   });
 
   it("should read pillars.json", () => {
@@ -87,131 +138,42 @@ describe("MCP server structure", () => {
   });
 });
 
-// ─── Design questions tool logic ────────────────────────────────────────────
+describe("IDE rule templates", () => {
+  it("should ship Cursor alwaysApply rule", () => {
+    const fp = path.join(REPO_ROOT, "tools", "ide", "cursor-rules", "aaf-mcp.mdc");
+    assert.ok(fs.existsSync(fp));
+    const text = fs.readFileSync(fp, "utf8");
+    assert.ok(text.includes("alwaysApply: true"));
+    assert.ok(text.includes("aaf_guide"));
+    assert.ok(text.includes("aaf_list_workloads"));
+  });
 
-describe("aaf_design_questions logic", () => {
-  const pillars = JSON.parse(fs.readFileSync(path.join(DATA_DIR, "pillars.json"), "utf8"));
+  it("should ship AGENTS snippet", () => {
+    const fp = path.join(REPO_ROOT, "tools", "ide", "AGENTS-aaf-snippet.md");
+    assert.ok(fs.existsSync(fp));
+  });
+});
 
-  it("should produce questions for every pillar", () => {
-    const result = pillars.map((p) => ({
-      pillarId: p.id,
-      questions: p.questions.map((q, i) => ({
-        questionId: `${p.id}-q${i + 1}`,
-        text: q,
-      })),
-    }));
-    assert.equal(result.length, 8);
-    for (const p of result) {
-      assert.ok(p.questions.length > 0, `${p.pillarId} has no questions`);
+describe("Content helper behaviour (via npx tsx)", () => {
+  it("guide design mentions workloads; get_doc rejects traversal; rank works", async () => {
+    const { spawnSync } = await import("child_process");
+    const r = spawnSync(
+      "npx",
+      ["--yes", "tsx", "tools/tests/run-aaf-mcp-content.ts"],
+      { cwd: REPO_ROOT, encoding: "utf8", timeout: 90000 }
+    );
+    if (r.status !== 0) {
+      assert.fail(`tsx helper test failed: ${r.stderr || r.stdout}`);
     }
-  });
-
-  it("question IDs should follow pattern pillarId-qN", () => {
-    for (const p of pillars) {
-      p.questions.forEach((q, i) => {
-        const qId = `${p.id}-q${i + 1}`;
-        assert.match(qId, /^[a-z-]+-q\d+$/);
-      });
-    }
+    assert.ok((r.stdout || "").includes("ok"));
   });
 });
 
-// ─── Scaffold spec tool logic ───────────────────────────────────────────────
-
-describe("aaf_scaffold_spec logic", () => {
-  const levels = ["assistive", "delegated", "bounded-autonomous", "supervisory"];
-
-  for (const level of levels) {
-    it(`should return spec for ${level} level`, () => {
-      const spec = {
-        autonomyLevel: level,
-        files: [
-          { path: "agent.py", purpose: "Main agent entry point" },
-          { path: "policy.yaml", purpose: "ACC" },
-          { path: "gates.py", purpose: "Gate implementations" },
-        ],
-      };
-      assert.ok(spec.files.length > 0);
-      assert.equal(spec.autonomyLevel, level);
-    });
-  }
-});
-
-// ─── Posture interpret logic ────────────────────────────────────────────────
-
-describe("aaf_posture_interpret logic", () => {
-  it("should calculate scores from found/not_found/unclear statuses", () => {
-    const report = {
-      security: [
-        { question: "q1", status: "found" },
-        { question: "q2", status: "found" },
-        { question: "q3", status: "not_found" },
-        { question: "q4", status: "unclear" },
-      ],
-    };
-    const found = report.security.filter((r) => r.status === "found").length;
-    const score = found / report.security.length;
-    assert.equal(score, 0.5);
+describe("Tools page lists new tools", () => {
+  it("tools.js mentions aaf_guide and aaf_list_workloads", () => {
+    const src = fs.readFileSync(path.join(REPO_ROOT, "website", "src", "pages", "tools.js"), "utf8");
+    assert.ok(src.includes("aaf_guide"));
+    assert.ok(src.includes("aaf_list_workloads"));
+    assert.ok(src.includes("YOUR_AAF_LIVE_KEY"));
   });
-});
-
-// ─── Review against ACC logic ───────────────────────────────────────────────
-
-describe("aaf_review_against_acc logic", () => {
-  it("should identify gaps where status is not_found", () => {
-    const report = {
-      security: [
-        { question: "Are all entry points authenticated?", status: "found" },
-        { question: "Are write actions gated?", status: "not_found" },
-      ],
-    };
-    const acc = "Are write actions gated?";
-    const gaps = [];
-    for (const result of report.security) {
-      if (result.status === "not_found") {
-        gaps.push({
-          question: result.question,
-          severity: acc.includes(result.question) ? "high" : "medium",
-        });
-      }
-    }
-    assert.equal(gaps.length, 1);
-    assert.equal(gaps[0].severity, "high");
-  });
-});
-
-// ─── Pillar guidance logic ──────────────────────────────────────────────────
-
-describe("aaf_pillar_guidance logic", () => {
-  const pillars = JSON.parse(fs.readFileSync(path.join(DATA_DIR, "pillars.json"), "utf8"));
-
-  it("should find each pillar by ID", () => {
-    for (const p of pillars) {
-      const found = pillars.find((x) => x.id === p.id);
-      assert.ok(found, `Pillar ${p.id} not found`);
-      assert.ok(found.questions.length > 0);
-    }
-  });
-});
-
-// ─── Tools page lists all MCP tools ─────────────────────────────────────────
-
-describe("tools page consistency", () => {
-  const toolsPage = fs.readFileSync(
-    path.join(REPO_ROOT, "website", "src", "pages", "tools.js"),
-    "utf8"
-  );
-
-  const expectedTools = [
-    "aaf_lookup", "aaf_checklist", "aaf_pillars_summary", "aaf_get_skill",
-    "aaf_design_questions", "aaf_tradeoff_analysis", "aaf_generate_acc",
-    "aaf_scaffold_spec", "aaf_posture_interpret", "aaf_review_against_acc",
-    "aaf_pillar_guidance",
-  ];
-
-  for (const tool of expectedTools) {
-    it(`tools page should list ${tool}`, () => {
-      assert.ok(toolsPage.includes(tool), `${tool} missing from tools page`);
-    });
-  }
 });

@@ -38,6 +38,11 @@ const PILLAR_DOCS = [
   "11-pillar-sustainability.md",
   "12-context-optimization.md",
   "13-autonomy-governance.md",
+  "13.5-common-agentic-workloads.md",
+  "13.51-workload-knowledge-assistant.md",
+  "13.52-workload-customer-chatbot.md",
+  "13.53-workload-internal-copilot.md",
+  "13.54-workload-workflow-agent.md",
 ];
 
 function loadEnv() {

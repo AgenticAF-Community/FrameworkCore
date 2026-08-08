@@ -1,0 +1,124 @@
+{
+  "_meta": {
+    "source": "docs/13.5*.md",
+    "version": 1
+  },
+  "complexityHeuristic": [
+    "Prefer a deterministic or model-assisted workflow when steps are known and the model need not own the control loop.",
+    "Else use one bounded agent with a constrained tool set, budgets, and exit conditions.",
+    "Add ordered stages, parallelism, specialist routing, or handoffs only when they create demonstrable value.",
+    "Do not select multi-agent topologies because they appear advanced."
+  ],
+  "costAccuracySpeed": {
+    "accuracy": { "spends": ["cost", "speed"], "mechanisms": ["Stronger models", "More retrieval", "Citations", "Validators", "Evaluator loops", "HITL"] },
+    "speed": { "spends": ["accuracy", "cost"], "mechanisms": ["Smaller models", "Less context", "Fewer tool rounds", "Fewer gates"] },
+    "cost": { "spends": ["accuracy", "speed"], "mechanisms": ["Smaller models", "Tighter context", "Budgets", "Early stop", "Deterministic stages"] },
+    "note": "Autonomy without budgets/gates usually worsens Cost volatility and Security even when Speed looks better on the happy path."
+  },
+  "workloads": [
+    {
+      "id": "knowledge-assistant",
+      "title": "Knowledge / RAG Assistant",
+      "doc": "13.51-workload-knowledge-assistant.md",
+      "intent": "Grounded answers from a corpus or curated knowledge base — with explicit bars before authority.",
+      "keywords": ["rag", "knowledge", "retrieval", "citations", "wiki", "corpus", "grounded", "q&a", "documentation"],
+      "defaultShape": "Bounded assistant: retrieve/load knowledge → assemble context with provenance → generate → epistemic gate → authoritative answer; optional low-risk side effects via Tool Gateway.",
+      "complexityDefault": "one-bounded-agent-or-deterministic-pipeline",
+      "criticalDecisions": ["knowledge-access", "verification-and-refusal", "actuation-scope"],
+      "reviewFocus": ["reliability", "context-optimization", "security", "autonomy-governance", "cost"],
+      "dominantTrades": [
+        { "pair": "cost-x-accuracy-x-speed", "tension": "Deeper retrieval and stronger models buy grounded accuracy; thin context and fast small models buy speed/cost but raise miss and hallucination risk.", "defaultChoice": "Accuracy/Reliability and provenance over raw Speed; bound Cost with just-in-time retrieval.", "buys": "Grounded quality, provenance", "spends": "Latency, token cost" },
+        { "pair": "reliability-x-cost", "tension": "Provenance + refusal paths improve Definition of Done but add validators and sometimes human review.", "defaultChoice": "Keep refusal and citation paths", "buys": "Reliable DoD", "spends": "Operating cost" },
+        { "pair": "reliability-x-performance", "tension": "Live API/SQL grounding can beat stale RAG for operational facts at round-trip latency cost.", "defaultChoice": "API/SQL for live facts; RAG for narrative docs", "buys": "Correct operational answers", "spends": "Latency" },
+        { "pair": "security-x-cost-context", "tension": "Stuffing large top-k or broad SQL tools worsens injection surface, cost, and mid-context miss rates.", "defaultChoice": "Least context; scoped tools", "buys": "Security and signal", "spends": "Setup effort, sometimes coverage" },
+        { "pair": "autonomy-governance-x-performance", "tension": "Non-authoritative until grounding passes slows replies; skipping the gate spends Reliability/Security.", "defaultChoice": "Gate before authority", "buys": "Safe answers", "spends": "Time-to-answer" }
+      ],
+      "failureModes": [
+        "Treating RAG hits as authoritative without citation or coverage checks",
+        "Using the LLM as a database for facts that belong in API/SQL",
+        "Context stuffing top-k everything",
+        "Adding write tools without product need",
+        "No refusal path"
+      ],
+      "whenNotThis": "Account actuation / customer case resolution → customer-chatbot. Multi-system business process with durable DoD → workflow-agent. IDE/repo assist → internal-copilot."
+    },
+    {
+      "id": "customer-chatbot",
+      "title": "Customer Service Chatbot",
+      "doc": "13.52-workload-customer-chatbot.md",
+      "intent": "Help a customer resolve an enquiry through conversation using approved knowledge and live systems of record, with escalation when needed.",
+      "keywords": ["customer", "support", "chatbot", "refund", "escalation", "handoff", "billing", "order", "service desk"],
+      "defaultShape": "Conversational agent with identity gate, FAQ/policy RAG + live account tools via Tool Gateway, epistemic checks, HITL on consequential writes, escalation with context.",
+      "complexityDefault": "one-bounded-agent-with-handoffs-as-needed",
+      "criticalDecisions": ["identity-before-actuation", "knowledge-vs-live-state", "write-authority", "escalation"],
+      "reviewFocus": ["security", "reliability", "autonomy-governance", "operational-excellence", "cost"],
+      "dominantTrades": [
+        { "pair": "cost-x-accuracy-x-speed", "tension": "Live API reads + policy RAG + validators buy accurate outcomes; a fast stuffed-FAQ model is cheaper/faster and more often wrong.", "defaultChoice": "Correct outcome / clean handoff over raw Speed", "buys": "Accurate account outcomes", "spends": "Latency, spend" },
+        { "pair": "security-x-autonomy", "tension": "HITL/policy gates on refunds buy Security; they spend Autonomy and Speed.", "defaultChoice": "Gate consequential writes", "buys": "Reduced Excessive Agency", "spends": "Autonomy, queue wait" },
+        { "pair": "security-x-performance", "tension": "Identity and Tool Gateway checks add latency; skipping them expands blast radius.", "defaultChoice": "Identity before personalised tools", "buys": "Security", "spends": "Chat latency" },
+        { "pair": "reliability-x-cost", "tension": "Escalation and dual knowledge paths raise cost; transcript-only success looks cheap until disputes.", "defaultChoice": "Outcome-based success, not transcript", "buys": "Reliability", "spends": "Operating cost" },
+        { "pair": "autonomy-x-cost", "tension": "Unbounded conversational loops without budgets explode Cost and Context.", "defaultChoice": "Turn/spend budgets", "buys": "Cost control", "spends": "Open-ended helpfulness" }
+      ],
+      "failureModes": [
+        "Model invents account facts instead of calling APIs",
+        "Write tools without Tool Gateway",
+        "Escalation drops context",
+        "FAQ RAG overrides live policy without resolution rules",
+        "Treating chat transcript as proof of completion"
+      ],
+      "whenNotThis": "Pure grounded Q&A → knowledge-assistant. Internal employee assist → internal-copilot. Back-office multi-step process → workflow-agent."
+    },
+    {
+      "id": "internal-copilot",
+      "title": "Internal Copilot",
+      "doc": "13.53-workload-internal-copilot.md",
+      "intent": "Assistive help over repos, docs, or ops context for employees — suggest by default, tightly gate writes.",
+      "keywords": ["copilot", "ide", "internal", "developer", "ops", "runbook", "code assistant", "employee"],
+      "defaultShape": "Assistive agent with just-in-time context (open files/repo slice/RAG/tools), suggest-only or confirm-before-write, session memory by default, environment-separated identities.",
+      "complexityDefault": "assistive-single-agent",
+      "criticalDecisions": ["context-assembly", "autonomy-and-write-risk", "memory", "blast-radius"],
+      "reviewFocus": ["context-optimization", "security", "autonomy-governance", "operational-excellence", "reliability"],
+      "dominantTrades": [
+        { "pair": "cost-x-accuracy-x-speed", "tension": "Frontier models + large repo slices buy quality; smaller models + tight slices reverse the triangle.", "defaultChoice": "Just-in-time context + model routing", "buys": "Suggestion quality within budget", "spends": "Whole-monorepo convenience" },
+        { "pair": "security-x-autonomy", "tension": "Suggest-only or confirm-before-write buys Security; spends Autonomy and perceived Speed.", "defaultChoice": "Assistive defaults", "buys": "Security", "spends": "Autonomy" },
+        { "pair": "security-x-context", "tension": "Org-wide retrieval or prod credentials expands exfil/injection impact.", "defaultChoice": "Scoped tools and tenancy", "buys": "Security", "spends": "Answer coverage" },
+        { "pair": "reliability-x-performance", "tension": "Tests/scanners before apply improve Reliability; silent apply is faster and fails later.", "defaultChoice": "Require checks before apply", "buys": "Reliability", "spends": "Speed" },
+        { "pair": "context-x-cost", "tension": "Opaque durable memory looks efficient until drift, leaks, and rework dominate.", "defaultChoice": "Session + versioned knowledge", "buys": "Governable memory", "spends": "Automatic accumulation" }
+      ],
+      "failureModes": [
+        "Silent writes without confirmation",
+        "Whole-org retrieval without tenancy",
+        "Durable memory storing secrets or stale decisions",
+        "One super-copilot identity with prod credentials",
+        "Treating vendor defaults as an ACC"
+      ],
+      "whenNotThis": "External customer dialogue with account tools → customer-chatbot. Grounded public/corp Q&A without IDE context → knowledge-assistant. Durable multi-system workflow → workflow-agent."
+    },
+    {
+      "id": "workflow-agent",
+      "title": "Workflow Automation Agent",
+      "doc": "13.54-workload-workflow-agent.md",
+      "intent": "Multi-step business process with tool writes and a verifiable Definition of Done — agent judgment inside a governed spine.",
+      "keywords": ["workflow", "automation", "orchestration", "ticket", "pipeline", "business process", "idempotent", "definition of done"],
+      "defaultShape": "Deterministic or staged spine with model-assisted steps, Tool Gateway, checkpoints, idempotent writes, post-write verification, budgets, optional HITL at write boundaries.",
+      "complexityDefault": "deterministic-spine-with-bounded-agent-stages",
+      "criticalDecisions": ["spine-vs-free-roam", "verification-of-done", "idempotency-and-compensation", "budgets"],
+      "reviewFocus": ["reliability", "operational-excellence", "security", "autonomy-governance", "cost", "performance"],
+      "dominantTrades": [
+        { "pair": "cost-x-accuracy-x-speed", "tension": "Stronger models and evaluator loops on judgment stages buy Accuracy; serial gates spend Speed and Cost.", "defaultChoice": "Reliability/Ops over Autonomy and raw Speed; spend Accuracy budget only where judgment is required", "buys": "Correct end state", "spends": "Latency, cost on judgment stages" },
+        { "pair": "reliability-x-performance", "tension": "Deterministic spine + gates + checkpoints buy resumability; add serial latency vs one unbounded loop.", "defaultChoice": "Spine + checkpoints", "buys": "Resumability", "spends": "Speed" },
+        { "pair": "reliability-x-cost", "tension": "Idempotent writes and verification reads cost extra; skipping them saves spend until duplicates arrive.", "defaultChoice": "Idempotency + verify", "buys": "Reliability", "spends": "Extra calls/cost" },
+        { "pair": "security-x-autonomy", "tension": "Tool Gateway + least privilege + optional HITL constrain Autonomy at writes.", "defaultChoice": "Gateway + least privilege", "buys": "Security", "spends": "Autonomy" },
+        { "pair": "autonomy-x-cost", "tension": "Unbounded retries/evaluator loops without budgets blow Cost and Sustainability.", "defaultChoice": "Hard budgets", "buys": "Cost control", "spends": "Open-ended retries" }
+      ],
+      "failureModes": [
+        "Agent owns entire process with no deterministic spine",
+        "Done claimed in natural language without reading back system state",
+        "Non-idempotent writes + retries → duplicates",
+        "No checkpointing",
+        "Missing budgets"
+      ],
+      "whenNotThis": "Conversational customer resolution → customer-chatbot. Grounded Q&A without multi-system DoD → knowledge-assistant. Interactive IDE/doc assist → internal-copilot."
+    }
+  ]
+}

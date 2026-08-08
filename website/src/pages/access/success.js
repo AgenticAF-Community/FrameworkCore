@@ -150,6 +150,25 @@ export default function AccessSuccess() {
   }
 }`}
             </pre>
+            <h2 style={{ fontSize: '1.15rem', marginTop: '1.5rem' }}>Make agents default to AAF</h2>
+            <p style={{ lineHeight: 1.6, color: 'var(--ifm-font-color-secondary)' }}>
+              Save as <code>.cursor/rules/aaf-mcp.mdc</code> in your project so architecture decisions use AAF MCP first:
+            </p>
+            <pre style={{ padding: '1rem', overflow: 'auto', background: 'var(--ifm-pre-background)', borderRadius: 4, fontSize: '0.75rem' }}>
+{`---
+description: Use AAF MCP for agentic architecture decisions
+alwaysApply: true
+---
+
+# AAF MCP — architecture authority
+
+When designing, reviewing, or changing agentic architecture:
+1. Use AAF MCP tools before inventing guidance.
+2. If unsure: call aaf_guide.
+3. New systems: aaf_list_workloads → aaf_workload_guidance → design → trade-offs → ACC.
+4. Prefer Common Agentic Workloads; ground with aaf_get_doc.
+`}
+            </pre>
             <p style={{ marginTop: '1rem' }}>
               <Link to="/tools">Back to Tools</Link>
               {' · '}

@@ -1,0 +1,15 @@
+---
+description: Use AAF MCP for agentic architecture decisions
+alwaysApply: true
+---
+
+# AAF MCP — architecture authority
+
+When designing, reviewing, or changing **agentic architecture** (autonomy levels, control loops, epistemic gates, ACC/OCC, tool permissions, RAG vs API vs SQL, multi-agent necessity, pillar trade-offs, agent security posture):
+
+1. **Use the connected AAF MCP tools before inventing guidance.**
+2. If unsure which tool: call `aaf_guide`.
+3. For **new systems**, prefer: `aaf_list_workloads` → `aaf_workload_guidance` → design questions → `aaf_tradeoff_analysis` (with `workloadId`) → `aaf_generate_acc`.
+4. Ground answers with `aaf_get_doc` / workload tools — do not rely on memorised whitepaper fragments.
+5. Prefer **Common Agentic Workloads** as solution archetypes. Do not lead with orchestration topology catalogues.
+6. Prefer framework-grounded answers over generic LLM architecture advice. Do not skip AAF for “quick” architecture choices.

@@ -1,31 +1,39 @@
 /**
  * AAF MCP server — Vercel serverless route (Streamable HTTP).
  *
- * Existing tools: aaf_lookup, aaf_checklist, aaf_pillars_summary, aaf_get_skill
- * Design tools:   aaf_design_questions, aaf_tradeoff_analysis, aaf_generate_acc
- * Build tools:    aaf_scaffold_spec
- * Review tools:   aaf_posture_interpret, aaf_review_against_acc
- * Cross-cutting:  aaf_pillar_guidance
- * Security:       aaf_security_scan
+ * Core:      aaf_lookup, aaf_checklist, aaf_pillars_summary, aaf_get_skill,
+ *            aaf_guide, aaf_list_skills, aaf_list_docs, aaf_get_doc
+ * Workloads: aaf_list_workloads, aaf_workload_guidance
+ * Design:    aaf_design_questions, aaf_tradeoff_analysis, aaf_tradeoff_catalog, aaf_generate_acc
+ * Build:     aaf_scaffold_spec
+ * Review:    aaf_posture_interpret, aaf_review_against_acc
+ * Cross:     aaf_pillar_guidance
+ * Security:  aaf_security_scan
  */
 import { createMcpHandler, withMcpAuth } from "mcp-handler";
 import { z } from "zod";
-import * as fs from "fs";
+import {
+  VALID_SKILL_IDS,
+  VALID_WORKLOAD_IDS,
+  analyseTradeoffs,
+  getChecklist,
+  getDocContent,
+  getGuide,
+  getPillarsSummary,
+  getSkillContent,
+  getWorkloadGuidance,
+  listDocsMeta,
+  listSkills,
+  listWorkloadsCompact,
+  loadAllTradeoffs,
+  lookupInDocs,
+  rankWorkloads,
+  safeReadJSON,
+  serverInstructions,
+  tradeoffCatalog,
+  DATA_DIR,
+} from "./lib/aaf-mcp-content";
 import * as path from "path";
-
-const REPO_ROOT = process.cwd();
-const DOCS_DIR = path.join(REPO_ROOT, "docs");
-const SKILLS_DIR = path.join(REPO_ROOT, "tools", "skills");
-const DATA_DIR = path.join(REPO_ROOT, "tools", "data");
-const VALID_SKILL_IDS = [
-  "aaf-architecture-review",
-  "aaf-security",
-  "aaf-epistemic-gates",
-  "aaf-cost-context",
-  "aaf-cross-cutting",
-  "aaf-acc-implementation",
-  "aaf-orchestration-occ",
-] as const;
 
 const VALID_PILLAR_IDS = [
   "security", "reliability", "cost", "operational-excellence",
@@ -33,83 +41,16 @@ const VALID_PILLAR_IDS = [
 ] as const;
 
 const AUTONOMY_LEVELS = ["assistive", "delegated", "bounded-autonomous", "supervisory"] as const;
+const GUIDE_INTENTS = [
+  "design", "workload", "tradeoffs", "review", "security", "lookup", "build", "general",
+] as const;
 
-// ─── Data loading helpers ───────────────────────────────────────────────────
-
-function safeReadFile(p: string): string | null {
-  try { return fs.readFileSync(p, "utf8"); } catch { return null; }
-}
-
-function safeReadJSON(p: string): any {
-  const raw = safeReadFile(p);
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch { return null; }
-}
-
-function loadPillars(): any[] {
+function loadPillarsLocal(): any[] {
   return safeReadJSON(path.join(DATA_DIR, "pillars.json")) || [];
 }
 
-function loadTradeoffs(): any[] {
-  const data = safeReadJSON(path.join(DATA_DIR, "trade-offs.json"));
-  return data?.tradeoffs || [];
-}
-
-// ─── Existing tool helpers ──────────────────────────────────────────────────
-
-function listDocs(): string[] {
-  try { return fs.readdirSync(DOCS_DIR).filter((n) => n.endsWith(".md")).sort(); } catch { return []; }
-}
-
-function lookupInDocs(query: string): { matches: string[]; excerpt: string | null } {
-  const q = query.trim().toLowerCase();
-  const docs = listDocs();
-  const matches: string[] = [];
-  let excerpt: string | null = null;
-  for (const doc of docs) {
-    const full = path.join(DOCS_DIR, doc);
-    if (!full.startsWith(DOCS_DIR)) continue;
-    const content = safeReadFile(full);
-    if (!content) continue;
-    const lower = content.toLowerCase();
-    if (lower.includes(q)) {
-      matches.push(doc);
-      if (!excerpt) {
-        const idx = lower.indexOf(q);
-        excerpt = content.slice(Math.max(0, idx - 80), Math.min(content.length, idx + q.length + 120)).replace(/\n/g, " ").trim();
-      }
-    }
-  }
-  return { matches, excerpt };
-}
-
-function getSkillContent(skillId: string): string | null {
-  if (!VALID_SKILL_IDS.includes(skillId as any)) return null;
-  const fp = path.join(SKILLS_DIR, skillId, "SKILL.md");
-  if (!fp.startsWith(SKILLS_DIR)) return null;
-  return safeReadFile(fp);
-}
-
-function getPillarsSummary(): string {
-  const fp = path.join(DOCS_DIR, "05-framework-overview.md");
-  const content = safeReadFile(fp);
-  if (!content) return "AAF pillars: Security, Reliability, Cost Optimization, Operational Excellence, Performance Efficiency, Sustainability. Cross-cutting: Context Optimization, Autonomy & Outcome Governance.";
-  return content.slice(0, 3200) + "\n\n[... see docs/05-framework-overview.md ...]";
-}
-
-function getChecklist(kind: string): string {
-  const content = getSkillContent("aaf-architecture-review");
-  if (!content) return "See docs/15-application-method.md for checklist.";
-  const section = content.includes("## Mode 2: Architecture review")
-    ? content.slice(content.indexOf("## Mode 2: Architecture review"))
-    : content;
-  return section.slice(0, 4000) + (section.length > 4000 ? "\n\n[...]" : "");
-}
-
-// ─── Design tool helpers ────────────────────────────────────────────────────
-
-function getDesignQuestions(autonomyLevel: string): any[] {
-  const pillars = loadPillars();
+function getDesignQuestions(_autonomyLevel: string): any[] {
+  const pillars = loadPillarsLocal();
   return pillars.map((p: any) => ({
     pillarId: p.id,
     pillarName: p.name,
@@ -122,53 +63,25 @@ function getDesignQuestions(autonomyLevel: string): any[] {
   }));
 }
 
-function analyseTradeoffs(choices: Record<string, Record<string, string>>): any[] {
-  const tradeoffs = loadTradeoffs();
-  const results: any[] = [];
-
-  for (const entry of tradeoffs) {
-    const matched: any[] = [];
-    for (const ind of entry.indicators || []) {
-      const pillarId = ind.questionId?.split("-q")[0];
-      const answers = choices[pillarId];
-      if (!answers) continue;
-      const userAnswer = answers[ind.questionId];
-      if (userAnswer === undefined) continue;
-      if (userAnswer.toLowerCase().trim() === (ind.answer || "").toLowerCase().trim()) {
-        matched.push(ind);
-      }
-    }
-    if (matched.length > 0) {
-      results.push({
-        id: entry.id,
-        pillars: entry.pillars,
-        tension: entry.tension,
-        recommendation: entry.recommendation,
-        source: entry.source,
-        confidence: entry.confidence,
-        autonomyNotes: entry.autonomyNotes,
-        matchedIndicators: matched,
-        matchStrength: matched.length / (entry.indicators?.length || 1),
-      });
-    }
-  }
-
-  return results.sort((a: any, b: any) => b.matchStrength - a.matchStrength);
-}
-
-function generateACC(answers: Record<string, Record<string, string>>, autonomyLevel: string, intent: string): string {
-  const pillars = loadPillars();
-  const tradeoffResults = analyseTradeoffs(answers);
+function generateACC(
+  answers: Record<string, Record<string, string>>,
+  autonomyLevel: string,
+  intent: string,
+  workloadId?: string
+): string {
+  const pillars = loadPillarsLocal();
+  const tradeoffResults = analyseTradeoffs(answers, workloadId);
 
   const yamlLines: string[] = [
     "# Agent Control Contract (ACC)",
     `# Generated by AAF MCP server`,
     `# Intent: ${intent}`,
+    workloadId ? `# Workload: ${workloadId}` : null,
     "",
     `autonomy_level: ${autonomyLevel}`,
     "",
     "pillars:",
-  ];
+  ].filter((l) => l !== null) as string[];
 
   for (const p of pillars) {
     yamlLines.push(`  ${p.id}:`);
@@ -193,8 +106,6 @@ function generateACC(answers: Record<string, Record<string, string>>, autonomyLe
 
   return yamlLines.join("\n");
 }
-
-// ─── Build tool helpers ─────────────────────────────────────────────────────
 
 function getScaffoldSpec(autonomyLevel: string): any {
   const baseFiles = [
@@ -226,10 +137,8 @@ function getScaffoldSpec(autonomyLevel: string): any {
   };
 }
 
-// ─── Review tool helpers ────────────────────────────────────────────────────
-
 function interpretPosture(report: Record<string, any[]>): any {
-  const tradeoffs = loadTradeoffs();
+  const tradeoffs = loadAllTradeoffs();
   const scores: Record<string, number> = {};
 
   for (const [pillarId, results] of Object.entries(report)) {
@@ -240,15 +149,23 @@ function interpretPosture(report: Record<string, any[]>): any {
 
   const tensions: any[] = [];
   for (const entry of tradeoffs) {
+    if (!entry.pillars || entry.pillars.length < 2) continue;
     const [pA, pB] = entry.pillars;
-    const sA = scores[pA]; const sB = scores[pB];
+    const sA = scores[pA];
+    const sB = scores[pB];
     if (sA === undefined || sB === undefined) continue;
     const delta = Math.abs(sA - sB);
     if (delta >= 0.3) {
       tensions.push({
-        id: entry.id, pillars: entry.pillars, tension: entry.tension,
-        recommendation: entry.recommendation, source: entry.source,
-        highPillar: sA > sB ? pA : pB, lowPillar: sA > sB ? pB : pA, scoreDelta: delta,
+        id: entry.id,
+        pillars: entry.pillars,
+        workloadId: entry.workloadId || null,
+        tension: entry.tension,
+        recommendation: entry.recommendation,
+        source: entry.source,
+        highPillar: sA > sB ? pA : pB,
+        lowPillar: sA > sB ? pB : pA,
+        scoreDelta: delta,
       });
     }
   }
@@ -258,7 +175,7 @@ function interpretPosture(report: Record<string, any[]>): any {
 
 function reviewAgainstACC(accYaml: string, report: Record<string, any[]>): any {
   const gaps: any[] = [];
-  const pillars = loadPillars();
+  const pillars = loadPillarsLocal();
 
   for (const pillar of pillars) {
     const pillarResults = report[pillar.id];
@@ -285,16 +202,13 @@ function reviewAgainstACC(accYaml: string, report: Record<string, any[]>): any {
   };
 }
 
-// ─── Pillar guidance helper ─────────────────────────────────────────────────
-
 function getPillarGuidance(pillarId: string): any {
-  const pillars = loadPillars();
-  const tradeoffs = loadTradeoffs();
+  const pillars = loadPillarsLocal();
+  const tradeoffs = loadAllTradeoffs();
   const pillar = pillars.find((p: any) => p.id === pillarId);
-
   if (!pillar) return null;
 
-  const relevantTradeoffs = tradeoffs.filter((t: any) => t.pillars.includes(pillarId));
+  const relevantTradeoffs = tradeoffs.filter((t: any) => (t.pillars || []).includes(pillarId));
 
   return {
     pillarId: pillar.id,
@@ -302,6 +216,7 @@ function getPillarGuidance(pillarId: string): any {
     questions: pillar.questions,
     tradeoffs: relevantTradeoffs.map((t: any) => ({
       id: t.id,
+      workloadId: t.workloadId || null,
       otherPillar: t.pillars.find((p: string) => p !== pillarId),
       tension: t.tension,
       recommendation: t.recommendation,
@@ -312,27 +227,104 @@ function getPillarGuidance(pillarId: string): any {
   };
 }
 
+function jsonText(data: unknown) {
+  return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] };
+}
+
 // ─── MCP server registration ────────────────────────────────────────────────
 
 const baseHandler = createMcpHandler(
   (server) => {
-    // ── Existing tools ──────────────────────────────────────────────────
+    server.registerTool("aaf_guide", {
+      title: "AAF Guide",
+      description:
+        "Call this FIRST when unsure which AAF tool to use. Returns an ordered tool plan for design, workload selection, trade-offs, review, security, lookup, or build.",
+      inputSchema: {
+        intent: z.enum(GUIDE_INTENTS).optional().describe("What you are trying to do"),
+        question: z.string().optional().describe("Optional free-text architecture question"),
+      },
+    }, async ({ intent, question }) => jsonText(getGuide(intent, question)));
+
+    server.registerTool("aaf_list_skills", {
+      title: "AAF List Skills",
+      description: "List AAF skill ids and one-line purposes before calling aaf_get_skill.",
+      inputSchema: {},
+    }, async () => jsonText({ skills: listSkills() }));
+
+    server.registerTool("aaf_list_docs", {
+      title: "AAF List Docs",
+      description: "List framework doc filenames and titles. Use aaf_get_doc to load content.",
+      inputSchema: {},
+    }, async () => jsonText({ docs: listDocsMeta() }));
+
+    server.registerTool("aaf_get_doc", {
+      title: "AAF Get Doc",
+      description:
+        "Load a framework doc by filename (e.g. 13.51-workload-knowledge-assistant.md). Optional section heading substring and maxChars/offset for chunking.",
+      inputSchema: {
+        docId: z.string().describe("Doc filename under docs/"),
+        section: z.string().optional().describe("Optional heading substring to extract"),
+        maxChars: z.number().int().positive().max(20000).optional(),
+        offset: z.number().int().nonnegative().optional(),
+      },
+    }, async ({ docId, section, maxChars, offset }) => {
+      const result = getDocContent(docId, { section, maxChars, offset });
+      if ("error" in result) return { content: [{ type: "text", text: result.error }], isError: true };
+      return jsonText(result);
+    });
+
+    server.registerTool("aaf_list_workloads", {
+      title: "AAF List Workloads",
+      description:
+        "Start here when choosing an agentic system shape. Lists Common Agentic Workloads plus the minimum-complexity heuristic. Optional requirements text ranks nearest workloads.",
+      inputSchema: {
+        requirements: z.string().optional().describe("Free-text requirements to rank nearest workloads"),
+      },
+    }, async ({ requirements }) => {
+      const catalog = listWorkloadsCompact();
+      if (requirements?.trim()) {
+        return jsonText({ ...catalog, ranked: rankWorkloads(requirements) });
+      }
+      return jsonText(catalog);
+    });
+
+    server.registerTool("aaf_workload_guidance", {
+      title: "AAF Workload Guidance",
+      description:
+        "Return rubrics, review focus, dominant cross-pillar / Cost×Accuracy×Speed trades, failure modes, and when-not-this for a workload id.",
+      inputSchema: {
+        workloadId: z.enum(VALID_WORKLOAD_IDS),
+        includeDoc: z.boolean().optional().describe("If true, include a large doc excerpt"),
+      },
+    }, async ({ workloadId, includeDoc }) => {
+      const guidance = getWorkloadGuidance(workloadId, includeDoc === true);
+      if (guidance.error) return { content: [{ type: "text", text: guidance.error }], isError: true };
+      return jsonText(guidance);
+    });
+
+    server.registerTool("aaf_tradeoff_catalog", {
+      title: "AAF Trade-off Catalog",
+      description: "List trade-off ids with pillar pairs, optional workload tags, and one-line tensions.",
+      inputSchema: {
+        workloadId: z.enum(VALID_WORKLOAD_IDS).optional(),
+      },
+    }, async ({ workloadId }) => jsonText({ tradeoffs: tradeoffCatalog(workloadId) }));
 
     server.registerTool("aaf_lookup", {
       title: "AAF Lookup",
-      description: "Look up a term or topic in the AAF framework docs. Returns matching docs and an excerpt.",
+      description:
+        "Search framework docs for a term or topic. Returns ranked matches with larger excerpts. Prefer aaf_get_doc for full sections; use aaf_list_workloads for system-shape choice.",
       inputSchema: { query: z.string().min(1) },
     }, async ({ query }) => {
-      const { matches, excerpt } = lookupInDocs(query);
-      const text = matches.length
-        ? `Matches: ${matches.join(", ")}\n${excerpt ? `Excerpt: ${excerpt}` : ""}`
-        : `No docs matched "${query}".`;
-      return { content: [{ type: "text", text }] };
+      const { matches, hint } = lookupInDocs(query);
+      if (!matches.length) return { content: [{ type: "text", text: hint }] };
+      return jsonText({ matches, hint });
     });
 
     server.registerTool("aaf_checklist", {
       title: "AAF Checklist",
-      description: "Return the AAF architecture review checklist (pre-production readiness).",
+      description:
+        "Return the AAF architecture checklist. kind=review (default) for pre-production readiness; kind=design for Mode 1 design-time checklist.",
       inputSchema: { kind: z.enum(["review", "design"]).optional() },
     }, async ({ kind }) => ({
       content: [{ type: "text", text: getChecklist(kind ?? "review") }],
@@ -340,7 +332,7 @@ const baseHandler = createMcpHandler(
 
     server.registerTool("aaf_pillars_summary", {
       title: "AAF Pillars Summary",
-      description: "Short summary of the six AAF pillars and cross-cutting foundations.",
+      description: "Short summary of the six AAF pillars and cross-cutting foundations. Use when orienting before deeper pillar or workload work.",
       inputSchema: {},
     }, async () => ({
       content: [{ type: "text", text: getPillarsSummary() }],
@@ -348,7 +340,8 @@ const baseHandler = createMcpHandler(
 
     server.registerTool("aaf_get_skill", {
       title: "AAF Get Skill",
-      description: "Return full content of an AAF skill by id.",
+      description:
+        "Return full content of an AAF skill by id. Call aaf_list_skills first if unsure. Skills: aaf-architecture-review, aaf-security, aaf-epistemic-gates, aaf-cost-context, aaf-cross-cutting, aaf-acc-implementation, aaf-orchestration-occ.",
       inputSchema: { skillId: z.enum(VALID_SKILL_IDS) },
     }, async ({ skillId }) => {
       const text = getSkillContent(skillId);
@@ -356,64 +349,66 @@ const baseHandler = createMcpHandler(
       return { content: [{ type: "text", text }] };
     });
 
-    // ── Design-phase tools ──────────────────────────────────────────────
-
     server.registerTool("aaf_design_questions", {
       title: "AAF Design Questions",
-      description: "Return the full design questionnaire for a given autonomy level. Each question includes pillar ID, question ID, and expected answer format. Use this to know what to ask when designing an agent.",
+      description:
+        "Return the full design questionnaire for an autonomy level. Prefer selecting a workload (aaf_list_workloads) first when designing a new system.",
       inputSchema: {
         autonomyLevel: z.enum(AUTONOMY_LEVELS).describe("The autonomy level of the agent being designed"),
       },
     }, async ({ autonomyLevel }) => {
       const questions = getDesignQuestions(autonomyLevel);
-      return { content: [{ type: "text", text: JSON.stringify({ autonomyLevel, pillars: questions }, null, 2) }] };
+      return jsonText({ autonomyLevel, pillars: questions });
     });
 
     server.registerTool("aaf_tradeoff_analysis", {
       title: "AAF Trade-off Analysis",
-      description: "Given design choices (per-pillar answers), return active trade-offs, tensions, and framework-grounded recommendations. This is the deterministic trade-off engine — same input always produces the same output.",
+      description:
+        "Deterministic trade-off engine from design choices. Optional workloadId includes workload-scoped dominant trades. Same input → same output.",
       inputSchema: {
-        choices: z.record(z.record(z.string())).describe("Design answers keyed by pillar ID then question ID. Example: { 'security': { 'security-q3': 'yes' } }"),
+        choices: z.record(z.record(z.string())).describe("Design answers keyed by pillar ID then question ID"),
+        workloadId: z.enum(VALID_WORKLOAD_IDS).optional(),
       },
-    }, async ({ choices }) => {
-      const results = analyseTradeoffs(choices);
+    }, async ({ choices, workloadId }) => {
+      const results = analyseTradeoffs(choices, workloadId);
       if (results.length === 0) {
-        return { content: [{ type: "text", text: "No trade-off tensions detected for the given design choices. This may mean the trade-offs data model is empty — run the extraction pipeline first." }] };
+        return {
+          content: [{
+            type: "text",
+            text: "No trade-off tensions matched. Try aaf_tradeoff_catalog, pass workloadId, or call aaf_workload_guidance for dominant trades.",
+          }],
+        };
       }
-      return { content: [{ type: "text", text: JSON.stringify({ activeTradeoffs: results.length, tradeoffs: results }, null, 2) }] };
+      return jsonText({ activeTradeoffs: results.length, workloadId: workloadId || null, tradeoffs: results });
     });
 
     server.registerTool("aaf_generate_acc", {
       title: "AAF Generate ACC",
-      description: "Given completed design answers and an autonomy level, generate an Agent Control Contract (ACC) in YAML format. The ACC is the machine-readable design contract for the agent.",
+      description:
+        "Generate an Agent Control Contract (ACC) YAML from design answers. Optional workloadId tags the ACC and includes workload trades.",
       inputSchema: {
         answers: z.record(z.record(z.string())).describe("Design answers keyed by pillar ID then question ID"),
         autonomyLevel: z.enum(AUTONOMY_LEVELS),
         intent: z.string().describe("One-line description of what the agent does"),
+        workloadId: z.enum(VALID_WORKLOAD_IDS).optional(),
       },
-    }, async ({ answers, autonomyLevel, intent }) => {
-      const acc = generateACC(answers, autonomyLevel, intent);
-      return { content: [{ type: "text", text: acc }] };
-    });
-
-    // ── Build-phase tools ───────────────────────────────────────────────
+    }, async ({ answers, autonomyLevel, intent, workloadId }) => ({
+      content: [{ type: "text", text: generateACC(answers, autonomyLevel, intent, workloadId) }],
+    }));
 
     server.registerTool("aaf_scaffold_spec", {
       title: "AAF Scaffold Spec",
-      description: "Given an autonomy level, return the file manifest that aaf build would generate: file paths, purposes, and the control loop structure. Use this to understand what to build or to generate the code yourself.",
+      description:
+        "Return the file manifest aaf build would generate for an autonomy level (paths, purposes, control loop). Use after ACC generation.",
       inputSchema: {
         autonomyLevel: z.enum(AUTONOMY_LEVELS),
       },
-    }, async ({ autonomyLevel }) => {
-      const spec = getScaffoldSpec(autonomyLevel);
-      return { content: [{ type: "text", text: JSON.stringify(spec, null, 2) }] };
-    });
-
-    // ── Review-phase tools ──────────────────────────────────────────────
+    }, async ({ autonomyLevel }) => jsonText(getScaffoldSpec(autonomyLevel)));
 
     server.registerTool("aaf_posture_interpret", {
       title: "AAF Posture Interpret",
-      description: "Given a posture report (JSON from aaf posture --format json), return per-pillar scores, active trade-off tensions based on score imbalances, and prioritised recommendations.",
+      description:
+        "Interpret posture JSON (from local aaf posture --format json): per-pillar scores and trade-off tensions from score imbalances.",
       inputSchema: {
         report: z.record(z.array(z.object({
           question: z.string(),
@@ -421,14 +416,12 @@ const baseHandler = createMcpHandler(
           evidence: z.string().optional(),
         }))).describe("Posture report keyed by pillar ID"),
       },
-    }, async ({ report }) => {
-      const interpretation = interpretPosture(report);
-      return { content: [{ type: "text", text: JSON.stringify(interpretation, null, 2) }] };
-    });
+    }, async ({ report }) => jsonText(interpretPosture(report)));
 
     server.registerTool("aaf_review_against_acc", {
       title: "AAF Review Against ACC",
-      description: "Given an ACC (YAML string) and a posture report (JSON), return a gap analysis: where the implementation diverges from the design contract, with severity ratings.",
+      description:
+        "Gap analysis between an ACC YAML string and a posture report JSON.",
       inputSchema: {
         accYaml: z.string().describe("The Agent Control Contract as a YAML string"),
         report: z.record(z.array(z.object({
@@ -437,29 +430,25 @@ const baseHandler = createMcpHandler(
           evidence: z.string().optional(),
         }))).describe("Posture report keyed by pillar ID"),
       },
-    }, async ({ accYaml, report }) => {
-      const gaps = reviewAgainstACC(accYaml, report);
-      return { content: [{ type: "text", text: JSON.stringify(gaps, null, 2) }] };
-    });
-
-    // ── Cross-cutting tools ─────────────────────────────────────────────
+    }, async ({ accYaml, report }) => jsonText(reviewAgainstACC(accYaml, report)));
 
     server.registerTool("aaf_pillar_guidance", {
       title: "AAF Pillar Guidance",
-      description: "Given a pillar ID, return targeted design considerations: the pillar's review questions, all cross-pillar trade-offs involving this pillar with recommendations and source citations, and autonomy-level notes.",
+      description:
+        "Targeted design considerations for one pillar: review questions plus related pillar and workload trade-offs.",
       inputSchema: {
         pillarId: z.enum(VALID_PILLAR_IDS),
       },
     }, async ({ pillarId }) => {
       const guidance = getPillarGuidance(pillarId);
       if (!guidance) return { content: [{ type: "text", text: `Pillar not found: ${pillarId}` }], isError: true };
-      return { content: [{ type: "text", text: JSON.stringify(guidance, null, 2) }] };
+      return jsonText(guidance);
     });
 
-    // ─── Security ───────────────────────────────────────────────────────
     server.registerTool("aaf_security_scan", {
       title: "AAF Security Scan",
-      description: "Given a posture-style scan report (file paths and content snippets), run CIA-aligned security checks and return prioritised findings with actionable recommendations referencing the AAF Security Pillar.",
+      description:
+        "CIA-aligned security checks on file path + snippet findings. Prefer loading aaf-security skill first for process context.",
       inputSchema: {
         findings: z.array(z.object({
           file: z.string().describe("Relative file path"),
@@ -475,8 +464,10 @@ const baseHandler = createMcpHandler(
         filePaths.push(f.file);
       }
 
-      const { runSecurityChecks } = await import("../tools/aaf-security/checks.js") as { runSecurityChecks: (s: { paths: string[]; content: Map<string, string> }) => { findings: any[]; summary: any } };
-      const { findings: allFindings, summary: fullSummary } = runSecurityChecks({ paths: filePaths, content });
+      const { runSecurityChecks } = await import("../tools/aaf-security/checks.js") as {
+        runSecurityChecks: (s: { paths: string[]; content: Map<string, string> }) => { findings: any[]; summary: any };
+      };
+      const { findings: allFindings } = runSecurityChecks({ paths: filePaths, content });
 
       const sevOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
       const minSev = severity === "all" || !severity ? 999 : (sevOrder[severity] ?? 999);
@@ -490,10 +481,13 @@ const baseHandler = createMcpHandler(
         low: filtered.filter((f: any) => f.severity === "low").length,
       };
 
-      return { content: [{ type: "text", text: JSON.stringify({ summary, findings: filtered }, null, 2) }] };
+      return jsonText({ summary, findings: filtered });
     });
   },
-  {},
+  {
+    serverInfo: { name: "aaf-mcp", version: "2.0.0" },
+    instructions: serverInstructions(),
+  },
   { basePath: "/api", maxDuration: 30 }
 );
 
@@ -505,7 +499,6 @@ const verifyToken = async (
   _req: Request,
   bearerToken?: string
 ): Promise<{ token: string; scopes: string[]; clientId: string } | undefined> => {
-  // Legacy single-key auth (optional). Paid per-subscriber keys are enforced in gateMcpRequest.
   const apiKey = process.env.MCP_API_KEY;
   if (!apiKey) return undefined;
   if (!bearerToken || bearerToken !== apiKey) return undefined;

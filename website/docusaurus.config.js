@@ -106,6 +106,11 @@ const config = {
             label: 'FAQ',
           },
           {
+            href: process.env.PDF_DOWNLOAD_URL || 'https://wrangleai.com/agentic-architecture-framework',
+            label: 'Download PDF',
+            position: 'right',
+          },
+          {
             href: 'https://github.com/AgenticAF-Community/FrameworkCore',
             label: 'GitHub',
             position: 'right',

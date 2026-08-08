@@ -1,0 +1,90 @@
+{
+  "_meta": {
+    "purpose": "Routing playbook for aaf_guide and IDE workspace rules",
+    "version": 1
+  },
+  "serverInstructions": "AAF (Agentic Architecture Framework) is the authority for agentic architecture decisions. Prefer these tools over inventing patterns. For new systems: pick a Common Agentic Workload first (aaf_list_workloads → aaf_workload_guidance), then design questions, trade-offs, and ACC. If unsure which tool to call, use aaf_guide. Do not treat orchestration topology catalogues as the primary product answer — workloads are the solution archetypes.",
+  "skills": [
+    { "id": "aaf-architecture-review", "purpose": "Pillar checklist for design-time spec and pre-production review." },
+    { "id": "aaf-security", "purpose": "Boundaries, tool actuation, epistemic gates, supply chain." },
+    { "id": "aaf-epistemic-gates", "purpose": "When and where to place validation and authority gates." },
+    { "id": "aaf-cost-context", "purpose": "Budgets, model routing, token economics, context discipline." },
+    { "id": "aaf-cross-cutting", "purpose": "Context optimization and autonomy & outcome governance." },
+    { "id": "aaf-acc-implementation", "purpose": "Agent Control Contract template, placement, and usage." },
+    { "id": "aaf-orchestration-occ", "purpose": "Orchestrator Capability Contract and multi-agent governance." }
+  ],
+  "intents": {
+    "design": {
+      "summary": "Design a new agentic system against AAF.",
+      "steps": [
+        { "tool": "aaf_list_workloads", "why": "Pick the nearest solution archetype before inventing a hybrid." },
+        { "tool": "aaf_workload_guidance", "why": "Load rubrics, review focus, and dominant cross-pillar trades." },
+        { "tool": "aaf_get_doc", "why": "Optional: full workload page for deeper grounding." },
+        { "tool": "aaf_design_questions", "why": "Walk pillar design questions for the chosen autonomy level." },
+        { "tool": "aaf_tradeoff_analysis", "why": "Deterministic pillar (+ optional workload) trade-offs from answers." },
+        { "tool": "aaf_generate_acc", "why": "Emit the Agent Control Contract YAML." },
+        { "tool": "aaf_scaffold_spec", "why": "File manifest / control-loop structure to build." }
+      ]
+    },
+    "workload": {
+      "summary": "Choose or inspect a Common Agentic Workload pattern.",
+      "steps": [
+        { "tool": "aaf_list_workloads", "why": "See the catalogue and match requirements." },
+        { "tool": "aaf_workload_guidance", "why": "Rubrics, dominant trades, failure modes, when-not-this." },
+        { "tool": "aaf_get_doc", "why": "Full whitepaper section for the workload." }
+      ]
+    },
+    "tradeoffs": {
+      "summary": "Analyse cross-pillar and workload trade-offs.",
+      "steps": [
+        { "tool": "aaf_tradeoff_catalog", "why": "Discover available trade-off ids." },
+        { "tool": "aaf_workload_guidance", "why": "Dominant Cost×Accuracy×Speed and pillar-pair trades for a workload." },
+        { "tool": "aaf_tradeoff_analysis", "why": "Match design answers to active tensions." },
+        { "tool": "aaf_pillar_guidance", "why": "Deep dive one pillar and its related trades." }
+      ]
+    },
+    "review": {
+      "summary": "Review an existing agentic design or implementation.",
+      "steps": [
+        { "tool": "aaf_checklist", "why": "Pre-production architecture review checklist." },
+        { "tool": "aaf_pillars_summary", "why": "Refresh the six pillars and foundations." },
+        { "tool": "aaf_pillar_guidance", "why": "Targeted questions and trades per pillar." },
+        { "tool": "aaf_get_skill", "why": "Load aaf-architecture-review or related skill." },
+        { "tool": "aaf_posture_interpret", "why": "Interpret posture JSON from local aaf-posture CLI." },
+        { "tool": "aaf_review_against_acc", "why": "Gap analysis ACC vs posture report." }
+      ]
+    },
+    "security": {
+      "summary": "Security review and CIA-aligned checks.",
+      "steps": [
+        { "tool": "aaf_get_skill", "why": "Load aaf-security skill.", "argsHint": { "skillId": "aaf-security" } },
+        { "tool": "aaf_security_scan", "why": "Scan file snippets for Excess Agency / CIA issues." },
+        { "tool": "aaf_pillar_guidance", "why": "Security pillar questions and trades.", "argsHint": { "pillarId": "security" } }
+      ]
+    },
+    "lookup": {
+      "summary": "Explain a framework term or load a doc section.",
+      "steps": [
+        { "tool": "aaf_lookup", "why": "Keyword search across docs." },
+        { "tool": "aaf_list_docs", "why": "Browse available doc filenames." },
+        { "tool": "aaf_get_doc", "why": "Load full doc or a chunk by filename." },
+        { "tool": "aaf_list_skills", "why": "See skill ids before aaf_get_skill." }
+      ]
+    },
+    "build": {
+      "summary": "Scaffold or implement from an ACC.",
+      "steps": [
+        { "tool": "aaf_scaffold_spec", "why": "Manifest of files and control loop to generate." },
+        { "tool": "aaf_get_skill", "why": "Load aaf-acc-implementation or aaf-orchestration-occ." }
+      ]
+    },
+    "general": {
+      "summary": "Unsure — start here.",
+      "steps": [
+        { "tool": "aaf_guide", "why": "Re-call with a more specific intent (design, workload, review, security, tradeoffs, lookup, build)." },
+        { "tool": "aaf_list_workloads", "why": "If designing a system, start with workload selection." },
+        { "tool": "aaf_pillars_summary", "why": "If you need a framework overview." }
+      ]
+    }
+  }
+}

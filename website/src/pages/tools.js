@@ -12,12 +12,19 @@ const SKILLS = [
 ];
 
 const MCP_TOOLS = [
+  { name: 'aaf_guide', desc: 'Call first when unsure — ordered tool plan by intent.', phase: 'Guide' },
+  { name: 'aaf_list_skills', desc: 'List skill ids and purposes.', phase: 'Core' },
+  { name: 'aaf_list_docs', desc: 'List framework doc filenames and titles.', phase: 'Core' },
+  { name: 'aaf_get_doc', desc: 'Load a full doc or section by filename.', phase: 'Core' },
   { name: 'aaf_lookup', desc: 'Search the framework docs for a term or topic.', phase: 'Core' },
-  { name: 'aaf_checklist', desc: 'Architecture review checklist (pre-production readiness).', phase: 'Core' },
+  { name: 'aaf_checklist', desc: 'Architecture design or review checklist.', phase: 'Core' },
   { name: 'aaf_pillars_summary', desc: 'Summary of the six pillars and cross-cutting foundations.', phase: 'Core' },
   { name: 'aaf_get_skill', desc: 'Retrieve the full content of any skill by ID.', phase: 'Core' },
+  { name: 'aaf_list_workloads', desc: 'Catalogue Common Agentic Workloads (optional requirements ranking).', phase: 'Workload' },
+  { name: 'aaf_workload_guidance', desc: 'Rubrics, dominant trades, failure modes for a workload.', phase: 'Workload' },
+  { name: 'aaf_tradeoff_catalog', desc: 'List pillar and workload trade-off ids.', phase: 'Design' },
   { name: 'aaf_design_questions', desc: 'Design questionnaire for a given autonomy level.', phase: 'Design' },
-  { name: 'aaf_tradeoff_analysis', desc: 'Deterministic trade-off analysis from design choices.', phase: 'Design' },
+  { name: 'aaf_tradeoff_analysis', desc: 'Deterministic trade-off analysis (optional workloadId).', phase: 'Design' },
   { name: 'aaf_generate_acc', desc: 'Generate an Agent Control Contract from design answers.', phase: 'Design' },
   { name: 'aaf_scaffold_spec', desc: 'File manifest for agent code scaffold generation.', phase: 'Build' },
   { name: 'aaf_posture_interpret', desc: 'Interpret posture report with trade-off tensions.', phase: 'Review' },
@@ -156,30 +163,77 @@ export default function Tools() {
             </table>
           </div>
           <p style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginBottom: '0.35rem' }}>
-            <strong>Option A — Direct URL</strong> (Cursor and clients that support remote HTTP MCP):
+            <strong>Option A — Direct URL</strong> (Cursor and clients that support remote HTTP MCP). Replace the key with yours from purchase or <a href="/manage-access">Manage access</a>:
           </p>
           <pre style={{ fontSize: '0.8rem', padding: '0.75rem', borderRadius: '6px', overflow: 'auto' }}>
-{JSON.stringify({ "mcpServers": { "aaf": { "url": "https://www.agenticaf.io/api/mcp" } } }, null, 2)}
+{JSON.stringify({
+  mcpServers: {
+    aaf: {
+      url: 'https://www.agenticaf.io/api/mcp',
+      headers: {
+        Authorization: 'Bearer <YOUR_AAF_LIVE_KEY>',
+      },
+    },
+  },
+}, null, 2)}
           </pre>
           <p style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginTop: '0.75rem', marginBottom: '0.35rem' }}>
-            <strong>Option B — <code>mcp-remote</code> bridge</strong> (Antigravity, Claude Desktop, Windsurf, and any stdio-only MCP host). Merge under <code>mcpServers</code>:
+            <strong>Option B — <code>mcp-remote</code> bridge</strong> (Antigravity, Claude Desktop, Windsurf, and any stdio-only MCP host). Auth is required:
           </p>
           <pre style={{ fontSize: '0.8rem', padding: '0.75rem', borderRadius: '6px', overflow: 'auto' }}>
 {JSON.stringify({
   mcpServers: {
     aaf: {
       command: 'npx',
-      args: ['-y', 'mcp-remote', 'https://www.agenticaf.io/api/mcp', '--transport', 'http-first'],
+      args: [
+        '-y',
+        'mcp-remote',
+        'https://www.agenticaf.io/api/mcp',
+        '--transport',
+        'http-first',
+        '--header',
+        'Authorization:${AAF_MCP_AUTHORIZATION}',
+      ],
+      env: {
+        AAF_MCP_AUTHORIZATION: 'Bearer <YOUR_AAF_LIVE_KEY>',
+      },
     },
   },
 }, null, 2)}
           </pre>
           <p style={{ fontSize: '0.75rem', color: 'var(--ifm-font-color-secondary)', marginTop: '0.35rem', marginBottom: '0.75rem' }}>
-            After saving, restart the app or reload MCP. Ask the assistant what tools it has — you should see <code>aaf_lookup</code>, <code>aaf_checklist</code>, etc. If the deployment requires an API key, add <code>--header</code> <code>{'Authorization:${AAF_MCP_AUTHORIZATION}'}</code> and set <code>AAF_MCP_AUTHORIZATION</code> to <code>Bearer &lt;key&gt;</code> in <code>env</code> — see <a href="https://github.com/AgenticAF-Community/FrameworkCore/blob/main/api/README.md">api/README.md</a>.
+            After saving, restart the app or reload MCP. Ask the assistant to call <code>aaf_guide</code> — you should see AAF tools. Without a valid Bearer key the server returns 401. See <a href="https://github.com/AgenticAF-Community/FrameworkCore/blob/main/api/README.md">api/README.md</a>.
           </p>
-          <p style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginTop: 0, marginBottom: 0, lineHeight: 1.6 }}>
-            <strong>Note:</strong> Some clients rename the server (e.g. <code>user-aaf</code>). That is normal. Windsurf MCP availability may depend on your plan — check Codeium’s docs.
-          </p>
+            <p style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginTop: 0, marginBottom: 0, lineHeight: 1.6 }}>
+              <strong>Note:</strong> Some clients rename the server (e.g. <code>user-aaf</code>). That is normal. Windsurf MCP availability may depend on your plan — check Codeium’s docs.
+            </p>
+          </div>
+
+          <div style={{ marginTop: '1.5rem', marginBottom: '0.5rem' }}>
+            <h3 style={{ ...headingStyle }}>Make agents default to AAF (workspace rule)</h3>
+            <p style={{ fontSize: '0.9rem', lineHeight: 1.65, color: 'var(--ifm-font-color-base)', marginBottom: '0.75rem' }}>
+              Connecting MCP alone does not persist decision policy across chats. Copy this Cursor rule into{' '}
+              <code>.cursor/rules/aaf-mcp.mdc</code> (<code>alwaysApply: true</code>) so architecture work pulls AAF tools first.
+              Same policy for other agents: <code>tools/ide/AGENTS-aaf-snippet.md</code> on GitHub.
+            </p>
+            <pre style={{ fontSize: '0.75rem', padding: '0.75rem', borderRadius: '6px', overflow: 'auto', maxHeight: '280px' }}>
+{`---
+description: Use AAF MCP for agentic architecture decisions
+alwaysApply: true
+---
+
+# AAF MCP — architecture authority
+
+When designing, reviewing, or changing **agentic architecture**:
+
+1. Use the connected AAF MCP tools before inventing guidance.
+2. If unsure which tool: call \`aaf_guide\`.
+3. For new systems: \`aaf_list_workloads\` → \`aaf_workload_guidance\` → design → trade-offs → ACC.
+4. Ground with \`aaf_get_doc\` / workload tools. Prefer Common Agentic Workloads over inventing hybrids.
+5. Do not skip AAF for “quick” architecture choices.
+`}
+            </pre>
+          </div>
         </div>
 
         <div style={sectionStyle}>
