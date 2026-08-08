@@ -66,7 +66,7 @@ const faqData = [
   {
     question: 'What is the AAF MCP server?',
     answer:
-      'The AAF MCP (Model Context Protocol) server is a hosted API that exposes the framework as tools for AI assistants such as Cursor, Claude, VS Code, and others. Assistants can look up framework terms, run checklists, load skills, generate Agent Control Contracts, and more — without re-reading the full whitepaper every time. Setup details are on the Tools page.',
+      'The AAF MCP (Model Context Protocol) server is a hosted API that exposes the framework as tools for AI assistants such as Cursor, Claude, VS Code, and others. Assistants can look up docs, choose Common Agentic Workloads, analyse trade-offs, load skills, generate Agent Control Contracts, and more — call aaf_guide when unsure which tool to use. After connecting, add the workspace rule from the Tools page so architecture decisions default to AAF. Setup details are on the Tools page.',
     link: '/tools',
   },
   {
@@ -78,7 +78,7 @@ const faqData = [
   {
     question: 'What do I get with MCP Access, and how do I manage it?',
     answer:
-      'You get an API key (shown once after purchase or rotate) to call https://www.agenticaf.io/api/mcp with Authorization: Bearer <key>. Use Manage access on the site to request a magic-link sign-in, see usage (calls used / 1000), rotate your key, or open the Stripe billing portal. Docs and the local posture CLI do not require a key.',
+      'You get an API key (shown once after purchase or rotate). Hosted MCP requires Authorization: Bearer <key> on every request to https://www.agenticaf.io/api/mcp — add that header in your IDE MCP config (see the Tools page). Use Manage access to request a magic-link sign-in, see usage (calls used / 1000), rotate your key, or open the Stripe billing portal. Framework docs, skills in the public GitHub repo, and the local posture CLI do not require a key.',
     link: '/tools',
   },
   {

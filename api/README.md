@@ -7,7 +7,7 @@
 
 ## MCP billing env (names only)
 
-Set these in local `.env` and Vercel (Preview first; keep Production `MCP_AUTH_REQUIRED=false` until cutover):
+Set these in local `.env` and Vercel. Production should keep `MCP_AUTH_REQUIRED=true` once cut over:
 
 | Variable | Role |
 |----------|------|
@@ -36,7 +36,9 @@ Verify locally: `node tools/scripts/verify-billing-infra.js`
 
 After the first cron run (or a manual GET to `/api/refresh-stats` with `Authorization: Bearer <CRON_SECRET>`), `GET /api/stats` serves from Blob so the homepage shows up-to-date figures. Without Blob, the stats API falls back to live GitHub + `AAF_STATS_JSON`.
 
-**MCP endpoint:** `https://www.agenticaf.io/api/mcp` (Streamable HTTP, 12 tools).
+**MCP endpoint:** `https://www.agenticaf.io/api/mcp` (Streamable HTTP). Requires `Authorization: Bearer aaf_live_…` when `MCP_AUTH_REQUIRED=true`.
+
+**Tool surface (19):** guide/list/docs (`aaf_guide`, `aaf_list_skills`, `aaf_list_docs`, `aaf_get_doc`), core lookup/skills, workloads (`aaf_list_workloads`, `aaf_workload_guidance`), design/trade-offs/ACC, build, review, pillar guidance, security scan.
 
 **Paid access:** £3/month · 1,000 requests · hard cap. Checkout: `GET /api/stripe/checkout`. After purchase, keys are shown once at `/access/success`. Manage/rotate via `/manage-access` (Resend magic link, subject `AAF MAGIC LINK FOR SIGN IN`).
 

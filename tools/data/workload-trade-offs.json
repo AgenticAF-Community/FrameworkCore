@@ -1,0 +1,108 @@
+{
+  "_meta": {
+    "generatedAt": "2026-08-08",
+    "source": "Hand-structured from docs/13.5*.md Dominant cross-pillar trades (deterministic; not LLM-extracted)",
+    "schemaValid": true
+  },
+  "tradeoffs": [
+    {
+      "id": "wl-knowledge-cost-accuracy-speed",
+      "workloadId": "knowledge-assistant",
+      "pillars": ["cost", "reliability", "performance"],
+      "tension": "Deeper retrieval and stronger models buy grounded accuracy; thin context and fast small models buy speed/cost but raise miss and hallucination risk.",
+      "recommendation": "Bias toward Accuracy/Reliability and provenance; bound Cost with just-in-time retrieval rather than context stuffing.",
+      "confidence": "explicit",
+      "source": { "doc": "docs/13.51-workload-knowledge-assistant.md", "section": "Dominant cross-pillar trades" },
+      "indicators": [],
+      "tags": ["cost-accuracy-speed", "workload"]
+    },
+    {
+      "id": "wl-knowledge-reliability-cost",
+      "workloadId": "knowledge-assistant",
+      "pillars": ["reliability", "cost"],
+      "tension": "Provenance and refusal paths improve Definition of Done but add validators, retries, and sometimes human review.",
+      "recommendation": "Keep citation/refusal paths; treat missing evidence as refuse or escalate.",
+      "confidence": "explicit",
+      "source": { "doc": "docs/13.51-workload-knowledge-assistant.md", "section": "Dominant cross-pillar trades" },
+      "indicators": [],
+      "tags": ["workload"]
+    },
+    {
+      "id": "wl-customer-security-autonomy",
+      "workloadId": "customer-chatbot",
+      "pillars": ["security", "autonomy-governance"],
+      "tension": "HITL or policy gates on refunds/writes buy Security and reduce Excessive Agency; they spend Autonomy and Speed.",
+      "recommendation": "Gate consequential writes; require identity before personalised tools.",
+      "confidence": "explicit",
+      "source": { "doc": "docs/13.52-workload-customer-chatbot.md", "section": "Dominant cross-pillar trades" },
+      "indicators": [],
+      "tags": ["workload"]
+    },
+    {
+      "id": "wl-customer-cost-accuracy-speed",
+      "workloadId": "customer-chatbot",
+      "pillars": ["cost", "reliability", "performance"],
+      "tension": "Live API reads + policy RAG + validators buy accurate account outcomes; stuffed FAQ context is cheaper/faster and more often wrong or stale.",
+      "recommendation": "Prefer correct outcome / clean handoff over raw Speed; use turn/spend budgets.",
+      "confidence": "explicit",
+      "source": { "doc": "docs/13.52-workload-customer-chatbot.md", "section": "Dominant cross-pillar trades" },
+      "indicators": [],
+      "tags": ["cost-accuracy-speed", "workload"]
+    },
+    {
+      "id": "wl-copilot-security-autonomy",
+      "workloadId": "internal-copilot",
+      "pillars": ["security", "autonomy-governance"],
+      "tension": "Suggest-only or confirm-before-write buys Security; it spends Autonomy and perceived Speed.",
+      "recommendation": "Default assistive; treat prod config/IAM/data mutation as human-required unless ACC says otherwise.",
+      "confidence": "explicit",
+      "source": { "doc": "docs/13.53-workload-internal-copilot.md", "section": "Dominant cross-pillar trades" },
+      "indicators": [],
+      "tags": ["workload"]
+    },
+    {
+      "id": "wl-copilot-context-cost",
+      "workloadId": "internal-copilot",
+      "pillars": ["context-optimization", "cost"],
+      "tension": "Opaque durable memory can look efficient until drift, leaks, and rework dominate; whole-monorepo stuffing raises Cost and noise.",
+      "recommendation": "Session context + versioned knowledge; just-in-time slices; model routing.",
+      "confidence": "explicit",
+      "source": { "doc": "docs/13.53-workload-internal-copilot.md", "section": "Dominant cross-pillar trades" },
+      "indicators": [],
+      "tags": ["workload"]
+    },
+    {
+      "id": "wl-workflow-reliability-performance",
+      "workloadId": "workflow-agent",
+      "pillars": ["reliability", "performance"],
+      "tension": "Deterministic spine + stage gates + checkpoints buy resumability and correct end state; they add serial latency versus one unbounded loop.",
+      "recommendation": "Prefer Reliability and Ops (verifiable DoD, checkpoints) over Autonomy and raw Speed.",
+      "confidence": "explicit",
+      "source": { "doc": "docs/13.54-workload-workflow-agent.md", "section": "Dominant cross-pillar trades" },
+      "indicators": [],
+      "tags": ["workload"]
+    },
+    {
+      "id": "wl-workflow-security-autonomy",
+      "workloadId": "workflow-agent",
+      "pillars": ["security", "autonomy-governance"],
+      "tension": "Tool Gateway + least privilege + optional HITL buy Security; they constrain Autonomy at write boundaries.",
+      "recommendation": "Keep gateway and budgets; never let the agent own the entire process without a deterministic spine.",
+      "confidence": "explicit",
+      "source": { "doc": "docs/13.54-workload-workflow-agent.md", "section": "Dominant cross-pillar trades" },
+      "indicators": [],
+      "tags": ["workload"]
+    },
+    {
+      "id": "wl-workflow-reliability-cost",
+      "workloadId": "workflow-agent",
+      "pillars": ["reliability", "cost"],
+      "tension": "Idempotent writes, compensation, and post-write verification reads cost extra; skipping them saves spend until duplicates and rework arrive.",
+      "recommendation": "Pay for idempotency and verification; enforce hard budgets on retries and evaluator loops.",
+      "confidence": "explicit",
+      "source": { "doc": "docs/13.54-workload-workflow-agent.md", "section": "Dominant cross-pillar trades" },
+      "indicators": [],
+      "tags": ["workload"]
+    }
+  ]
+}
