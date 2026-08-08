@@ -30,7 +30,7 @@ In practice, teams can access the framework in three ways: **(1)** reading and a
 
 The AAF MCP server exposes framework content and prebuilt skills so that MCP-capable clients can apply the framework during design or review without leaving the IDE.
 
-**Hosted MCP access** is £3/month with a hard cap of 1,000 requests (docs and GitHub stay free). Get a key via **Get MCP Access** on [agenticaf.io](https://www.agenticaf.io) or the Tools page; manage or rotate it at `/manage-access` (magic-link email). When auth is required, send `Authorization: Bearer <key>`.
+**Hosted MCP access** is £3/month with a hard cap of 1,000 tool calls (initialize and tools/list do not count; docs and GitHub stay free). Get a key via **Get MCP Access** on [agenticaf.io](https://www.agenticaf.io) or the Tools page; manage or rotate it at `/manage-access` (magic-link email). Send `Authorization: Bearer <key>` on every MCP request.
 
 **Setup (hosted HTTP — Cursor and similar)**  
 Many clients accept a remote URL: `https://www.agenticaf.io/api/mcp` (Streamable HTTP), plus an `Authorization` header with your API key. See the Tools page on agenticaf.io for the exact JSON snippet.

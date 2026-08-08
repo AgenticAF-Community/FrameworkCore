@@ -72,13 +72,13 @@ const faqData = [
   {
     question: 'Why is hosted MCP access paid?',
     answer:
-      'The framework documentation, GitHub repo, skills, and local CLI remain free. Hosted MCP runs on shared infrastructure with authentication, usage metering, and support. AAF MCP Access is £3/month and includes 1,000 requests with a hard monthly cap (no overage). That covers operating the service so the community docs can stay free to read.',
+      'The framework documentation, GitHub repo, skills, and local CLI remain free. Hosted MCP runs on shared infrastructure with authentication, usage metering, and support. AAF MCP Access is £3/month and includes 1,000 tool calls with a hard monthly cap (no overage). Initialize and tools/list do not count toward the cap. That covers operating the service so the community docs can stay free to read.',
     link: '/tools',
   },
   {
     question: 'What do I get with MCP Access, and how do I manage it?',
     answer:
-      'You get an API key (shown once after purchase or rotate). Hosted MCP requires Authorization: Bearer <key> on every request to https://www.agenticaf.io/api/mcp — add that header in your IDE MCP config (see the Tools page). Use Manage access to request a magic-link sign-in, see usage (calls used / 1000), rotate your key, or open the Stripe billing portal. Framework docs, skills in the public GitHub repo, and the local posture CLI do not require a key.',
+      'You get an API key (shown once after purchase or rotate). Hosted MCP requires Authorization: Bearer <key> on every request to https://www.agenticaf.io/api/mcp — add that header in your IDE MCP config (see the Tools page). Usage is metered as tool calls (1,000/month). Use Manage access to request a magic-link sign-in, see usage, rotate your key, or open the Stripe billing portal. Framework docs, skills in the public GitHub repo, and the local posture CLI do not require a key.',
     link: '/tools',
   },
   {

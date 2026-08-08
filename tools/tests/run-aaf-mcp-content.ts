@@ -24,8 +24,11 @@ if (ranked[0].id !== "customer-chatbot") {
 }
 
       const trades = analyseTradeoffs({}, "knowledge-assistant");
-      if (!trades.some((t: any) => t.workloadId === "knowledge-assistant")) {
+      if (!trades.workloadDominantTrades?.some((t: any) => t.workloadId === "knowledge-assistant")) {
         throw new Error("missing workload trades");
+      }
+      if (!Array.isArray(trades.matchedFromAnswers)) {
+        throw new Error("matchedFromAnswers missing");
       }
 
       const design = getChecklist("design");

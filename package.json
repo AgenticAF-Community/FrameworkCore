@@ -22,6 +22,8 @@
     "install:docs-sync-hook": "node tools/scripts/install-docs-sync-hook.js",
     "test": "node --test tools/tests/*.test.js",
     "test:foundation": "node --test tools/tests/foundation.test.js",
+    "test:mcp-content": "npx tsx tools/tests/run-aaf-mcp-content.ts",
+    "test:mcp-integrity": "npx tsx tools/tests/run-mcp-integrity.ts",
     "aaf": "node tools/cli.js"
   },
   "devDependencies": {

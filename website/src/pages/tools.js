@@ -30,7 +30,7 @@ const MCP_TOOLS = [
   { name: 'aaf_posture_interpret', desc: 'Interpret posture CLI JSON (run local aaf-posture first).', phase: 'Review' },
   { name: 'aaf_review_against_acc', desc: 'Gap analysis: ACC vs posture report (CLI JSON accepted).', phase: 'Review' },
   { name: 'aaf_pillar_guidance', desc: 'Targeted design guidance for a specific pillar.', phase: 'Cross-cutting' },
-  { name: 'aaf_security_scan', desc: 'CIA-aligned security scan with actionable recommendations.', phase: 'Security' },
+  { name: 'aaf_security_scan', desc: 'CIA-oriented heuristic lint on snippets (optional declared_tree absence checks).', phase: 'Security' },
 ];
 
 const sectionStyle = { marginBottom: '2rem' };
@@ -98,7 +98,7 @@ export default function Tools() {
               Manage access
             </a>
             <p style={{ ...textStyle, marginTop: '0.5rem', marginBottom: 0 }}>
-              £3/month · 1,000 MCP requests · hard cap. After purchase, send your API key as{' '}
+              £3/month · 1,000 MCP tool calls · hard cap (initialize / tools/list do not count). After purchase, send your API key as{' '}
               <code>Authorization: Bearer &lt;key&gt;</code>. By purchasing you agree to our{' '}
               <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.
             </p>
@@ -242,7 +242,8 @@ When designing, reviewing, or changing **agentic architecture**:
           </h2>
           <p style={textStyle}>
             A CLI that scans a codebase and produces an AAF posture report: how well the project aligns with the
-            eight pillars. Output is human-readable HTML/markdown and optional JSON for CI.
+            six pillars and two cross-cutting foundations. Output is human-readable HTML/markdown and optional JSON for CI.
+            Findings are heuristic signals — not a production certification.
           </p>
           <p style={{ fontSize: '0.85rem', color: 'var(--ifm-font-color-secondary)', marginTop: '0.5rem' }}>
             CLI lives in <a href="https://github.com/AgenticAF-Community/FrameworkCore/tree/main/tools/aaf-posture"><code>tools/aaf-posture/</code></a> on GitHub.

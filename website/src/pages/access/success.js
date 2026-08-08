@@ -166,7 +166,8 @@ When designing, reviewing, or changing agentic architecture:
 1. Use AAF MCP tools before inventing guidance.
 2. If unsure: call aaf_guide.
 3. New systems: aaf_list_workloads → aaf_workload_guidance → design → trade-offs → ACC.
-4. Prefer Common Agentic Workloads; ground with aaf_get_doc.
+4. For codebase review: run node tools/aaf-posture/cli.js . --format json --output ./aaf-posture.json then aaf_posture_interpret (hosted MCP cannot scan disk).
+5. Prefer Common Agentic Workloads; ground with aaf_get_doc.
 `}
             </pre>
             <p style={{ marginTop: '1rem' }}>

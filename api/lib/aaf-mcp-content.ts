@@ -343,9 +343,13 @@ export function tradeoffCatalog(workloadId?: string): any[] {
 export function analyseTradeoffs(
   choices: Record<string, Record<string, string>>,
   workloadId?: string
-): any[] {
+): {
+  matchedFromAnswers: any[];
+  workloadDominantTrades: any[];
+} {
   const tradeoffs = loadAllTradeoffs();
-  const results: any[] = [];
+  const matchedFromAnswers: any[] = [];
+  const workloadDominantTrades: any[] = [];
 
   for (const entry of tradeoffs) {
     if (workloadId && entry.workloadId && entry.workloadId !== workloadId) continue;
@@ -353,7 +357,7 @@ export function analyseTradeoffs(
     const indicators = entry.indicators || [];
     if (indicators.length === 0 && entry.workloadId) {
       if (!workloadId || entry.workloadId === workloadId) {
-        results.push({
+        workloadDominantTrades.push({
           id: entry.id,
           pillars: entry.pillars,
           workloadId: entry.workloadId,
@@ -361,9 +365,8 @@ export function analyseTradeoffs(
           recommendation: entry.recommendation,
           source: entry.source,
           confidence: entry.confidence,
-          matchStrength: workloadId === entry.workloadId ? 1 : 0.5,
-          matchedIndicators: [],
-          note: "Workload-scoped trade-off (always relevant when this workload is selected).",
+          sourceQuote: entry.sourceQuote || null,
+          note: "Workload catalogue trade-off (not matched from design answers).",
         });
       }
       continue;
@@ -381,13 +384,14 @@ export function analyseTradeoffs(
       }
     }
     if (matched.length > 0) {
-      results.push({
+      matchedFromAnswers.push({
         id: entry.id,
         pillars: entry.pillars,
         workloadId: entry.workloadId || null,
         tension: entry.tension,
         recommendation: entry.recommendation,
         source: entry.source,
+        sourceQuote: entry.sourceQuote || null,
         confidence: entry.confidence,
         autonomyNotes: entry.autonomyNotes,
         matchedIndicators: matched,
@@ -396,7 +400,132 @@ export function analyseTradeoffs(
     }
   }
 
-  return results.sort((a: any, b: any) => b.matchStrength - a.matchStrength);
+  matchedFromAnswers.sort((a: any, b: any) => b.matchStrength - a.matchStrength);
+  return { matchedFromAnswers, workloadDominantTrades };
+}
+
+/** Flat list for generateACC trade_offs section (matched + optional workload catalogue). */
+export function analyseTradeoffsFlat(
+  choices: Record<string, Record<string, string>>,
+  workloadId?: string
+): any[] {
+  const { matchedFromAnswers, workloadDominantTrades } = analyseTradeoffs(choices, workloadId);
+  return [...matchedFromAnswers, ...workloadDominantTrades];
+}
+
+export const AUTONOMY_LEVEL_IMPLICATIONS: Record<
+  string,
+  { summary: string; gates: string; hitl: string; budgets: string; escalation: string }
+> = {
+  assistive: {
+    summary: "Agent drafts; human remains the actuator for consequential actions.",
+    gates: "Validate suggestions before the human acts; treat model output as advisory.",
+    hitl: "Human approves or performs all write/delete/actuation steps.",
+    budgets: "Bound suggestion loops and context size; cost still accrues on drafts.",
+    escalation: "Escalate ambiguity to the human rather than acting.",
+  },
+  delegated: {
+    summary: "Agent proposes plans; human approves execution of write/high-risk actions.",
+    gates: "Deterministic policy gates before approved actuation; verify after writes.",
+    hitl: "Human approval required for write/delete and high-risk tool classes.",
+    budgets: "Enforce step/tool/token/spend budgets on the proposed plan.",
+    escalation: "Escalate when gates fail, budgets exhaust, or confidence is low.",
+  },
+  "bounded-autonomous": {
+    summary: "Agent executes within pre-approved scopes and hard budgets; escalates on exceptions.",
+    gates: "Non-bypassable Tool Gateway + epistemic gates on writes; evidence-based DoD.",
+    hitl: "HITL only for out-of-policy or high-severity exceptions.",
+    budgets: "Hard runtime budgets with automatic stop; no unbounded retries.",
+    escalation: "Defined degraded modes when verification fails or budgets trip.",
+  },
+  supervisory: {
+    summary: "Supervisor + workers with nested contracts; workers must not exceed granted scopes.",
+    gates: "Per-worker ACCs/OCCs; supervisory verification of handoffs and outcomes.",
+    hitl: "Human or supervisor approval at trust/domain boundaries.",
+    budgets: "Budgets at supervisor and worker levels; prevent cost amplification across workers.",
+    escalation: "Handoff/escalation across trust boundaries with provenance preserved.",
+  },
+};
+
+export function getLevelImplications(autonomyLevel: string) {
+  return (
+    AUTONOMY_LEVEL_IMPLICATIONS[autonomyLevel] ||
+    AUTONOMY_LEVEL_IMPLICATIONS.delegated
+  );
+}
+
+/**
+ * Parse ACC YAML emitted by generateACC into question text → answer.
+ * Format:
+ *   - question: "..."
+ *     answer: "yes|no|partial|not_answered"
+ */
+export function parseAccAnswers(accYaml: string): Map<string, string> {
+  const map = new Map<string, string>();
+  const lines = String(accYaml || "").split("\n");
+  let pendingQuestion: string | null = null;
+  for (const line of lines) {
+    const q = line.match(/^\s*-\s*question:\s*"(.*)"\s*$/);
+    if (q) {
+      pendingQuestion = q[1];
+      continue;
+    }
+    const a = line.match(/^\s*answer:\s*"(.*)"\s*$/);
+    if (a && pendingQuestion) {
+      map.set(pendingQuestion, a[1].toLowerCase().trim());
+      pendingQuestion = null;
+    }
+  }
+  return map;
+}
+
+/**
+ * Gap analysis: only high when ACC committed (yes/partial) and posture not_found.
+ * Explicit no → omit (consistent). Unanswered → medium.
+ */
+export function reviewAgainstACC(accYaml: string, reportInput: any): any {
+  const report = normalizePostureReport(reportInput);
+  const answers = parseAccAnswers(accYaml);
+  const gaps: any[] = [];
+
+  for (const [pillarId, pillarResults] of Object.entries(report)) {
+    if (!Array.isArray(pillarResults)) continue;
+    for (const result of pillarResults) {
+      if (result.status !== "not_found") continue;
+      const question = result.question;
+      const answer = answers.get(question);
+      if (answer === "no") {
+        continue; // explicit non-commitment; absence is consistent
+      }
+      if (answer === "yes" || answer === "partial") {
+        gaps.push({
+          pillarId,
+          question,
+          accAnswer: answer,
+          severity: "high",
+          detail: "ACC committed to this control (yes/partial) but posture found no evidence in the codebase",
+        });
+        continue;
+      }
+      gaps.push({
+        pillarId,
+        question,
+        accAnswer: answer || "missing",
+        severity: "medium",
+        detail: answer
+          ? "ACC lists this question as unanswered; posture found no evidence"
+          : "Posture not_found and question not found as an answered ACC item",
+      });
+    }
+  }
+
+  const sevRank: Record<string, number> = { high: 0, medium: 1, low: 2, info: 3 };
+  return {
+    totalGaps: gaps.length,
+    gaps: gaps.sort((a, b) => (sevRank[a.severity] ?? 9) - (sevRank[b.severity] ?? 9)),
+    contract:
+      "high = ACC yes/partial missing in codebase; medium = unanswered/missing ACC answer; no = omitted (consistent)",
+  };
 }
 
 export function serverInstructions(): string {

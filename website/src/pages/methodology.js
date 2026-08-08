@@ -95,27 +95,38 @@ export default function Methodology() {
           </ul>
         </Section>
 
-        <Section title="3. Where AI is NOT used (deterministic)">
-          <p style={textStyle}>Everything downstream of the approved data model is purely deterministic:</p>
+        <Section title="3. Where AI is NOT used (deterministic vs heuristic)">
+          <p style={textStyle}>
+            Downstream of the approved data model, no LLM is used. Some steps are strictly deterministic lookups;
+            others are non-LLM <strong>heuristics</strong> (pattern matching) and must not be treated as certification.
+          </p>
           <ul style={listStyle}>
             <li>
-              <strong>Pattern-matching engine</strong> — given your design choices, it looks up applicable trade-offs
-              using rule-based matching. No AI. Same input always produces the same output.
+              <strong>Pattern-matching engine (deterministic)</strong> — given your design choices, it looks up applicable trade-offs
+              using rule-based matching. Same input always produces the same output.
             </li>
             <li>
-              <strong>Doc block renderer</strong> — generates the "Design Recommendations & Trade-offs" sections
+              <strong>Doc block renderer (deterministic)</strong> — generates the &quot;Design Recommendations &amp; Trade-offs&quot; sections
               at the bottom of each pillar doc directly from the approved data model.
             </li>
             <li>
-              <strong>Design questionnaire</strong> — questions are extracted from pillar docs structurally
+              <strong>Design questionnaire (deterministic)</strong> — questions are extracted from pillar docs structurally
               (headings and bullet lists), not by AI.
             </li>
             <li>
-              <strong>Posture scoring</strong> — heuristic checks match codebase patterns against known indicators.
-              No AI involved.
+              <strong>Posture CLI checks (heuristic)</strong> — keyword/path pattern matches against a codebase.
+              Indicative only; manual review required for production readiness.
             </li>
             <li>
-              <strong>MCP tool responses</strong> — deterministic lookups against the approved data model.
+              <strong>Security snippet lint (heuristic)</strong> — regex/pattern checks on caller-provided snippets
+              (optional declared-tree absence checks). Not a full security audit.
+            </li>
+            <li>
+              <strong>Workload keyword ranking (heuristic)</strong> — overlap scoring to suggest nearest Common Agentic Workloads.
+            </li>
+            <li>
+              <strong>MCP doc/skill/trade-off lookups (deterministic)</strong> — reads approved docs and data files;
+              trade-off answer matching is deterministic. Heuristic tools above are labeled in their responses.
             </li>
           </ul>
         </Section>
