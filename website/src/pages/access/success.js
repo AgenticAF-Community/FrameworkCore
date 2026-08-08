@@ -80,7 +80,7 @@ export default function AccessSuccess() {
       <main style={{ padding: '2rem 1rem', maxWidth: '720px', margin: '0 auto', color: 'var(--ifm-font-color-base)' }}>
         <h1 style={{ fontSize: '1.75rem', marginBottom: '1rem', color: 'var(--ifm-heading-color)' }}>MCP Access</h1>
         <p style={{ lineHeight: 1.6, marginBottom: '1rem', color: 'var(--ifm-font-color-secondary)' }}>
-          £3/month · 1,000 MCP requests · hard cap
+          £3/month · 1,000 MCP tool calls · hard cap (initialize / tools/list do not count)
         </p>
 
         {loading && <p>Preparing your API key…</p>}

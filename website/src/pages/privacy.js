@@ -101,7 +101,7 @@ export default function Privacy() {
 
           <h3 style={h3Style}>3.3 Service usage</h3>
           <ul style={listStyle}>
-            <li>MCP request counts against your monthly allowance</li>
+            <li>MCP tool-call counts against your monthly allowance</li>
             <li>
               Aggregate, non-identifying telemetry used for public Site stats (for example total tool-call counts),
               where enabled
@@ -132,7 +132,7 @@ export default function Privacy() {
 
         <Section title="4. How we use personal data">
           <ul style={listStyle}>
-            <li>Provide MCP Access, authenticate you, and enforce the monthly request limit</li>
+            <li>Provide MCP Access, authenticate you, and enforce the monthly tool-call limit</li>
             <li>Process payments and manage subscriptions via Stripe</li>
             <li>Send transactional email (magic links, billing-related notices, security notices)</li>
             <li>Provide email support</li>

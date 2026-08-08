@@ -52,7 +52,7 @@ export default function Terms() {
               <strong>Price:</strong> £3 per month, inclusive of VAT where applicable
             </li>
             <li>
-              <strong>Included usage:</strong> 1,000 MCP requests per billing month (hard cap)
+              <strong>Included usage:</strong> 1,000 MCP tool calls per billing month (hard cap; initialize and tools/list do not count)
             </li>
             <li>
               <strong>Seats:</strong> one seat / one primary API key per subscription (keys may be rotated)
@@ -114,12 +114,13 @@ export default function Terms() {
           </ul>
         </Section>
 
-        <Section title="6. Fair use and request limits">
+        <Section title="6. Fair use and tool-call limits">
           <p style={textStyle}>
-            The 1,000-request monthly allowance is a hard cap. When the cap is reached, MCP requests may be rejected
-            until the next billing period (or until you renew/upgrade if such options are offered). Circumventing
-            metering, sharing a single subscription across many unrelated users or systems beyond a single seat, or
-            abusing the Service is prohibited.
+            The 1,000 tool-call monthly allowance is a hard cap. Only MCP <code>tools/call</code> operations count
+            toward the allowance; protocol handshake calls such as initialize and tools/list do not. When the cap is
+            reached, further tool calls may be rejected until the next billing period (or until you renew/upgrade if
+            such options are offered). Circumventing metering, sharing a single subscription across many unrelated
+            users or systems beyond a single seat, or abusing the Service is prohibited.
           </p>
         </Section>
 
