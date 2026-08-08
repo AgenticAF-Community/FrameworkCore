@@ -100,7 +100,7 @@ export default function Home() {
               marginBottom: '0.45rem',
             }}
           >
-            <strong style={{ color: 'var(--ifm-font-color-base)' }}>1,000 req / mo</strong>
+            <strong style={{ color: 'var(--ifm-font-color-base)' }}>1,000 tool calls / mo</strong>
             {' '}· hard cap · no overage
           </p>
           <p style={{ fontSize: '0.75rem', lineHeight: 1.4, color: 'var(--ifm-font-color-secondary)', marginBottom: '0.55rem' }}>

@@ -82,7 +82,7 @@ export default function ManageAccess() {
       <main style={{ padding: '2rem 1rem', maxWidth: '640px', margin: '0 auto', color: 'var(--ifm-font-color-base)' }}>
         <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem', color: 'var(--ifm-heading-color)' }}>Manage MCP Access</h1>
         <p style={{ color: 'var(--ifm-font-color-secondary)', marginBottom: '1.5rem' }}>
-          £3/month · 1,000 MCP requests · hard cap
+          £3/month · 1,000 MCP tool calls · hard cap (initialize / tools/list do not count)
         </p>
 
         {checking && <p style={{ fontSize: '0.9rem', color: 'var(--ifm-font-color-secondary)' }}>Checking session…</p>}
