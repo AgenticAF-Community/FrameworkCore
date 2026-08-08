@@ -55,9 +55,12 @@ function checkAbsence(contentEntries, paths, positivePatterns, positivePathPatte
 /**
  * Run all security checks against scanned content.
  * @param {{ paths: string[], content: Map<string,string> }} scanResult
+ * @param {{ includeAbsenceChecks?: boolean }} [opts] — default true (CLI); pass false for MCP snippet mode (no absence claims)
  * @returns {{ findings: object[], summary: object }}
  */
-export function runSecurityChecks(scanResult) {
+export function runSecurityChecks(scanResult, opts = {}) {
+  // Default true for local CLI / full-tree scans; MCP snippet mode passes false explicitly.
+  const includeAbsenceChecks = opts.includeAbsenceChecks !== false;
   const { paths, content } = scanResult;
   const entries = [...content.entries()];
   const findings = [];
@@ -71,11 +74,11 @@ export function runSecurityChecks(scanResult) {
     "Move this secret to a vault or environment variable. Never store secrets in source code. See AAF Security Pillar 5.5: Secrets Management."
   ));
 
-  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.vault, ["vault", "secret"])) {
+  if (includeAbsenceChecks && !checkAbsence(entries, paths, POSITIVE_PATTERNS.vault, ["vault", "secret"])) {
     findings.push({
       severity: "high", cia_dimension: "confidentiality",
       check: "No vault or secrets manager detected",
-      location: "(project-wide)",
+      location: "(declared-tree)",
       evidence: "No references to vault, secret manager, or getSecret patterns",
       recommendation: "Introduce a secrets manager (e.g. HashiCorp Vault, AWS Secrets Manager, environment variables at minimum). Fetch secrets just-in-time per tool call. See AAF Security Pillar 5.5.",
     });
@@ -97,31 +100,31 @@ export function runSecurityChecks(scanResult) {
     "Replace wildcard/admin permissions with narrowly scoped, least-privilege grants per tool and action class. See AAF Security Pillar 5.3: Privilege Separation."
   ));
 
-  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.gateway, ["gateway"])) {
+  if (includeAbsenceChecks && !checkAbsence(entries, paths, POSITIVE_PATTERNS.gateway, ["gateway"])) {
     findings.push({
       severity: "high", cia_dimension: "integrity",
       check: "No tool gateway pattern detected",
-      location: "(project-wide)",
+      location: "(declared-tree)",
       evidence: "No references to a gateway, policy gate, or epistemic gate enforcing tool access",
       recommendation: "Implement a non-bypassable Tool Gateway that evaluates every tool invocation against policy, budgets, and risk class before execution. See AAF Security Pillar 5.4.",
     });
   }
 
-  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.injectionMitigation)) {
+  if (includeAbsenceChecks && !checkAbsence(entries, paths, POSITIVE_PATTERNS.injectionMitigation)) {
     findings.push({
       severity: "medium", cia_dimension: "integrity",
       check: "No prompt injection mitigation detected",
-      location: "(project-wide)",
+      location: "(declared-tree)",
       evidence: "No references to instruction hierarchy, system prompt separation, or content labelling",
       recommendation: "Enforce instruction hierarchy: system instructions must not be overridable by user/retrieved content. Label external content as data, not instructions. See AAF Security Pillar 5.6.",
     });
   }
 
-  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.verification, ["verify", "validation"])) {
+  if (includeAbsenceChecks && !checkAbsence(entries, paths, POSITIVE_PATTERNS.verification, ["verify", "validation"])) {
     findings.push({
       severity: "medium", cia_dimension: "integrity",
       check: "No action verification pattern detected",
-      location: "(project-wide)",
+      location: "(declared-tree)",
       evidence: "No references to verification, evidence-based completion, or assertion patterns",
       recommendation: "Add evidence-based verification after write actions. Confirm the action succeeded before proceeding. See AAF Security Pillar 5.4: Evidence-based definition of done.",
     });
@@ -129,31 +132,31 @@ export function runSecurityChecks(scanResult) {
 
   // --- AVAILABILITY ---
 
-  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.rateLimit, ["rate.limit", "throttle"])) {
+  if (includeAbsenceChecks && !checkAbsence(entries, paths, POSITIVE_PATTERNS.rateLimit, ["rate.limit", "throttle"])) {
     findings.push({
       severity: "medium", cia_dimension: "availability",
       check: "No rate limiting detected",
-      location: "(project-wide)",
+      location: "(declared-tree)",
       evidence: "No references to rate limiting, throttling, or quotas",
       recommendation: "Add rate limiting at agent entry points to prevent abuse, resource starvation, and runaway loops. See AAF Security Pillar 5.2: Rate limiting and abuse controls.",
     });
   }
 
-  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.budget)) {
+  if (includeAbsenceChecks && !checkAbsence(entries, paths, POSITIVE_PATTERNS.budget)) {
     findings.push({
       severity: "medium", cia_dimension: "availability",
       check: "No budget enforcement detected",
-      location: "(project-wide)",
+      location: "(declared-tree)",
       evidence: "No references to step budgets, token limits, or tool call limits",
       recommendation: "Enforce runtime budgets (steps, tokens, tool calls, spend) to prevent unbounded loops and cost overruns. See AAF Cost Pillar and Autonomy Governance.",
     });
   }
 
-  if (!checkAbsence(entries, paths, POSITIVE_PATTERNS.fallback)) {
+  if (includeAbsenceChecks && !checkAbsence(entries, paths, POSITIVE_PATTERNS.fallback)) {
     findings.push({
       severity: "low", cia_dimension: "availability",
       check: "No graceful degradation for model unavailability",
-      location: "(project-wide)",
+      location: "(declared-tree)",
       evidence: "No references to fallback, graceful degradation, failover, or circuit breaker patterns",
       recommendation: "Design fallback behaviour for when the LLM provider is unavailable. The model is a critical dependency — if it's offline, the agent cannot reason. See AAF Security Pillar 5.2.",
     });
@@ -161,6 +164,7 @@ export function runSecurityChecks(scanResult) {
 
   const summary = {
     total: findings.length,
+    includeAbsenceChecks,
     critical: findings.filter((f) => f.severity === "critical").length,
     high: findings.filter((f) => f.severity === "high").length,
     medium: findings.filter((f) => f.severity === "medium").length,

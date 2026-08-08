@@ -1,6 +1,7 @@
 /**
  * MCP Bearer auth + monthly quota (hard cap).
- * Usage counters are keyed by calendar month (UTC) so the 1000 cap resets each month.
+ * Usage counters are keyed by calendar month (UTC).
+ * Only JSON-RPC tools/call counts toward the 1000 tool-call quota.
  */
 import { getBillingConfig } from "./config";
 import { getKv, KV_PREFIX } from "./kv";
@@ -49,7 +50,54 @@ export function callsKey(customerId: string, periodId = currentPeriodId()): stri
   return `${KV_PREFIX.customer}${customerId}:calls:${periodId}`;
 }
 
-export async function authenticateMcpRequest(req: Request): Promise<AuthResult> {
+/** Production-like hosts must enforce MCP auth. */
+export function isProductionLike(): boolean {
+  if (String(process.env.VERCEL_ENV || "").toLowerCase() === "production") return true;
+  const base = String(process.env.APP_BASE_URL || "").toLowerCase();
+  return base.includes("agenticaf.io");
+}
+
+/** True when production would otherwise open-bypass MCP. */
+export function mcpAuthMisconfigured(): boolean {
+  if (!isProductionLike()) return false;
+  return String(process.env.MCP_AUTH_REQUIRED || "").toLowerCase() !== "true";
+}
+
+/** Whether this request should consume a quota unit (tools/call only). */
+export async function requestCountsTowardQuota(req: Request): Promise<boolean> {
+  if (req.method !== "POST") return false;
+  try {
+    const clone = req.clone();
+    const text = await clone.text();
+    if (!text) return false;
+    // Streamable MCP may be JSON or SSE-wrapped; try JSON first
+    const trimmed = text.trim();
+    if (trimmed.startsWith("{")) {
+      const body = JSON.parse(trimmed);
+      return body?.method === "tools/call";
+    }
+    // SSE data lines
+    for (const line of text.split("\n")) {
+      if (!line.startsWith("data:")) continue;
+      const payload = line.slice(5).trim();
+      if (!payload.startsWith("{")) continue;
+      try {
+        const body = JSON.parse(payload);
+        if (body?.method === "tools/call") return true;
+      } catch {
+        /* ignore */
+      }
+    }
+  } catch {
+    /* non-JSON body — do not count */
+  }
+  return false;
+}
+
+export async function authenticateMcpRequest(
+  req: Request,
+  opts?: { meterToolCall?: boolean }
+): Promise<AuthResult> {
   const cfg = getBillingConfig();
   const token = extractBearer(req);
 
@@ -78,8 +126,20 @@ export async function authenticateMcpRequest(req: Request): Promise<AuthResult> 
   const counterKey = callsKey(customerId, periodId);
   const usedBeforeRaw = await kv.get<number | string>(counterKey);
   const usedBefore = Number(usedBeforeRaw ?? 0);
+
+  const shouldMeter = opts?.meterToolCall !== false;
+
+  if (!shouldMeter) {
+    return {
+      ok: true,
+      customerId,
+      customer: { ...customer, callsUsed: usedBefore, includedCalls: included },
+      callsUsed: usedBefore,
+    };
+  }
+
   if (usedBefore >= included) {
-    return { ok: false, status: 429, error: "Monthly request limit reached (1000)" };
+    return { ok: false, status: 429, error: "Monthly tool-call limit reached (1000)" };
   }
 
   const nextUsed = await kv.incr(counterKey);
@@ -91,7 +151,7 @@ export async function authenticateMcpRequest(req: Request): Promise<AuthResult> 
   });
 
   if (nextUsed > included) {
-    return { ok: false, status: 429, error: "Monthly request limit reached (1000)" };
+    return { ok: false, status: 429, error: "Monthly tool-call limit reached (1000)" };
   }
 
   return {
@@ -112,13 +172,26 @@ export function authErrorResponse(result: AuthFail): Response {
   });
 }
 
-/** When MCP_AUTH_REQUIRED is false, allow open access (legacy). */
+/**
+ * Gate MCP requests.
+ * - Production-like: MCP_AUTH_REQUIRED must be true (else caller returns 503).
+ * - Local/preview: MCP_AUTH_REQUIRED=false allows open bypass for development only.
+ * - Quota: only tools/call increments the monthly counter.
+ */
 export async function gateMcpRequest(
   req: Request
 ): Promise<AuthResult | { ok: true; bypass: true }> {
   const required = String(process.env.MCP_AUTH_REQUIRED || "").toLowerCase() === "true";
-  if (!required) return { ok: true, bypass: true };
-  return authenticateMcpRequest(req);
+  if (!required) {
+    if (isProductionLike()) {
+      // Caller should have blocked via mcpAuthMisconfigured; keep fail-closed here too.
+      return { ok: false, status: 401, error: "MCP auth required in production" };
+    }
+    return { ok: true, bypass: true };
+  }
+
+  const meterToolCall = await requestCountsTowardQuota(req);
+  return authenticateMcpRequest(req, { meterToolCall });
 }
 
 export async function setCustomerCallsUsed(customerId: string, callsUsed: number): Promise<void> {

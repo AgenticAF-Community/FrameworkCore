@@ -10,15 +10,15 @@
  * Cross:     aaf_pillar_guidance
  * Security:  aaf_security_scan
  */
-import { createMcpHandler, withMcpAuth } from "mcp-handler";
-import { z } from "zod";
 import {
   VALID_SKILL_IDS,
   VALID_WORKLOAD_IDS,
   analyseTradeoffs,
+  analyseTradeoffsFlat,
   getChecklist,
   getDocContent,
   getGuide,
+  getLevelImplications,
   getPillarsSummary,
   getSkillContent,
   getWorkloadGuidance,
@@ -29,12 +29,16 @@ import {
   lookupInDocs,
   normalizePostureReport,
   rankWorkloads,
+  reviewAgainstACC,
   safeReadJSON,
   serverInstructions,
   tradeoffCatalog,
   DATA_DIR,
 } from "./lib/aaf-mcp-content";
 import * as path from "path";
+import { createMcpHandler } from "mcp-handler";
+import { z } from "zod";
+import { authErrorResponse, gateMcpRequest, mcpAuthMisconfigured } from "./lib/mcp-auth";
 
 const VALID_PILLAR_IDS = [
   "security", "reliability", "cost", "operational-excellence",
@@ -50,18 +54,23 @@ function loadPillarsLocal(): any[] {
   return safeReadJSON(path.join(DATA_DIR, "pillars.json")) || [];
 }
 
-function getDesignQuestions(_autonomyLevel: string): any[] {
+function getDesignQuestions(autonomyLevel: string): any {
   const pillars = loadPillarsLocal();
-  return pillars.map((p: any) => ({
-    pillarId: p.id,
-    pillarName: p.name,
-    questions: p.questions.map((q: string, i: number) => ({
-      questionId: `${p.id}-q${i + 1}`,
-      text: q,
-      expectedAnswer: "yes/no/partial",
-      phase: "design",
+  return {
+    autonomyLevel,
+    note: "Pillar questions are shared across autonomy levels; levelImplications describe how gates/HITL/budgets change.",
+    levelImplications: getLevelImplications(autonomyLevel),
+    pillars: pillars.map((p: any) => ({
+      pillarId: p.id,
+      pillarName: p.name,
+      questions: p.questions.map((q: string, i: number) => ({
+        questionId: `${p.id}-q${i + 1}`,
+        text: q,
+        expectedAnswer: "yes/no/partial",
+        phase: "design",
+      })),
     })),
-  }));
+  };
 }
 
 function generateACC(
@@ -71,7 +80,7 @@ function generateACC(
   workloadId?: string
 ): string {
   const pillars = loadPillarsLocal();
-  const tradeoffResults = analyseTradeoffs(answers, workloadId);
+  const tradeoffResults = analyseTradeoffsFlat(answers, workloadId);
 
   const yamlLines: string[] = [
     "# Agent Control Contract (ACC)",
@@ -179,36 +188,6 @@ function interpretPosture(reportInput: any): any {
   };
 }
 
-function reviewAgainstACC(accYaml: string, reportInput: any): any {
-  const report = normalizePostureReport(reportInput);
-  const gaps: any[] = [];
-  const pillars = loadPillarsLocal();
-
-  for (const pillar of pillars) {
-    const pillarResults = report[pillar.id];
-    if (!Array.isArray(pillarResults)) continue;
-
-    for (const result of pillarResults) {
-      if (result.status === "not_found") {
-        const accMentions = accYaml.includes(result.question);
-        gaps.push({
-          pillarId: pillar.id,
-          question: result.question,
-          severity: accMentions ? "high" : "medium",
-          detail: accMentions
-            ? "Specified in ACC but not detected in codebase"
-            : "Not detected in codebase",
-        });
-      }
-    }
-  }
-
-  return {
-    totalGaps: gaps.length,
-    gaps: gaps.sort((a: any, b: any) => (a.severity === "high" ? -1 : 1) - (b.severity === "high" ? -1 : 1)),
-  };
-}
-
 function getPillarGuidance(pillarId: string): any {
   const pillars = loadPillarsLocal();
   const tradeoffs = loadAllTradeoffs();
@@ -228,6 +207,7 @@ function getPillarGuidance(pillarId: string): any {
       tension: t.tension,
       recommendation: t.recommendation,
       source: t.source,
+      sourceQuote: t.sourceQuote || null,
       confidence: t.confidence,
       autonomyNotes: t.autonomyNotes,
     })),
@@ -359,34 +339,36 @@ const baseHandler = createMcpHandler(
     server.registerTool("aaf_design_questions", {
       title: "AAF Design Questions",
       description:
-        "Return the full design questionnaire for an autonomy level. Prefer selecting a workload (aaf_list_workloads) first when designing a new system.",
+        "Return the shared pillar design questionnaire plus levelImplications for the given autonomy level. Questions are shared across levels; gates/HITL/budgets/escalation expectations vary by level. Prefer selecting a workload (aaf_list_workloads) first when designing a new system.",
       inputSchema: {
         autonomyLevel: z.enum(AUTONOMY_LEVELS).describe("The autonomy level of the agent being designed"),
       },
-    }, async ({ autonomyLevel }) => {
-      const questions = getDesignQuestions(autonomyLevel);
-      return jsonText({ autonomyLevel, pillars: questions });
-    });
+    }, async ({ autonomyLevel }) => jsonText(getDesignQuestions(autonomyLevel)));
 
     server.registerTool("aaf_tradeoff_analysis", {
       title: "AAF Trade-off Analysis",
       description:
-        "Deterministic trade-off engine from design choices. Optional workloadId includes workload-scoped dominant trades. Same input → same output.",
+        "Deterministic trade-off lookup. Returns matchedFromAnswers (indicator-matched from design choices) and, when workloadId is set, workloadDominantTrades (catalogue rows — not inferred from answers). Same input → same output.",
       inputSchema: {
         choices: z.record(z.record(z.string())).describe("Design answers keyed by pillar ID then question ID"),
         workloadId: z.enum(VALID_WORKLOAD_IDS).optional(),
       },
     }, async ({ choices, workloadId }) => {
-      const results = analyseTradeoffs(choices, workloadId);
-      if (results.length === 0) {
+      const { matchedFromAnswers, workloadDominantTrades } = analyseTradeoffs(choices, workloadId);
+      if (matchedFromAnswers.length === 0 && workloadDominantTrades.length === 0) {
         return {
           content: [{
             type: "text",
-            text: "No trade-off tensions matched. Try aaf_tradeoff_catalog, pass workloadId, or call aaf_workload_guidance for dominant trades.",
+            text: "No trade-offs matched. Try aaf_tradeoff_catalog, pass workloadId for catalogue trades, or call aaf_workload_guidance.",
           }],
         };
       }
-      return jsonText({ activeTradeoffs: results.length, workloadId: workloadId || null, tradeoffs: results });
+      return jsonText({
+        workloadId: workloadId || null,
+        matchedFromAnswers,
+        workloadDominantTrades,
+        note: "Only matchedFromAnswers are derived from design choices; workloadDominantTrades are explicit catalogue entries for the workload.",
+      });
     });
 
     server.registerTool("aaf_generate_acc", {
@@ -424,7 +406,7 @@ const baseHandler = createMcpHandler(
     server.registerTool("aaf_review_against_acc", {
       title: "AAF Review Against ACC",
       description:
-        "Gap analysis between an ACC YAML string and a posture report. Use after running the local posture CLI. report accepts the same shapes as aaf_posture_interpret (raw CLI JSON or flat map).",
+        "Gap analysis between an ACC YAML and a posture report. High severity only when ACC answer is yes/partial and posture is not_found. Explicit ACC no is omitted (consistent). Unanswered ACC items are medium. Accepts raw CLI JSON or flat pillar→items map.",
       inputSchema: {
         accYaml: z.string().describe("The Agent Control Contract as a YAML string"),
         report: z.any().describe("CLI JSON from aaf-posture --format json, or flat pillar→items map"),
@@ -447,32 +429,49 @@ const baseHandler = createMcpHandler(
     server.registerTool("aaf_security_scan", {
       title: "AAF Security Scan",
       description:
-        "CIA-aligned security checks on file path + snippet findings. Prefer loading aaf-security skill first for process context.",
+        "CIA-oriented heuristic lint on provided file snippets (not a full-project cert). Default scope=snippets runs pattern checks only — no project-wide absence claims. scope=declared_tree enables absence checks using the provided paths[] as the declared tree. Prefer loading aaf-security skill first.",
       inputSchema: {
         findings: z.array(z.object({
           file: z.string().describe("Relative file path"),
           snippet: z.string().describe("Relevant code snippet or content from the file"),
-        })).describe("Array of file paths and content snippets to analyse"),
+        })).max(50).describe("Array of file paths and content snippets (max 50)"),
+        scope: z.enum(["snippets", "declared_tree"]).optional().describe("snippets (default) skips absence checks; declared_tree allows them"),
+        paths: z.array(z.string()).max(500).optional().describe("Optional declared tree paths when scope=declared_tree"),
         severity: z.enum(["critical", "high", "medium", "all"]).optional().describe("Minimum severity to include (default: all)"),
       },
-    }, async ({ findings: inputFindings, severity }) => {
+    }, async ({ findings: inputFindings, severity, scope, paths: declaredPaths }) => {
+      const mode = scope || "snippets";
       const content = new Map<string, string>();
       const filePaths: string[] = [];
-      for (const f of inputFindings) {
-        content.set(f.file, f.snippet);
+      const maxSnippet = 20 * 1024;
+      for (const f of (inputFindings || []).slice(0, 50)) {
+        content.set(f.file, String(f.snippet || "").slice(0, maxSnippet));
         filePaths.push(f.file);
       }
+      const treePaths = mode === "declared_tree"
+        ? [...new Set([...(declaredPaths || []), ...filePaths])].slice(0, 500)
+        : filePaths;
 
       const { runSecurityChecks } = await import("../tools/aaf-security/checks.js") as {
-        runSecurityChecks: (s: { paths: string[]; content: Map<string, string> }) => { findings: any[]; summary: any };
+        runSecurityChecks: (
+          s: { paths: string[]; content: Map<string, string> },
+          opts?: { includeAbsenceChecks?: boolean }
+        ) => { findings: any[]; summary: any };
       };
-      const { findings: allFindings } = runSecurityChecks({ paths: filePaths, content });
+      const { findings: allFindings } = runSecurityChecks(
+        { paths: treePaths, content },
+        { includeAbsenceChecks: mode === "declared_tree" }
+      );
 
       const sevOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
       const minSev = severity === "all" || !severity ? 999 : (sevOrder[severity] ?? 999);
       const filtered = allFindings.filter((f: any) => (sevOrder[f.severity] ?? 999) <= minSev);
 
       const summary = {
+        scope: mode,
+        note: mode === "snippets"
+          ? "Snippet mode: content pattern checks only; absence/project-wide checks skipped."
+          : "Declared-tree mode: absence checks use provided paths as the tree under review (still heuristic).",
         total: filtered.length,
         critical: filtered.filter((f: any) => f.severity === "critical").length,
         high: filtered.filter((f: any) => f.severity === "high").length,
@@ -484,41 +483,29 @@ const baseHandler = createMcpHandler(
     });
   },
   {
-    serverInfo: { name: "aaf-mcp", version: "2.0.0" },
+    serverInfo: { name: "aaf-mcp", version: "2.1.0" },
     instructions: serverInstructions(),
   },
   { basePath: "/api", maxDuration: 30 }
 );
 
-// ─── Auth ───────────────────────────────────────────────────────────────────
-
-import { authErrorResponse, gateMcpRequest } from "./lib/mcp-auth";
-
-const verifyToken = async (
-  _req: Request,
-  bearerToken?: string
-): Promise<{ token: string; scopes: string[]; clientId: string } | undefined> => {
-  const apiKey = process.env.MCP_API_KEY;
-  if (!apiKey) return undefined;
-  if (!bearerToken || bearerToken !== apiKey) return undefined;
-  return { token: bearerToken, scopes: ["read:aaf"], clientId: "api-key" };
-};
-
-const authHandler = withMcpAuth(baseHandler, verifyToken, {
-  required: false,
-  requiredScopes: ["read:aaf"],
-  resourceMetadataPath: "/.well-known/oauth-protected-resource",
-});
+// ─── Auth (subscriber Bearer via gateMcpRequest only) ───────────────────────
 
 async function withMcpBillingGate(
   req: Request,
   handler: (req: Request) => Promise<Response> | Response
 ): Promise<Response> {
+  if (mcpAuthMisconfigured()) {
+    return new Response(
+      JSON.stringify({ error: "MCP auth misconfigured: MCP_AUTH_REQUIRED must be true in production" }),
+      { status: 503, headers: { "content-type": "application/json" } }
+    );
+  }
   const gate = await gateMcpRequest(req);
   if (!gate.ok) return authErrorResponse(gate);
   return handler(req);
 }
 
-export const GET = (req: Request) => withMcpBillingGate(req, authHandler);
-export const POST = (req: Request) => withMcpBillingGate(req, authHandler);
-export const DELETE = (req: Request) => withMcpBillingGate(req, authHandler);
+export const GET = (req: Request) => withMcpBillingGate(req, baseHandler);
+export const POST = (req: Request) => withMcpBillingGate(req, baseHandler);
+export const DELETE = (req: Request) => withMcpBillingGate(req, baseHandler);

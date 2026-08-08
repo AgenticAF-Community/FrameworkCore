@@ -3,11 +3,11 @@
 - **`mcp.ts`** — AAF MCP server (Streamable HTTP) for Vercel.
 - **`stats.ts`** — Public stats for the homepage: GitHub repo, MCP tool calls, posture reports, pillar averages. Reads from Vercel Blob when available (see below).
 - **`refresh-stats.ts`** — Cron handler: fetches GitHub + `AAF_STATS_JSON`, writes to Vercel Blob. Invoked by Vercel Cron (see `vercel.json`).
-- **`lib/`** — Shared billing/auth helpers (`config`, `kv`, `keys`, `stripe`) for paid MCP access (£3/mo, 1,000 requests hard cap).
+- **`lib/`** — Shared billing/auth helpers (`config`, `kv`, `keys`, `stripe`, `mcp-auth`) for paid MCP access (£3/mo, 1,000 **tool calls** hard cap).
 
 ## MCP billing env (names only)
 
-Set these in local `.env` and Vercel. Production should keep `MCP_AUTH_REQUIRED=true` once cut over:
+Set these in local `.env` and Vercel. **Production must keep `MCP_AUTH_REQUIRED=true`** (fail-closed: otherwise MCP returns 503).
 
 | Variable | Role |
 |----------|------|
@@ -20,7 +20,7 @@ Set these in local `.env` and Vercel. Production should keep `MCP_AUTH_REQUIRED=
 | `AUTH_SECRET` | HMAC for API-key hashes + magic links |
 | `APP_BASE_URL` | Checkout success/cancel + magic-link base |
 | `RESEND_API_KEY` / `RESEND_FROM_EMAIL` | Magic-link email (`support@agenticaf.io`) |
-| `MCP_AUTH_REQUIRED` | `true` to enforce Bearer API keys on MCP |
+| `MCP_AUTH_REQUIRED` | `true` required in production; local-only `false` opens bypass for development |
 
 Verify locally: `node tools/scripts/verify-billing-infra.js`
 
@@ -36,13 +36,17 @@ Verify locally: `node tools/scripts/verify-billing-infra.js`
 
 After the first cron run (or a manual GET to `/api/refresh-stats` with `Authorization: Bearer <CRON_SECRET>`), `GET /api/stats` serves from Blob so the homepage shows up-to-date figures. Without Blob, the stats API falls back to live GitHub + `AAF_STATS_JSON`.
 
-**MCP endpoint:** `https://www.agenticaf.io/api/mcp` (Streamable HTTP). Requires `Authorization: Bearer aaf_live_…` when `MCP_AUTH_REQUIRED=true`.
+**MCP endpoint:** `https://www.agenticaf.io/api/mcp` (Streamable HTTP). Requires `Authorization: Bearer aaf_live_…`.
+
+**Auth:** Subscriber Bearer keys via `gateMcpRequest` only. Production-like deploys (`VERCEL_ENV=production` or `APP_BASE_URL` hosting agenticaf.io) refuse to serve MCP if `MCP_AUTH_REQUIRED` is not `true` (503). Local/preview may set `MCP_AUTH_REQUIRED=false` for an explicit open bypass — not a production mode.
+
+**Metering:** Only JSON-RPC `tools/call` counts toward the monthly cap. `initialize` and `tools/list` do not. Pre-check rejects when already at cap; the crossing call may consume the last unit via atomic incr.
 
 **Tool surface (19):** guide/list/docs (`aaf_guide`, `aaf_list_skills`, `aaf_list_docs`, `aaf_get_doc`), core lookup/skills, workloads (`aaf_list_workloads`, `aaf_workload_guidance`), design/trade-offs/ACC, build, review, pillar guidance, security scan.
 
-**Paid access:** £3/month · 1,000 requests · hard cap. Checkout: `GET /api/stripe/checkout`. After purchase, keys are shown once at `/access/success`. Manage/rotate via `/manage-access` (Resend magic link, subject `AAF MAGIC LINK FOR SIGN IN`).
+**Paid access:** £3/month · 1,000 tool calls · hard cap. Checkout: `GET /api/stripe/checkout`. After purchase, keys are shown once at `/access/success`. Manage/rotate via `/manage-access` (Resend magic link, subject `AAF MAGIC LINK FOR SIGN IN`).
 
-When `MCP_AUTH_REQUIRED=true`, send `Authorization: Bearer <aaf_live_…>`. When `false`, the endpoint stays open (legacy / pre-cutover). Optional legacy single key: `MCP_API_KEY`.
+Send `Authorization: Bearer <aaf_live_…>` on every MCP request.
 
 Stripe webhook: `POST /api/stripe/webhook` (raw body + `stripe-signature`).
 
@@ -72,7 +76,7 @@ Antigravity uses **`mcp_config.json`** with **`command` + `args`** (local stdio)
 
 `http-first` matches the AAF server’s Streamable HTTP transport (mcp-remote’s default is also `http-first`; the flag makes intent explicit).
 
-If **`MCP_API_KEY`** is set on the deployment, add a header (avoid spaces after `:` in `args` on some Windows clients; put the full value in `env`):
+Add your subscriber Bearer key (avoid spaces after `:` in `args` on some Windows clients; put the full value in `env`):
 
 ```json
 {
@@ -89,7 +93,7 @@ If **`MCP_API_KEY`** is set on the deployment, add a header (avoid spaces after 
         "Authorization:${AAF_MCP_AUTHORIZATION}"
       ],
       "env": {
-        "AAF_MCP_AUTHORIZATION": "Bearer YOUR_MCP_API_KEY"
+        "AAF_MCP_AUTHORIZATION": "Bearer aaf_live_YOUR_KEY"
       }
     }
   }
