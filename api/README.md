@@ -3,6 +3,26 @@
 - **`mcp.ts`** — AAF MCP server (Streamable HTTP) for Vercel.
 - **`stats.ts`** — Public stats for the homepage: GitHub repo, MCP tool calls, posture reports, pillar averages. Reads from Vercel Blob when available (see below).
 - **`refresh-stats.ts`** — Cron handler: fetches GitHub + `AAF_STATS_JSON`, writes to Vercel Blob. Invoked by Vercel Cron (see `vercel.json`).
+- **`lib/`** — Shared billing/auth helpers (`config`, `kv`, `keys`, `stripe`) for paid MCP access (£3/mo, 1,000 requests hard cap).
+
+## MCP billing env (names only)
+
+Set these in local `.env` and Vercel (Preview first; keep Production `MCP_AUTH_REQUIRED=false` until cutover):
+
+| Variable | Role |
+|----------|------|
+| `STRIPE_SECRET_KEY` | Stripe secret (`sk_test_` until live) |
+| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable (optional for Checkout Sessions) |
+| `STRIPE_PRICE_ID` | £3/month subscription price |
+| `STRIPE_WEBHOOK_SECRET` | Webhook signature verify |
+| `STRIPE_CUSTOMER_PORTAL_URL` | Customer portal login link |
+| `KV_REST_API_URL` / `KV_REST_API_TOKEN` | Upstash Redis REST |
+| `AUTH_SECRET` | HMAC for API-key hashes + magic links |
+| `APP_BASE_URL` | Checkout success/cancel + magic-link base |
+| `RESEND_API_KEY` / `RESEND_FROM_EMAIL` | Magic-link email (`support@agenticaf.io`) |
+| `MCP_AUTH_REQUIRED` | `true` to enforce Bearer API keys on MCP |
+
+Verify locally: `node tools/scripts/verify-billing-infra.js`
 
 ## Stats and cron (get homepage stats live)
 
@@ -16,7 +36,13 @@
 
 After the first cron run (or a manual GET to `/api/refresh-stats` with `Authorization: Bearer <CRON_SECRET>`), `GET /api/stats` serves from Blob so the homepage shows up-to-date figures. Without Blob, the stats API falls back to live GitHub + `AAF_STATS_JSON`.
 
-**MCP endpoint:** `https://www.agenticaf.io/api/mcp` (Streamable HTTP, 12 tools). Optional auth: set `MCP_API_KEY` in Vercel and send `Authorization: Bearer <key>`.
+**MCP endpoint:** `https://www.agenticaf.io/api/mcp` (Streamable HTTP, 12 tools).
+
+**Paid access:** £3/month · 1,000 requests · hard cap. Checkout: `GET /api/stripe/checkout`. After purchase, keys are shown once at `/access/success`. Manage/rotate via `/manage-access` (Resend magic link, subject `AAF MAGIC LINK FOR SIGN IN`).
+
+When `MCP_AUTH_REQUIRED=true`, send `Authorization: Bearer <aaf_live_…>`. When `false`, the endpoint stays open (legacy / pre-cutover). Optional legacy single key: `MCP_API_KEY`.
+
+Stripe webhook: `POST /api/stripe/webhook` (raw body + `stripe-signature`).
 
 ### Google Antigravity IDE (and other stdio-only clients)
 

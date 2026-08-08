@@ -499,10 +499,13 @@ const baseHandler = createMcpHandler(
 
 // ─── Auth ───────────────────────────────────────────────────────────────────
 
+import { authErrorResponse, gateMcpRequest } from "./lib/mcp-auth";
+
 const verifyToken = async (
   _req: Request,
   bearerToken?: string
 ): Promise<{ token: string; scopes: string[]; clientId: string } | undefined> => {
+  // Legacy single-key auth (optional). Paid per-subscriber keys are enforced in gateMcpRequest.
   const apiKey = process.env.MCP_API_KEY;
   if (!apiKey) return undefined;
   if (!bearerToken || bearerToken !== apiKey) return undefined;
@@ -515,6 +518,15 @@ const authHandler = withMcpAuth(baseHandler, verifyToken, {
   resourceMetadataPath: "/.well-known/oauth-protected-resource",
 });
 
-export const GET = authHandler;
-export const POST = authHandler;
-export const DELETE = authHandler;
+async function withMcpBillingGate(
+  req: Request,
+  handler: (req: Request) => Promise<Response> | Response
+): Promise<Response> {
+  const gate = await gateMcpRequest(req);
+  if (!gate.ok) return authErrorResponse(gate);
+  return handler(req);
+}
+
+export const GET = (req: Request) => withMcpBillingGate(req, authHandler);
+export const POST = (req: Request) => withMcpBillingGate(req, authHandler);
+export const DELETE = (req: Request) => withMcpBillingGate(req, authHandler);

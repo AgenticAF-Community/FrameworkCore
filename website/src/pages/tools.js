@@ -83,6 +83,19 @@ export default function Tools() {
             A Model Context Protocol server that exposes the framework as tools. AI assistants that support MCP
             can call these tools to get accurate, framework-grounded answers.
           </p>
+          <div style={{ margin: '1rem 0 1.25rem' }}>
+            <a href="/api/stripe/checkout" className="button button--primary" style={{ textDecoration: 'none', marginRight: '0.75rem' }}>
+              Get MCP Access
+            </a>
+            <a href="/manage-access" className="button button--secondary" style={{ textDecoration: 'none' }}>
+              Manage access
+            </a>
+            <p style={{ ...textStyle, marginTop: '0.5rem', marginBottom: 0 }}>
+              £3/month · 1,000 MCP requests · hard cap. After purchase, send your API key as{' '}
+              <code>Authorization: Bearer &lt;key&gt;</code>. By purchasing you agree to our{' '}
+              <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.
+            </p>
+          </div>
           <ul style={{ ...textStyle, paddingLeft: '1.5rem', marginTop: '0.75rem' }}>
             {MCP_TOOLS.map((t) => (
               <li key={t.name} style={{ marginBottom: '0.35rem' }}>

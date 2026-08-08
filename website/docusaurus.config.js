@@ -158,7 +158,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} AgenticAF Community. Licensed under CC BY-NC 4.0 (non-commercial).`,
+        copyright: `Copyright © ${new Date().getFullYear()} AgenticAF Community · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a>`,
       },
       metadata: [
         { name: 'description', content: 'Agentic Architecture Framework: vendor-agnostic guide to AI agent architecture' },

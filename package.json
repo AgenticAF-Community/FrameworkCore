@@ -4,15 +4,20 @@
   "private": true,
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.25.2",
+    "@upstash/redis": "^1.38.2",
+    "@vercel/blob": "^0.26.0",
+    "dotenv": "^17.4.2",
     "mcp-handler": "^1.0.7",
-    "zod": "^3.23.0",
-    "@vercel/blob": "^0.26.0"
+    "resend": "^6.18.1",
+    "stripe": "^22.4.0",
+    "zod": "^3.23.0"
   },
   "bin": {
     "aaf": "./tools/cli.js"
   },
   "scripts": {
     "build:pdf": "node scripts/build-pdf.js",
+    "build:pdf:arxiv": "node scripts/build-arxiv-pdf.js",
     "sync:from-docs": "node tools/scripts/sync-from-docs.js",
     "install:docs-sync-hook": "node tools/scripts/install-docs-sync-hook.js",
     "test": "node --test tools/tests/*.test.js",
