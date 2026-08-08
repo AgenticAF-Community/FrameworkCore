@@ -204,10 +204,9 @@ export default function Tools() {
           <p style={{ fontSize: '0.75rem', color: 'var(--ifm-font-color-secondary)', marginTop: '0.35rem', marginBottom: '0.75rem' }}>
             After saving, restart the app or reload MCP. Ask the assistant to call <code>aaf_guide</code> — you should see AAF tools. Without a valid Bearer key the server returns 401. See <a href="https://github.com/AgenticAF-Community/FrameworkCore/blob/main/api/README.md">api/README.md</a>.
           </p>
-            <p style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginTop: 0, marginBottom: 0, lineHeight: 1.6 }}>
-              <strong>Note:</strong> Some clients rename the server (e.g. <code>user-aaf</code>). That is normal. Windsurf MCP availability may depend on your plan — check Codeium’s docs.
-            </p>
-          </div>
+          <p style={{ fontSize: '0.8rem', color: 'var(--ifm-font-color-secondary)', marginTop: 0, marginBottom: '1rem', lineHeight: 1.6 }}>
+            <strong>Note:</strong> Some clients rename the server (e.g. <code>user-aaf</code>). That is normal. Windsurf MCP availability may depend on your plan — check Codeium’s docs.
+          </p>
 
           <div style={{ marginTop: '1.5rem', marginBottom: '0.5rem' }}>
             <h3 style={{ ...headingStyle }}>Make agents default to AAF (workspace rule)</h3>
