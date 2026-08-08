@@ -3,7 +3,7 @@
  */
 import { createHmac, timingSafeEqual } from "crypto";
 import { getBillingConfig } from "./config";
-import { getKv, KV_PREFIX } from "./kv";
+import { getKv, kvGetDel, KV_PREFIX } from "./kv";
 import { generateToken } from "./keys";
 import type { CustomerRecord } from "./mcp-auth";
 
@@ -42,12 +42,10 @@ export async function createMagicLink(
 export async function consumeMagicToken(
   token: string
 ): Promise<{ email: string; customerId: string } | null> {
-  const kv = getKv();
   const key = `${KV_PREFIX.magic}${token}`;
-  const data = await kv.get<{ email: string; customerId: string }>(key);
-  if (!data) return null;
-  await kv.del(key);
-  return data;
+  // Atomic get-and-delete — one-time magic links cannot be raced.
+  const data = await kvGetDel<{ email: string; customerId: string }>(key);
+  return data || null;
 }
 
 export function signSession(payload: { customerId: string; email: string; exp: number }): string {

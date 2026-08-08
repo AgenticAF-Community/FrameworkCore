@@ -63,6 +63,9 @@ async function activateSubscription(redis, input) {
 
 async function consumeReveal(redis, token) {
   const key = `aaf:reveal:${token}`;
+  if (typeof redis.getdel === "function") {
+    return redis.getdel(key);
+  }
   const data = await redis.get(key);
   if (!data) return null;
   await redis.del(key);

@@ -1,9 +1,12 @@
 /**
- * POST /api/auth/rotate-key — mint new API key, revoke old hash, one-time reveal token.
+ * POST /api/auth/rotate-key — mint new API key, revoke old hash, one-time reveal URL.
+ * Does not return revealToken in JSON (URL only) to limit accidental disclosure.
  */
+import { REVEAL_TTL_SEC } from "../lib/access";
 import { generateApiKey, generateToken, hashApiKey } from "../lib/keys";
 import { getKv, KV_PREFIX } from "../lib/kv";
 import { getCustomer, getSessionFromRequest } from "../lib/magic";
+import { encryptApiKey } from "../lib/reveal-crypto";
 import { resolveAppBaseUrl } from "../lib/urls";
 
 export async function POST(req: Request): Promise<Response> {
@@ -33,15 +36,18 @@ export async function POST(req: Request): Promise<Response> {
     const revealToken = generateToken(24);
     await kv.set(
       `${KV_PREFIX.reveal}${revealToken}`,
-      { customerId: session.customerId, apiKey, reused: false },
-      { ex: 3600 }
+      {
+        customerId: session.customerId,
+        reused: false,
+        enc: encryptApiKey(apiKey),
+      },
+      { ex: REVEAL_TTL_SEC }
     );
 
     const appBase = resolveAppBaseUrl(req);
     return json({
       ok: true,
       revealUrl: `${appBase}/access/success?token=${encodeURIComponent(revealToken)}`,
-      revealToken,
     });
   } catch (e: any) {
     return json({ error: e?.message || "Rotate failed" }, 500);

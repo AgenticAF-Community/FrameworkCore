@@ -1,7 +1,14 @@
 /**
  * GET/POST /api/stripe/checkout — start £3/mo MCP subscription Checkout.
+ * Sets an HttpOnly bind cookie tied to the Checkout session so only that
+ * browser can later redeem /api/access/reveal?session_id=…
  */
+import {
+  checkoutBindCookieHeader,
+  storeCheckoutBindSecret,
+} from "../lib/access";
 import { getBillingConfig } from "../lib/config";
+import { generateToken } from "../lib/keys";
 import { getStripe } from "../lib/stripe";
 import { resolveAppBaseUrl } from "../lib/urls";
 
@@ -38,7 +45,18 @@ async function startCheckout(req: Request): Promise<Response> {
       });
     }
 
-    return Response.redirect(session.url, 303);
+    const bindSecret = generateToken(24);
+    await storeCheckoutBindSecret(session.id, bindSecret);
+
+    const secure = appBase.startsWith("https://");
+    return new Response(null, {
+      status: 303,
+      headers: {
+        Location: session.url,
+        "Set-Cookie": checkoutBindCookieHeader(bindSecret, secure),
+        "Cache-Control": "no-store",
+      },
+    });
   } catch (e: any) {
     return new Response(JSON.stringify({ error: e?.message || "Checkout failed" }), {
       status: 500,
