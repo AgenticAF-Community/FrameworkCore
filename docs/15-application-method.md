@@ -120,6 +120,8 @@ Use the Posture tool before or during an architecture review to get a gap view; 
 
 At design time, the objective is to make the system’s governance explicit before implementation choices calcify.
 
+Start by picking the closest [Common Agentic Workload](/13.5-common-agentic-workloads) pattern (knowledge assistant, customer chatbot, internal copilot, or workflow automation). Use that page’s default shape and design decisions, then make the following governance explicit.
+
 A design spec should answer, at minimum:
 
 Autonomy declaration
