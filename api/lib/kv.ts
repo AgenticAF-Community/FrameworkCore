@@ -16,6 +16,12 @@ export function getKv(): Redis {
   return cached;
 }
 
+/** Atomic GET + DEL (Redis GETDEL). Upstash exposes this on the client instance. */
+export async function kvGetDel<T>(key: string): Promise<T | null> {
+  const kv = getKv() as Redis & { getdel: (k: string) => Promise<T | null> };
+  return kv.getdel(key);
+}
+
 export const KV_PREFIX = {
   customer: "aaf:customer:",
   keyHash: "aaf:key:",

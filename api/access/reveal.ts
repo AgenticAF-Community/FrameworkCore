@@ -1,10 +1,20 @@
 /**
  * GET /api/access/reveal?token=... | ?session_id=...
  * Consumes one-time reveal token and returns API key JSON (once).
- * If webhook is slow, session_id path can activate from Stripe Checkout Session.
+ *
+ * session_id path requires the HttpOnly checkout bind cookie set when
+ * Checkout was started, so a leaked cs_… URL alone cannot mint/reveal a key.
  */
-import { activateSubscription, bindCheckoutSessionReveal, consumeRevealToken } from "../lib/access";
-import { getKv, KV_PREFIX } from "../lib/kv";
+import {
+  CHECKOUT_BIND_COOKIE,
+  activateSubscription,
+  bindCheckoutSessionReveal,
+  consumeRevealToken,
+  takeCheckoutSessionReveal,
+  verifyCheckoutBindSecret,
+} from "../lib/access";
+import { parseCookies } from "../lib/magic";
+import { checkoutEmail, isPaidCheckoutSession } from "../lib/payments";
 import { getStripe } from "../lib/stripe";
 
 export async function GET(req: Request): Promise<Response> {
@@ -14,8 +24,22 @@ export async function GET(req: Request): Promise<Response> {
     const sessionId = url.searchParams.get("session_id");
 
     if (!token && sessionId) {
-      const kv = getKv();
-      let mapped = await kv.get<{ revealToken: string }>(`${KV_PREFIX.reveal}session:${sessionId}`);
+      const cookies = parseCookies(req);
+      const bindOk = await verifyCheckoutBindSecret(
+        sessionId,
+        cookies[CHECKOUT_BIND_COOKIE]
+      );
+      if (!bindOk) {
+        return json(
+          {
+            error:
+              "Checkout session is not bound to this browser. Open Manage access to rotate a key.",
+          },
+          403
+        );
+      }
+
+      let mapped = await takeCheckoutSessionReveal(sessionId);
 
       // Webhook race: activate from Stripe if KV map not ready yet
       if (!mapped?.revealToken) {
@@ -24,7 +48,6 @@ export async function GET(req: Request): Promise<Response> {
 
       if (mapped?.revealToken) {
         token = mapped.revealToken;
-        await kv.del(`${KV_PREFIX.reveal}session:${sessionId}`);
       }
     }
 
@@ -49,7 +72,6 @@ export async function GET(req: Request): Promise<Response> {
 
     return json({
       apiKey: revealed.apiKey,
-      customerId: revealed.customerId,
       message: "Copy this key now. It will not be shown again.",
     });
   } catch (e: any) {
@@ -59,18 +81,25 @@ export async function GET(req: Request): Promise<Response> {
 
 async function activateFromCheckoutSession(
   sessionId: string
-): Promise<{ revealToken: string } | null> {
+): Promise<{ revealToken: string; customerId: string } | null> {
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.retrieve(sessionId);
-  if (session.mode !== "subscription") return null;
-  if (session.status !== "complete" && session.payment_status !== "paid") return null;
+  if (!isPaidCheckoutSession(session)) return null;
 
   const customerId = String(session.customer || "");
   const subscriptionId = String(session.subscription || "");
-  const email = String(
-    session.customer_details?.email || session.customer_email || ""
-  ).toLowerCase();
+  const email = checkoutEmail(session);
   if (!customerId || !email) return null;
+
+  // Prefer an active/trialing subscription when Stripe has attached one.
+  if (subscriptionId) {
+    try {
+      const sub = await stripe.subscriptions.retrieve(subscriptionId);
+      if (!["active", "trialing"].includes(String(sub.status))) return null;
+    } catch {
+      return null;
+    }
+  }
 
   const result = await activateSubscription({
     email,
@@ -84,7 +113,7 @@ async function activateFromCheckoutSession(
   }
 
   await bindCheckoutSessionReveal(sessionId, result.revealToken, result.customerId);
-  return { revealToken: result.revealToken };
+  return { revealToken: result.revealToken, customerId: result.customerId };
 }
 
 function json(body: unknown, status: number): Response {

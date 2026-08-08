@@ -3,7 +3,12 @@
  */
 import { getBillingConfig } from "../lib/config";
 import { getStripe } from "../lib/stripe";
-import { activateSubscription, deactivateSubscription } from "../lib/access";
+import {
+  activateSubscription,
+  bindCheckoutSessionReveal,
+  deactivateSubscription,
+} from "../lib/access";
+import { checkoutEmail, isPaidCheckoutSession } from "../lib/payments";
 
 export const config = {
   api: { bodyParser: false },
@@ -12,6 +17,23 @@ export const config = {
 async function readRawBody(req: Request): Promise<Buffer> {
   const ab = await req.arrayBuffer();
   return Buffer.from(ab);
+}
+
+async function activateFromPaidSession(session: any): Promise<void> {
+  if (!isPaidCheckoutSession(session)) return;
+
+  const customerId = String(session.customer || "");
+  const subscriptionId = String(session.subscription || "");
+  const email = checkoutEmail(session);
+  if (!customerId || !email) return;
+
+  const result = await activateSubscription({
+    email,
+    stripeCustomerId: customerId,
+    stripeSubscriptionId: subscriptionId,
+  });
+
+  await bindCheckoutSessionReveal(session.id, result.revealToken, result.customerId);
 }
 
 export async function POST(req: Request): Promise<Response> {
@@ -32,22 +54,15 @@ export async function POST(req: Request): Promise<Response> {
 
   try {
     switch (event.type) {
-      case "checkout.session.completed": {
+      case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded": {
+        await activateFromPaidSession(event.data.object);
+        break;
+      }
+      case "checkout.session.async_payment_failed": {
         const session = event.data.object as any;
-        if (session.mode !== "subscription") break;
         const customerId = String(session.customer || "");
-        const subscriptionId = String(session.subscription || "");
-        const email = String(session.customer_details?.email || session.customer_email || "").toLowerCase();
-        if (!customerId || !email) break;
-
-        const result = await activateSubscription({
-          email,
-          stripeCustomerId: customerId,
-          stripeSubscriptionId: subscriptionId,
-        });
-
-        const { bindCheckoutSessionReveal } = await import("../lib/access");
-        await bindCheckoutSessionReveal(session.id, result.revealToken, result.customerId);
+        if (customerId) await deactivateSubscription(customerId);
         break;
       }
       case "customer.subscription.deleted":
