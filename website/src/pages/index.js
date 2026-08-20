@@ -33,85 +33,101 @@ export default function Home() {
           }
         `}</style>
 
-        {/* Compact left-rail MCP CTA (stacks above content on mobile) */}
-        <aside
-          className="aaf-home-mcp"
-          style={{
-            padding: '0.9rem 1rem',
-            borderRadius: 8,
-            border: '1px solid var(--ifm-color-emphasis-200)',
-            background: 'var(--ifm-color-emphasis-100)',
-          }}
-        >
-          <p
+        {/* Compact left-rail: MCP CTA + Product Hunt (stacks above content on mobile) */}
+        <div className="aaf-home-mcp" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+          <aside
             style={{
-              fontSize: '0.7rem',
-              fontWeight: 700,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: 'var(--ifm-color-primary)',
-              marginBottom: '0.4rem',
+              padding: '0.9rem 1rem',
+              borderRadius: 8,
+              border: '1px solid var(--ifm-color-emphasis-200)',
+              background: 'var(--ifm-color-emphasis-100)',
             }}
           >
-            Hosted MCP
-          </p>
-          <p
-            style={{
-              fontSize: '1.05rem',
-              fontWeight: 650,
-              lineHeight: 1.3,
-              color: 'var(--ifm-heading-color)',
-              marginBottom: '0.45rem',
-            }}
-          >
-            Build better agents with our MCP
-          </p>
-          <p
-            style={{
-              fontSize: '0.88rem',
-              lineHeight: 1.45,
-              color: 'var(--ifm-font-color-base)',
-              marginBottom: '0.75rem',
-            }}
-          >
-            Let your agent build against a constant standard — not inconsistent design approaches.
-          </p>
+            <p
+              style={{
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: 'var(--ifm-color-primary)',
+                marginBottom: '0.4rem',
+              }}
+            >
+              Hosted MCP
+            </p>
+            <p
+              style={{
+                fontSize: '1.05rem',
+                fontWeight: 650,
+                lineHeight: 1.3,
+                color: 'var(--ifm-heading-color)',
+                marginBottom: '0.45rem',
+              }}
+            >
+              Build better agents with our MCP
+            </p>
+            <p
+              style={{
+                fontSize: '0.88rem',
+                lineHeight: 1.45,
+                color: 'var(--ifm-font-color-base)',
+                marginBottom: '0.75rem',
+              }}
+            >
+              Let your agent build against a constant standard — not inconsistent design approaches.
+            </p>
+
+            <a
+              href="/api/stripe/checkout"
+              className="button button--sm"
+              style={{
+                textDecoration: 'none',
+                display: 'block',
+                textAlign: 'center',
+                marginBottom: '0.55rem',
+                background: '#22a05a',
+                borderColor: '#22a05a',
+                color: '#fff',
+              }}
+            >
+              Get access — £3/mo
+            </a>
+            <p
+              style={{
+                fontSize: '0.8rem',
+                lineHeight: 1.4,
+                color: 'var(--ifm-font-color-secondary)',
+                marginBottom: '0.45rem',
+              }}
+            >
+              <strong style={{ color: 'var(--ifm-font-color-base)' }}>1,000 tool calls / mo</strong>
+              {' '}· hard cap · no overage
+            </p>
+            <p style={{ fontSize: '0.75rem', lineHeight: 1.4, color: 'var(--ifm-font-color-secondary)', marginBottom: '0.55rem' }}>
+              Helps fund hosting and ongoing framework updates.
+            </p>
+            <p style={{ fontSize: '0.72rem', lineHeight: 1.4, color: 'var(--ifm-font-color-secondary)', marginBottom: 0 }}>
+              <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a>
+              <br />
+              <a href="/manage-access">Manage access</a>
+            </p>
+          </aside>
 
           <a
-            href="/api/stripe/checkout"
-            className="button button--sm"
-            style={{
-              textDecoration: 'none',
-              display: 'block',
-              textAlign: 'center',
-              marginBottom: '0.55rem',
-              background: '#22a05a',
-              borderColor: '#22a05a',
-              color: '#fff',
-            }}
+            href="https://www.producthunt.com/products/agentic-architecture-framework?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-agentic-architecture-framework"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'block', lineHeight: 0 }}
           >
-            Get access — £3/mo
+            <img
+              alt="Agentic Architecture Framework - Vendor Agnostic Opensource Architecture Framework | Product Hunt"
+              width={250}
+              height={54}
+              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1183799&theme=light&t=1787212626977"
+              style={{ width: '100%', maxWidth: 250, height: 'auto' }}
+            />
           </a>
-          <p
-            style={{
-              fontSize: '0.8rem',
-              lineHeight: 1.4,
-              color: 'var(--ifm-font-color-secondary)',
-              marginBottom: '0.45rem',
-            }}
-          >
-            <strong style={{ color: 'var(--ifm-font-color-base)' }}>1,000 tool calls / mo</strong>
-            {' '}· hard cap · no overage
-          </p>
-          <p style={{ fontSize: '0.75rem', lineHeight: 1.4, color: 'var(--ifm-font-color-secondary)', marginBottom: '0.55rem' }}>
-            Helps fund hosting and ongoing framework updates.
-          </p>
-          <p style={{ fontSize: '0.72rem', lineHeight: 1.4, color: 'var(--ifm-font-color-secondary)', marginBottom: 0 }}>
-            <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a>
-            <br />
-            <a href="/manage-access">Manage access</a>
-          </p>
-        </aside>
+        </div>
 
         <div>
           <div style={{ marginBottom: '1.25rem' }}>
