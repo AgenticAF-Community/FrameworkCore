@@ -480,8 +480,8 @@ export function parseAccAnswers(accYaml: string): Map<string, string> {
 }
 
 /**
- * Gap analysis: only high when ACC committed (yes/partial) and posture not_found.
- * Explicit no → omit (consistent). Unanswered → medium.
+ * Gap analysis: high when ACC committed (yes/partial) and posture is not_found
+ * or asserted (documented only). Explicit no → omit (consistent). Unanswered → medium.
  */
 export function reviewAgainstACC(accYaml: string, reportInput: any): any {
   const report = normalizePostureReport(reportInput);

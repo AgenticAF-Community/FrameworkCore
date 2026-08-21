@@ -19,7 +19,7 @@
  * orphans its heuristic. tools/tests/posture.test.js fails on that drift.
  */
 import { PILLARS } from "./pillars.js";
-import { partitionByClass } from "./classify.js";
+import { partitionByClass, classifyFile, EVIDENCE_CLASSES, DOCS } from "./classify.js";
 import { SIGNALS, PATH_SIGNALS } from "./signals.js";
 
 const MAX_SNIPPET = 120;
@@ -68,16 +68,29 @@ function formatEvidence(match, note) {
   return note ? `${note} ${body}` : body;
 }
 
+function signalsFor(signalKey, opts = {}) {
+  const keys = [signalKey, ...[].concat(opts.also || [])];
+  const list = [];
+  for (const key of keys) {
+    if (!SIGNALS[key]) throw new Error(`Unknown signal key: ${key}`);
+    list.push(...SIGNALS[key]);
+  }
+  return list;
+}
+
 /**
  * Resolve a question against code first, then documentation.
  *
- * @param {object} ctx - { evidence, docs, paths }
+ * Path matches use the same classification as file contents: only code and
+ * config paths can evidence a control. A markdown CHANGELOG is a claim, not
+ * a versioned release process.
+ *
+ * @param {object} ctx - { evidence, docs, evidencePaths, docPaths }
  * @param {string} signalKey - Key into SIGNALS.
- * @param {object} [opts] - { pathKey, negative }
+ * @param {object} [opts] - { pathKey, negative, also }
  */
 function resolve(ctx, signalKey, opts = {}) {
-  const signals = SIGNALS[signalKey];
-  if (!signals) throw new Error(`Unknown signal key: ${signalKey}`);
+  const signals = signalsFor(signalKey, opts);
 
   // A negative signal contradicts the control outright, so it wins.
   if (opts.negative) {
@@ -93,8 +106,12 @@ function resolve(ctx, signalKey, opts = {}) {
   const pathKey = opts.pathKey ?? signalKey;
   const pathPatterns = PATH_SIGNALS[pathKey];
   if (pathPatterns) {
-    const hit = ctx.paths.find((p) => pathPatterns.some((re) => re.test(p)));
-    if (hit) return { status: "found", evidence: `${hit} — path match` };
+    const codeHit = ctx.evidencePaths.find((p) => pathPatterns.some((re) => re.test(p)));
+    if (codeHit) return { status: "found", evidence: `${codeHit} — path match` };
+    const docHit = ctx.docPaths.find((p) => pathPatterns.some((re) => re.test(p)));
+    if (docHit) {
+      return { status: "asserted", evidence: `documented only — ${docHit} — path match` };
+    }
   }
 
   const inDocs = firstMatch(ctx.docs, signals);
@@ -119,7 +136,7 @@ const HEURISTICS = {
     // A wildcard grant contradicts least privilege, so it is checked first.
     "Are tool scopes least privilege?": ["leastPrivilege", { negative: "broadPermission" }],
     "Are write actions gated and verified?": ["writeGate"],
-    "Are untrusted inputs (including retrieved content) treated as hostile?": ["untrustedInput"],
+    "Are untrusted inputs (including retrieved content) treated as hostile?": ["untrustedInput", { also: "injectionMitigation" }],
   },
 
   reliability: {
@@ -182,7 +199,9 @@ export function runChecks(scanResult) {
   const { paths, content } = scanResult;
   const entries = [...content.entries()];
   const { evidence, docs } = partitionByClass(entries);
-  const ctx = { evidence, docs, paths };
+  const evidencePaths = paths.filter((p) => EVIDENCE_CLASSES.has(classifyFile(p)));
+  const docPaths = paths.filter((p) => classifyFile(p) === DOCS);
+  const ctx = { evidence, docs, evidencePaths, docPaths };
 
   const report = {};
   for (const pillar of PILLARS) {

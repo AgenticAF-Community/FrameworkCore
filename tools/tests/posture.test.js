@@ -76,6 +76,9 @@ describe("posture heuristic registry", () => {
         if (opts?.pathKey) {
           assert.ok(PATH_SIGNALS[opts.pathKey], `"${q}" references unknown path key "${opts.pathKey}"`);
         }
+        for (const extra of [].concat(opts?.also || [])) {
+          assert.ok(SIGNALS[extra], `"${q}" references unknown additional signal "${extra}"`);
+        }
       }
     }
   });
@@ -188,6 +191,13 @@ Provenance is tracked. Autonomy level is delegated. Escalation is defined.
     const counts = tally(report);
     assert.equal(counts.found, 0, `Expected no evidenced controls, got ${counts.found}`);
   });
+
+  it("does not treat a documentation path as evidence", () => {
+    const report = check({ "CHANGELOG.md": "## 1.0.0\n" });
+    const versioning = question(report, "operational-excellence", "Are skills/tools versioned");
+    assert.notEqual(versioning.status, "found", "CHANGELOG.md is documentation, not a versioning process");
+    assert.equal(versioning.status, "asserted");
+  });
 });
 
 // ─── Negative signals ──────────────────────────────────────────────────────
@@ -229,6 +239,13 @@ describe("posture detects genuine controls", () => {
     assert.equal(question(report, "operational-excellence", "evaluation harness").status, "found");
     assert.equal(question(report, "operational-excellence", "control loop observable").status, "found");
     assert.equal(question(report, "context-optimization", "context separated from memory").status, "found");
+  });
+
+  it("treats system-role separation as untrusted-input evidence", () => {
+    const report = check({
+      "src/prompt.js": "const messages = [{ role: 'system', content: policy }];\n",
+    });
+    assert.equal(question(report, "security", "untrusted inputs").status, "found");
   });
 
   it("returns one of the four known statuses for every question", () => {
