@@ -21,12 +21,15 @@
     "sync:from-docs": "node tools/scripts/sync-from-docs.js",
     "install:docs-sync-hook": "node tools/scripts/install-docs-sync-hook.js",
     "test": "node --test tools/tests/*.test.js",
+    "test:unit": "node --test tools/tests/billing-security.test.js tools/tests/engine.test.js tools/tests/extraction.test.js tools/tests/foundation.test.js tools/tests/mcp-integrity.test.js tools/tests/mcp-tools.test.js tools/tests/security.test.js",
+    "test:integration": "node --test tools/tests/magic-link.test.js tools/tests/mcp-auth.test.js tools/tests/stripe-webhook.test.js",
     "test:foundation": "node --test tools/tests/foundation.test.js",
     "test:mcp-content": "npx tsx tools/tests/run-aaf-mcp-content.ts",
     "test:mcp-integrity": "npx tsx tools/tests/run-mcp-integrity.ts",
     "aaf": "node tools/cli.js"
   },
   "devDependencies": {
-    "md-to-pdf": "^5.2.5"
+    "md-to-pdf": "^5.2.5",
+    "tsx": "^4.19.2"
   }
 }

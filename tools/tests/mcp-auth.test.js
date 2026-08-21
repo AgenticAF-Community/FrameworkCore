@@ -8,6 +8,9 @@ const { describe, it, before, after } = require("node:test");
 const assert = require("node:assert/strict");
 const { createHmac, randomBytes } = require("crypto");
 const { Redis } = require("@upstash/redis");
+const { skipWithoutEnv } = require("./helpers/env.js");
+
+const REQUIRED_ENV = ["KV_REST_API_URL", "KV_REST_API_TOKEN", "AUTH_SECRET"];
 
 function requireEnv(name) {
   const v = process.env[name];
@@ -65,7 +68,7 @@ async function authenticateMcpRequest(req, redis) {
   return { ok: true, customerId, callsUsed: nextUsed };
 }
 
-describe("mcp-auth", () => {
+describe("mcp-auth", skipWithoutEnv(REQUIRED_ENV), () => {
   /** @type {import('@upstash/redis').Redis} */
   let redis;
   let customerId;

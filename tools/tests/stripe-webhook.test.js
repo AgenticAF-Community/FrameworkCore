@@ -11,6 +11,17 @@ const { Redis } = require("@upstash/redis");
 const Stripe = require("stripe");
 const fs = require("fs");
 const path = require("path");
+const { skipWithoutEnv } = require("./helpers/env.js");
+
+const REQUIRED_ENV = [
+  "STRIPE_SECRET_KEY",
+  "STRIPE_PRICE_ID",
+  "STRIPE_WEBHOOK_SECRET",
+  "KV_REST_API_URL",
+  "KV_REST_API_TOKEN",
+  "AUTH_SECRET",
+  "APP_BASE_URL",
+];
 
 function requireEnv(name) {
   const v = process.env[name];
@@ -72,7 +83,7 @@ async function consumeReveal(redis, token) {
   return data;
 }
 
-describe("stripe-webhook + checkout", () => {
+describe("stripe-webhook + checkout", skipWithoutEnv(REQUIRED_ENV), () => {
   const cleanup = [];
   let redis;
   let stripe;
@@ -156,12 +167,26 @@ describe("stripe-webhook + checkout", () => {
     assert.equal(event.type, "checkout.session.completed");
   });
 
-  it("home and tools pages include Get MCP Access CTA", () => {
-    const index = fs.readFileSync(path.join(__dirname, "../../website/src/pages/index.js"), "utf8");
-    const tools = fs.readFileSync(path.join(__dirname, "../../website/src/pages/tools.js"), "utf8");
-    assert.match(index, /Get MCP Access/);
-    assert.match(tools, /Get MCP Access/);
-    assert.match(tools, /Manage access/);
-    assert.ok(fs.existsSync(path.join(__dirname, "../../website/src/pages/access/success.js")));
+});
+
+// Page wiring needs no credentials, so it runs everywhere.
+//
+// This asserts the links, not the button labels. Marketing copy changes often:
+// the homepage button has already moved from "Get MCP Access" to
+// "Get access — £3/mo". The contract that must hold is that both pages can
+// still reach checkout and manage-access, and that the success page exists.
+describe("MCP access page wiring", () => {
+  const PAGES = path.join(__dirname, "../../website/src/pages");
+
+  it("home and tools pages link to checkout and manage-access", () => {
+    for (const page of ["index.js", "tools.js"]) {
+      const source = fs.readFileSync(path.join(PAGES, page), "utf8");
+      assert.match(source, /["']\/api\/stripe\/checkout["']/, `${page} should link to checkout`);
+      assert.match(source, /["']\/manage-access["']/, `${page} should link to manage-access`);
+    }
+  });
+
+  it("post-purchase reveal page exists", () => {
+    assert.ok(fs.existsSync(path.join(PAGES, "access/success.js")));
   });
 });

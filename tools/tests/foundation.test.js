@@ -18,15 +18,37 @@ const MANIFEST_PATH = path.join(REPO_ROOT, "tools", "skills", "manifest.json");
 
 describe("MCP skill IDs", () => {
   const mcpSource = fs.readFileSync(path.join(REPO_ROOT, "api", "mcp.ts"), "utf8");
+  // VALID_SKILL_IDS lives in api/lib/aaf-mcp-content.ts; api/mcp.ts imports it.
+  const contentSource = fs.readFileSync(
+    path.join(REPO_ROOT, "api", "lib", "aaf-mcp-content.ts"),
+    "utf8"
+  );
+
+  /** Parse the VALID_SKILL_IDS array rather than substring-matching the file. */
+  function declaredSkillIds() {
+    const block = contentSource.match(/export const VALID_SKILL_IDS\s*=\s*\[([\s\S]*?)\]/);
+    assert.ok(block, "Could not find VALID_SKILL_IDS in api/lib/aaf-mcp-content.ts");
+    return [...block[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+  }
 
   it("VALID_SKILL_IDS should include every skill directory", () => {
     const skillDirs = fs.readdirSync(SKILLS_DIR).filter((d) =>
       fs.existsSync(path.join(SKILLS_DIR, d, "SKILL.md"))
     );
+    const declared = declaredSkillIds();
     for (const id of skillDirs) {
       assert.ok(
-        mcpSource.includes(`"${id}"`),
-        `Skill "${id}" is missing from VALID_SKILL_IDS in api/mcp.ts`
+        declared.includes(id),
+        `Skill "${id}" is missing from VALID_SKILL_IDS in api/lib/aaf-mcp-content.ts`
+      );
+    }
+  });
+
+  it("VALID_SKILL_IDS should not list a skill that has no directory", () => {
+    for (const id of declaredSkillIds()) {
+      assert.ok(
+        fs.existsSync(path.join(SKILLS_DIR, id, "SKILL.md")),
+        `VALID_SKILL_IDS lists "${id}", but tools/skills/${id}/SKILL.md does not exist`
       );
     }
   });

@@ -54,6 +54,42 @@ When in doubt, framework text lives in `docs/`; the website reflects it.
 
 ---
 
+## Running the tests
+
+Install once, then run the suite:
+
+```bash
+npm install
+npm test
+```
+
+`npm test` must pass on a fresh clone, with no credentials. CI runs it on every
+pull request, on Node 20 and Node 22, and also builds the website.
+
+| Command | What it runs |
+|---------|--------------|
+| `npm test` | Everything. Integration suites skip themselves if credentials are absent. |
+| `npm run test:unit` | Only the suites that never need credentials. |
+| `npm run test:integration` | Only the suites that call live Stripe, Upstash KV, and Resend. |
+
+Three suites talk to live services: `magic-link`, `mcp-auth`, and
+`stripe-webhook`. Without credentials they report `# SKIP` and name the
+variables they need. This keeps a missing secret from looking like a broken
+change. Maintainers who hold the credentials copy `.env.example` to `.env` and
+fill it in; the suites then run for real.
+
+**Caution:** the Stripe suite creates real Checkout Sessions when
+`STRIPE_SECRET_KEY` is a live key. It never completes a payment, but use test
+keys unless you intend otherwise.
+
+To build the website locally:
+
+```bash
+cd website && npm ci && npm run build
+```
+
+---
+
 ## Document structure
 
 The whitepaper lives in `docs/` with one file per major section:

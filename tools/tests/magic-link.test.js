@@ -11,6 +11,15 @@ const { Redis } = require("@upstash/redis");
 const { Resend } = require("resend");
 const fs = require("fs");
 const path = require("path");
+const { skipWithoutEnv } = require("./helpers/env.js");
+
+const REQUIRED_ENV = [
+  "KV_REST_API_URL",
+  "KV_REST_API_TOKEN",
+  "AUTH_SECRET",
+  "RESEND_API_KEY",
+  "RESEND_FROM_EMAIL",
+];
 
 function requireEnv(name) {
   const v = process.env[name];
@@ -30,7 +39,7 @@ function generateToken(n = 32) {
   return randomBytes(n).toString("base64url");
 }
 
-describe("magic-link", () => {
+describe("magic-link", skipWithoutEnv(REQUIRED_ENV), () => {
   const cleanup = [];
   let redis;
   let customerId;
