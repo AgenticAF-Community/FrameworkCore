@@ -136,9 +136,13 @@ for (const pillar of PILLARS) {
   const postureItems = postureReport[pillar.id] || [];
 
   for (const item of postureItems) {
-    if (item.status === "not_found") {
+    // "asserted" means documentation claims the control but no code evidences
+    // it. That is still a gap against an ACC commitment — a claim repeated in
+    // a README is not an implementation.
+    if (item.status === "not_found" || item.status === "asserted") {
       const accEntry = accQuestions.find((q) => q.question === item.question);
       const wasPromised = accEntry && ["yes", "partial"].includes(accEntry.answer);
+      const documentedOnly = item.status === "asserted";
       gaps.push({
         pillarId: pillar.id,
         pillarName: pillar.name,
@@ -147,8 +151,10 @@ for (const pillar of PILLARS) {
         postureStatus: item.status,
         severity: wasPromised ? "high" : "medium",
         detail: wasPromised
-          ? `Declared "${accEntry.answer}" in ACC but not detected in codebase`
-          : "Not detected in codebase",
+          ? `Declared "${accEntry.answer}" in ACC but ${documentedOnly ? "only described in documentation, not evidenced in code" : "not detected in codebase"}`
+          : documentedOnly
+            ? "Described in documentation but not evidenced in code"
+            : "Not detected in codebase",
       });
     }
   }

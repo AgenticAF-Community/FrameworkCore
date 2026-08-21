@@ -491,7 +491,10 @@ export function reviewAgainstACC(accYaml: string, reportInput: any): any {
   for (const [pillarId, pillarResults] of Object.entries(report)) {
     if (!Array.isArray(pillarResults)) continue;
     for (const result of pillarResults) {
-      if (result.status !== "not_found") continue;
+      // "asserted" means the posture scan matched documentation only. The
+      // control is claimed, not evidenced, so it is still a gap.
+      if (result.status !== "not_found" && result.status !== "asserted") continue;
+      const documentedOnly = result.status === "asserted";
       const question = result.question;
       const answer = answers.get(question);
       if (answer === "no") {
@@ -503,7 +506,9 @@ export function reviewAgainstACC(accYaml: string, reportInput: any): any {
           question,
           accAnswer: answer,
           severity: "high",
-          detail: "ACC committed to this control (yes/partial) but posture found no evidence in the codebase",
+          detail: documentedOnly
+            ? "ACC committed to this control (yes/partial) and documentation describes it, but posture found no evidence in code or config"
+            : "ACC committed to this control (yes/partial) but posture found no evidence in the codebase",
         });
         continue;
       }

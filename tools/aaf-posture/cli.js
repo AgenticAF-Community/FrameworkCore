@@ -56,16 +56,30 @@ if (format === "json") {
   fs.writeFileSync(outFile, html, "utf8");
   console.log("Report written to", outFile);
 } else {
+  const counts = { found: 0, asserted: 0, not_found: 0, unclear: 0 };
+  for (const pillar of PILLARS) {
+    for (const item of report[pillar.id]) counts[item.status] = (counts[item.status] ?? 0) + 1;
+  }
+
   let md = `# AAF Posture Report\n\n**Path:** \`${root}\`  \n**Files scanned:** ${scanResult.paths.length}\n\n`;
-  md += "> Findings are heuristic (code/config patterns). Manual review is required for production readiness.\n\n";
+  md += `**${counts.found} evidenced · ${counts.asserted} documented only · ${counts.not_found} no signal`;
+  md += counts.unclear ? ` · ${counts.unclear} unclear**\n\n` : "**\n\n";
+  md += "> Findings are heuristic (code/config patterns). Manual review is required for production readiness.\n";
+  md += "> `✓` evidenced in code or config. `◐` claimed in documentation but not evidenced — verify it. `○` no signal.\n\n";
   for (const pillar of PILLARS) {
     md += `## ${pillar.name}\n\n`;
     for (const item of report[pillar.id]) {
-      const badge = item.status === "found" ? "✓" : item.status === "not_found" ? "○" : "?";
+      const badge =
+        item.status === "found" ? "✓" : item.status === "asserted" ? "◐" : item.status === "not_found" ? "○" : "?";
       md += `- ${badge} ${item.question}\n`;
       if (item.evidence) md += `  - *${item.status}*: ${item.evidence}\n`;
     }
     md += "\n";
+  }
+  if (counts.asserted > 0) {
+    md += `> ${counts.asserted} control${counts.asserted === 1 ? " is" : "s are"} described in documentation `;
+    md += "but not evidenced in code or config. Documentation states intent; it does not prove behaviour. ";
+    md += "Confirm each one before treating it as in place.\n\n";
   }
   if (outputPath) {
     fs.writeFileSync(outputPath, md, "utf8");
