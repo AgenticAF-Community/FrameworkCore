@@ -121,7 +121,7 @@ describe("checks.js runChecks output", async () => {
     for (const pillar of PILLARS) {
       for (const result of report[pillar.id]) {
         assert.ok(result.question, "Missing question field");
-        assert.ok(["found", "not_found", "unclear"].includes(result.status), `Invalid status: ${result.status}`);
+        assert.ok(["found", "asserted", "not_found", "unclear"].includes(result.status), `Invalid status: ${result.status}`);
       }
     }
   });

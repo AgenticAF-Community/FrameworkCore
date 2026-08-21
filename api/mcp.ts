@@ -406,7 +406,7 @@ const baseHandler = createMcpHandler(
     server.registerTool("aaf_review_against_acc", {
       title: "AAF Review Against ACC",
       description:
-        "Gap analysis between an ACC YAML and a posture report. High severity only when ACC answer is yes/partial and posture is not_found. Explicit ACC no is omitted (consistent). Unanswered ACC items are medium. Accepts raw CLI JSON or flat pillar→items map.",
+        "Gap analysis between an ACC YAML and a posture report. High severity when ACC answer is yes/partial and posture is not_found or asserted (documented only, not evidenced in code or config). Explicit ACC no is omitted (consistent). Unanswered ACC items are medium. Accepts raw CLI JSON or flat pillar→items map.",
       inputSchema: {
         accYaml: z.string().describe("The Agent Control Contract as a YAML string"),
         report: z.any().describe("CLI JSON from aaf-posture --format json, or flat pillar→items map"),

@@ -36,8 +36,9 @@ function escapeHtml(s) {
 }
 
 function statusBadge(status) {
-  if (status === "found") return '<span class="badge badge--found">Found</span>';
-  if (status === "not_found") return '<span class="badge badge--not-found">Not found</span>';
+  if (status === "found") return '<span class="badge badge--found">Evidenced</span>';
+  if (status === "asserted") return '<span class="badge badge--asserted">Documented only</span>';
+  if (status === "not_found") return '<span class="badge badge--not-found">No signal</span>';
   return '<span class="badge badge--unclear">Unclear</span>';
 }
 
@@ -46,11 +47,19 @@ function actionHint(status, pillarId) {
   const doc = PILLAR_DOC[pillarId] || "docs/";
   const action = status === "not_found"
     ? `Add or implement this check. See ${doc}`
-    : "Confirm manually; heuristic had no signal.";
+    : status === "asserted"
+      ? `Documentation claims this control, but no code or config evidences it. Verify it exists, or implement it. See ${doc}`
+      : "Confirm manually; heuristic had no signal.";
   return `<div class="action-hint"><strong>Action:</strong> ${escapeHtml(action)}</div>`;
 }
 
-/** Score weight: found=1, unclear=0.5, not_found=0. Returns 0–100. */
+/**
+ * Score weight: found=1, unclear=0.5, asserted=0, not_found=0. Returns 0–100.
+ *
+ * `asserted` scores zero on purpose. A control described in documentation but
+ * absent from code is not in place; counting it would restate the claim as a
+ * result. It is surfaced separately so the reader knows what to verify.
+ */
 function pillarScore(items) {
   if (!items.length) return 0;
   let sum = 0;
@@ -79,7 +88,7 @@ export function buildHtmlReport(opts) {
   const date = new Date().toISOString().slice(0, 10);
   const time = new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 
-  let nFound = 0, nNotFound = 0, nUnclear = 0;
+  let nFound = 0, nNotFound = 0, nUnclear = 0, nAsserted = 0;
   const pillarScores = [];
   for (const pillar of PILLARS) {
     const items = report[pillar.id] || [];
@@ -87,11 +96,12 @@ export function buildHtmlReport(opts) {
     pillarScores.push({ id: pillar.id, name: pillar.name, score: sc, total: items.length, isCross: pillar.name.includes("cross-cutting") });
     for (const item of items) {
       if (item.status === "found") nFound++;
+      else if (item.status === "asserted") nAsserted++;
       else if (item.status === "not_found") nNotFound++;
       else nUnclear++;
     }
   }
-  const totalChecks = nFound + nNotFound + nUnclear;
+  const totalChecks = nFound + nAsserted + nNotFound + nUnclear;
   const overallScore = totalChecks ? Math.round(((nFound + 0.5 * nUnclear) / totalChecks) * 100) : 0;
   const gradeInfo = grade(overallScore);
 
@@ -180,6 +190,7 @@ export function buildHtmlReport(opts) {
       font-size: 0.8rem;
     }
     .summary span { color: var(--aaf-iron); }
+    .summary .asserted .n { color: #8a4b08; }
     .summary .n { font-weight: 600; color: var(--aaf-black); }
     .summary .found .n { color: #0d6832; }
     .summary .not-found .n { color: #721c24; }
@@ -290,6 +301,7 @@ export function buildHtmlReport(opts) {
       font-weight: 600;
     }
     .badge--found { background: #d4edda; color: #155724; }
+    .badge--asserted { background: #ffe8cc; color: #8a4b08; }
     .badge--not-found { background: #f8d7da; color: #721c24; }
     .badge--unclear { background: #fff3cd; color: #856404; }
     .evidence {
@@ -332,10 +344,11 @@ export function buildHtmlReport(opts) {
     <span class="header-meta">${escapeHtml(rootPath)} · ${scannedFiles} files · ${date} ${time}</span>
   </header>
   <div class="summary">
-    <span class="found"><span class="n">${nFound}</span> found</span>
-    <span class="not-found"><span class="n">${nNotFound}</span> not found</span>
+    <span class="found"><span class="n">${nFound}</span> evidenced</span>
+    <span class="asserted"><span class="n">${nAsserted}</span> documented only</span>
+    <span class="not-found"><span class="n">${nNotFound}</span> no signal</span>
     <span class="unclear"><span class="n">${nUnclear}</span> unclear</span>
-    <span>→ <strong>Focus on not found / unclear to action</strong></span>
+    <span>→ <strong>${nAsserted ? "Verify the documented-only claims first" : "Focus on no signal / unclear to action"}</strong></span>
   </div>
   <div class="scorecard">
     <div class="score-overall">
