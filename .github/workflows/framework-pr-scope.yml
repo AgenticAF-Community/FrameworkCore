@@ -1,0 +1,90 @@
+name: Framework PR scope
+
+# Runs from main (pull_request_target). Lists PR files via the API only —
+# never checks out or executes the PR branch.
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  close-out-of-scope:
+    name: Close non-framework PRs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close PRs that touch paths outside docs/
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = pr.number;
+            const login = pr.user.login;
+            const association = pr.author_association;
+            const OUT_OF_SCOPE = 'out-of-scope';
+            const MAINTAINER_CONSIDER = 'maintainer-consider';
+
+            function isFrameworkPath(filename) {
+              return filename === 'docs' || filename.startsWith('docs/');
+            }
+
+            const labels = (pr.labels || []).map((l) => l.name);
+            if (labels.includes(MAINTAINER_CONSIDER)) {
+              core.info(`Skipping #${pull_number}: labeled ${MAINTAINER_CONSIDER}`);
+              return;
+            }
+
+            const maintainer = ['OWNER', 'MEMBER', 'COLLABORATOR'].includes(association);
+            const bot = login.endsWith('[bot]') || login === 'github-actions[bot]';
+            if (maintainer || bot) {
+              core.info(`Skipping #${pull_number}: ${login} (${association})`);
+              return;
+            }
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number,
+              per_page: 100,
+            });
+            const outside = files
+              .map((f) => f.filename)
+              .filter((name) => !isFrameworkPath(name));
+
+            if (outside.length === 0) {
+              core.info(`#${pull_number} is docs-only`);
+              return;
+            }
+
+            core.info(`#${pull_number} touches non-framework paths: ${outside.join(', ')}`);
+
+            try {
+              await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: OUT_OF_SCOPE,
+                color: 'c5c5c5',
+                description: 'Touches paths outside docs/; closed for maintainer review',
+              });
+            } catch (err) {
+              if (err.status !== 422) throw err;
+            }
+
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: pull_number,
+              labels: [OUT_OF_SCOPE],
+            });
+
+            await github.rest.issues.update({
+              owner,
+              repo,
+              issue_number: pull_number,
+              state: 'closed',
+              state_reason: 'not_planned',
+            });

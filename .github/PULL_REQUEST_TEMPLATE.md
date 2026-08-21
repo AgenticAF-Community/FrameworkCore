@@ -8,6 +8,7 @@
 
 ## Checklist
 
+- [ ] This PR changes only files under `docs/` (whitepaper and assets)
 - [ ] Changes align with the framework's scope (architecture discipline for agentic systems)
 - [ ] Citations/sources preserved where relevant
 - [ ] No sensitive or proprietary content added

@@ -17,7 +17,7 @@ Deliver community-driven, vendor-agnostic architecture guidance for the agentic 
 ## How to contribute
 
 - **Join the discussion** — every page on this site has a comment thread. Challenge assumptions, share patterns, flag gaps.
-- **Open issues and PRs** — propose changes directly in the [GitHub repo](https://github.com/AgenticAF-Community/FrameworkCore). All contributions are reviewed by the community.
+- **Open issues and PRs** — propose changes to the framework text in `docs/` in the [GitHub repo](https://github.com/AgenticAF-Community/FrameworkCore). Community PRs are reviewed by a maintainer; PRs outside the whitepaper are closed.
 - **Join the working group** — apply at [agenticaf.io/working-group](/working-group) to become a maintainer. See the Terms of Reference and current members.
 - **Spread the word** — tell your colleagues, and tell your agents. The framework is available via the [AAF MCP server](/tools) so your AI tools can reference it natively.
 - **Submit a case study** — built something that validates (or challenges) the framework? Submit it via the [case study template](https://github.com/AgenticAF-Community/FrameworkCore/issues/new?template=case-study-submission.yml) and it may be included as a section-aligned case study in the framework.

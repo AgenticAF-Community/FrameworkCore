@@ -18,11 +18,13 @@ The whitepaper is split into sections in `docs/` for easier contribution and nav
 
 ## Contributing
 
-We welcome feedback and contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to:
+We welcome feedback and contributions to the **framework text** in `docs/`. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to:
 
 - Submit feedback on specific sections (Issues)
-- Propose changes (Pull Requests)
+- Propose whitepaper changes (Pull Requests — `docs/` only)
 - Discuss ideas (GitHub Discussions)
+
+PRs that change hosting, billing, tools, or other non-framework code are closed automatically.
 
 ## License
 

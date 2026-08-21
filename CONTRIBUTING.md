@@ -2,6 +2,19 @@
 
 Thank you for contributing. This guide is for **everyone** (community and working group members). Working group members have write access to the repo; everyone else contributes via fork and pull request.
 
+## Pull requests: framework only
+
+Community PRs must change **only** the framework text:
+
+- **In scope:** `docs/` (the whitepaper) and `docs/assets/` (figures for those sections).
+- **Out of scope:** everything else — including `api/`, `website/`, `tools/`, tests, billing, MCP hosting, and GitHub Actions.
+
+You do not need to run tests, configure `.env`, or touch the site or MCP server. Read a section, propose a change to that markdown, and open a PR.
+
+PRs that include any path outside `docs/` are closed automatically. Maintainers still see them and may take the work; there is no discussion on the PR.
+
+Prefer an [Issue](https://github.com/AgenticAF-Community/FrameworkCore/issues) or [Discussion](https://github.com/AgenticAF-Community/FrameworkCore/discussions) if you are unsure whether a change belongs in the whitepaper.
+
 ---
 
 ## Working group members
@@ -16,7 +29,7 @@ If you’re a **working group member**, you can contribute directly to the repos
 
 2. **Create a branch** for your change (e.g. `docs/update-security-pillar`, `fix-intro-typo`).
 
-3. **Edit** the relevant files (see [Document structure](#document-structure) and [Repo layout](#repo-layout) below).
+3. **Edit** the relevant whitepaper files under `docs/` (see [Document structure](#document-structure)).
 
 4. **Open a Pull Request** against `main`. Use the [PR template](.github/PULL_REQUEST_TEMPLATE.md): which section you changed, rationale, and the checklist. Request review from a maintainer.
 
@@ -36,21 +49,22 @@ If you’re a **working group member**, you can contribute directly to the repos
 - Start a [Discussion](https://github.com/AgenticAF-Community/FrameworkCore/discussions) in Ideas or Q&A. Use Discussions for open-ended questions, RFCs, and proposals.
 
 **Proposed text change?**
-- **Working group:** Branch and open a PR (see above).
-- **Community (no write access):** Fork the repo, make your change on a branch, then open a PR from your fork to `FrameworkCore` `main`. Same PR template and review process.
+- **Working group:** Branch and open a PR against `docs/` (see above).
+- **Community (no write access):** Fork the repo, edit only files under `docs/`, then open a PR from your fork to `FrameworkCore` `main`. Same PR template and review process.
 
 ---
 
 ## Repo layout
 
-| Path | Purpose |
-|------|---------|
-| `docs/` | Whitepaper sections (markdown). Single source of truth for the framework. |
-| `docs/assets/` | Images and graphics for the whitepaper. |
-| `website/` | Docusaurus site (agenticaf.io). Builds from `docs/` and other content. |
-| `tools/` | Skills, MCP server tools, posture CLI, design/build/review CLIs, trade-off engine. See `tools/README.md`. |
+| Path | Community PRs |
+|------|----------------|
+| `docs/` | **Yes.** Whitepaper — single source of truth for the framework. |
+| `docs/assets/` | **Yes.** Images and graphics for the whitepaper. |
+| `website/` | **No.** How the site is published (agenticaf.io). |
+| `tools/` | **No.** Skills, CLIs, and engines that apply the framework. |
+| `api/` | **No.** Hosted MCP, auth, and billing. |
 
-When in doubt, framework text lives in `docs/`; the website reflects it.
+When in doubt, change `docs/` only. The website reflects the whitepaper after a maintainer merge.
 
 ---
 
@@ -80,9 +94,9 @@ Images for the whitepaper go in `docs/assets/`.
 
 ---
 
-## Scope
+## Content scope
 
-Contributions should:
+Framework PRs should:
 
 - Align with the six pillars and two foundations.
 - Maintain the governance-first, epistemic-gate lens.
